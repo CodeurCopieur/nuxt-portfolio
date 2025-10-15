@@ -1,0 +1,959 @@
+/* assets/css/base.css */
+
+/* Tailwind layers */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* -------------------------------------------
+   🎨 Variables CSS modernes
+------------------------------------------- */
+:root {
+  --color-bg: #ffffff;
+  --color-text: #111111;
+  --color-primary: #0ea5e9; /* sky-500 */
+  --color-secondary: #6366f1; /* indigo-500 */
+  --color-accent: #8b5cf6; /* violet-500 */
+  --color-success: #10b981; /* emerald-500 */
+  --color-warning: #f59e0b; /* amber-500 */
+  --color-error: #ef4444; /* red-500 */
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+  --gradient-secondary: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+  --gradient-accent: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark {
+  --color-bg: #0f172a; /* slate-900 */
+  --color-text: #f8fafc; /* slate-50 */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.3);
+}
+
+/* -------------------------------------------
+   🌍 Global styles modernes
+------------------------------------------- */
+html {
+  scroll-behavior: smooth;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+}
+
+body {
+  @apply bg-[var(--color-bg)] text-[var(--color-text)] antialiased leading-relaxed;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+/* -------------------------------------------
+   🔗 Links modernes
+------------------------------------------- */
+a {
+  @apply text-[var(--color-primary)] transition-all duration-300;
+  text-decoration: none;
+}
+
+a:hover {
+  @apply text-sky-700 dark:text-sky-300;
+  transform: translateY(-1px);
+}
+
+/* -------------------------------------------
+   🎯 Boutons modernes
+------------------------------------------- */
+.btn-primary {
+  @apply bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-semibold rounded-xl px-6 py-3 transition-all duration-300 hover:from-sky-600 hover:to-indigo-700 hover:scale-105 hover:shadow-xl;
+}
+
+.btn-secondary {
+  @apply border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-xl px-6 py-3 transition-all duration-300 hover:border-sky-500 hover:text-sky-600 dark:hover:border-sky-400 dark:hover:text-sky-400 hover:scale-105;
+}
+
+/* Amélioration des couleurs de texte au hover pour les boutons */
+button:hover,
+.btn-primary:hover,
+.btn-secondary:hover {
+  color: inherit;
+}
+
+/* Liens dans les boutons - pas de changement de couleur */
+a.btn-primary,
+a.btn-secondary {
+  text-decoration: none;
+}
+
+a.btn-primary:hover,
+a.btn-secondary:hover {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Styles spécifiques pour les boutons avec gradient */
+.bg-gradient-to-r button:hover,
+.bg-gradient-to-r a:hover,
+button.bg-gradient-to-r:hover,
+a.bg-gradient-to-r:hover {
+  color: white !important;
+}
+
+/* Override pour les boutons avec texte blanc */
+.text-white:hover,
+button.text-white:hover,
+a.text-white:hover {
+  color: white !important;
+}
+
+/* Styles pour les boutons secondaires avec bordure */
+.border-2:hover {
+  color: inherit;
+}
+
+/* Protection pour les liens avec bg-clip-text */
+.bg-clip-text:hover,
+a.bg-clip-text:hover,
+.text-transparent:hover,
+a.text-transparent:hover {
+  color: transparent !important;
+  background-clip: text !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* Protection spécifique pour le logo avec bg-clip-text */
+.router-link-active.bg-clip-text:hover,
+.router-link-exact-active.bg-clip-text:hover {
+  color: transparent !important;
+  background-clip: text !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* Protection pour les liens actifs sans bg-clip-text */
+.router-link-active:hover,
+.router-link-exact-active:hover {
+  color: rgb(3 105 161 / var(--tw-text-opacity, 1)) !important;
+}
+
+/* -------------------------------------------
+   🖼️ Images optimisées
+------------------------------------------- */
+img {
+  @apply max-w-full h-auto;
+  transition: transform var(--transition-normal);
+}
+
+img:hover {
+  transform: scale(1.02);
+}
+
+/* -------------------------------------------
+   🎯 Focus moderne (accessibilité)
+------------------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 0.375rem;
+}
+
+/* -------------------------------------------
+   🔄 Animations utilitaires modernes
+------------------------------------------- */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(14, 165, 233, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(14, 165, 233, 0.8), 0 0 30px rgba(14, 165, 233, 0.6);
+  }
+}
+
+/* Classes d'animation */
+.animate-fade-in {
+  animation: fade-in 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) both;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* -------------------------------------------
+   🎭 Transitions de page modernes
+------------------------------------------- */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes page-leave {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.98);
+  }
+}
+
+@keyframes overlay-slide-up {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes overlay-slide-down {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Classes de transition de page */
+.page-enter {
+  animation: page-enter 0.8s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.page-leave {
+  animation: page-leave 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.overlay-slide-up {
+  animation: overlay-slide-up 0.8s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.overlay-slide-down {
+  animation: overlay-slide-down 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* Transitions fluides pour les éléments */
+.page-transition-element {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.page-transition-element:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Animation de chargement */
+@keyframes loading-dots {
+  0%, 20% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-5px);
+  }
+  80%, 100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+}
+
+.loading-dot {
+  animation: loading-dots 1.4s ease-in-out infinite both;
+}
+
+.loading-dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.loading-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* -------------------------------------------
+   🎨 Composants utilitaires
+------------------------------------------- */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass-effect {
+  background: rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gradient-text {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hover-lift {
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+}
+
+/* -------------------------------------------
+   📱 Responsive utilities
+------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* -------------------------------------------
+   🎭 Scrollbar personnalisée
+------------------------------------------- */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--color-primary), var(--color-secondary));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--color-secondary), var(--color-accent));
+}
+
+/* -------------------------------------------
+   🌟 Effets de sélection
+------------------------------------------- */
+::selection {
+  background: var(--color-primary);
+  color: white;
+}
+
+::-moz-selection {
+  background: var(--color-primary);
+  color: white;
+}
+
+/* -------------------------------------------
+   🎯 Scroll sympathique et animations
+------------------------------------------- */
+
+/* Scroll fluide amélioré */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px; /* Pour éviter que le header cache le contenu */
+}
+
+/* Animations au scroll */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Classes d'animation au scroll */
+.scroll-fade-in {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scroll-fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scroll-fade-in-left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scroll-fade-in-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.scroll-fade-in-right {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scroll-fade-in-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.scroll-scale-in {
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scroll-scale-in.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.scroll-slide-up {
+  opacity: 0;
+  transform: translateY(60px);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scroll-slide-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Délais pour les animations en cascade */
+.scroll-delay-100 {
+  transition-delay: 100ms;
+}
+
+.scroll-delay-200 {
+  transition-delay: 200ms;
+}
+
+.scroll-delay-300 {
+  transition-delay: 300ms;
+}
+
+.scroll-delay-400 {
+  transition-delay: 400ms;
+}
+
+.scroll-delay-500 {
+  transition-delay: 500ms;
+}
+
+/* Effet de parallaxe subtil */
+.parallax-bg {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Indicateur de scroll */
+.scroll-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+  transform-origin: left;
+  z-index: 9998;
+}
+
+/* Animation de rebond au scroll */
+@keyframes bounce-on-scroll {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.bounce-on-scroll {
+  animation: bounce-on-scroll 2s ease-in-out infinite;
+}
+
+/* Effet de flou au scroll */
+.scroll-blur {
+  transition: filter 0.3s ease;
+}
+
+.scroll-blur.blurred {
+  filter: blur(2px);
+}
+
+/* Animation de rotation au scroll */
+@keyframes rotate-on-scroll {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rotate-on-scroll {
+  animation: rotate-on-scroll 20s linear infinite;
+}
+
+/* Effet de glitch au scroll */
+@keyframes glitch {
+  0% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+  }
+  40% {
+    transform: translate(-2px, -2px);
+  }
+  60% {
+    transform: translate(2px, 2px);
+  }
+  80% {
+    transform: translate(2px, -2px);
+  }
+  100% {
+    transform: translate(0);
+  }
+}
+
+.glitch-on-scroll {
+  animation: glitch 0.3s ease-in-out;
+}
+
+/* Effet de typewriter au scroll */
+@keyframes typewriter {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.typewriter-on-scroll {
+  overflow: hidden;
+  white-space: nowrap;
+  animation: typewriter 2s steps(40, end);
+}
+
+/* Effet de morphing au scroll */
+@keyframes morph {
+  0% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+  50% {
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+  }
+  100% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+}
+
+.morph-on-scroll {
+  animation: morph 8s ease-in-out infinite;
+}
+
+/* -------------------------------------------
+   🖱️ Curseur personnalisé sympathique
+------------------------------------------- */
+
+/* Curseur principal */
+.custom-cursor {
+  position: fixed;
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle, 
+    rgba(14, 165, 233, 0.9) 0%,
+    rgba(99, 102, 241, 0.8) 50%,
+    rgba(168, 85, 247, 0.6) 100%
+  );
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  box-shadow: 
+    0 0 20px rgba(14, 165, 233, 0.6),
+    0 0 40px rgba(99, 102, 241, 0.4),
+    0 0 60px rgba(168, 85, 247, 0.2),
+    inset 0 0 20px rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+  transform: translate3d(-50%, -50%, 0);
+  backdrop-filter: blur(2px);
+  /* Optimisations pour Chrome */
+  will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Curseur de suivi */
+.cursor-follower {
+  position: fixed;
+  width: 30px;
+  height: 30px;
+  background: rgba(14, 165, 233, 0.1);
+  border: 2px solid var(--color-primary);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transition: all 0.3s ease;
+  transform: translate3d(-50%, -50%, 0);
+  /* Optimisations pour Chrome */
+  will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Effet de hover sur les liens */
+.custom-cursor.hover {
+  transform: translate3d(-50%, -50%, 0) scale(0.7);
+  background: radial-gradient(circle, 
+    rgba(34, 197, 94, 0.9) 0%,
+    rgba(16, 185, 129, 0.8) 50%,
+    rgba(5, 150, 105, 0.6) 100%
+  );
+  box-shadow: 
+    0 0 15px rgba(34, 197, 94, 0.8),
+    0 0 30px rgba(16, 185, 129, 0.6),
+    0 0 45px rgba(5, 150, 105, 0.4),
+    inset 0 0 15px rgba(255, 255, 255, 0.2);
+}
+
+.cursor-follower.hover {
+  transform: translate3d(-50%, -50%, 0) scale(0.6);
+  background: rgba(99, 102, 241, 0.3);
+  border-color: var(--color-secondary);
+  border-width: 1px;
+}
+
+/* Effet de traînée réduit au hover */
+.cursor-trail.hover {
+  width: 2px;
+  height: 2px;
+  opacity: 0.4;
+}
+
+/* Effet pour les labels */
+.custom-cursor.label {
+  transform: translate3d(-50%, -50%, 0) scale(0.6);
+  background: radial-gradient(circle, 
+    rgba(14, 165, 233, 0.8) 0%,
+    rgba(99, 102, 241, 0.7) 50%,
+    rgba(168, 85, 247, 0.6) 100%
+  );
+  box-shadow: 
+    0 0 12px rgba(14, 165, 233, 0.6),
+    0 0 24px rgba(99, 102, 241, 0.4),
+    0 0 36px rgba(168, 85, 247, 0.2),
+    inset 0 0 12px rgba(255, 255, 255, 0.1);
+}
+
+.cursor-follower.label {
+  transform: translate3d(-50%, -50%, 0) scale(0.4);
+  background: rgba(14, 165,233, 0.2);
+  border-color: var(--color-primary);
+  border-width: 1px;
+}
+
+.cursor-trail.label {
+  width: 1px;
+  height: 1px;
+  opacity: 0.3;
+}
+
+/* Effet de clic */
+.custom-cursor.clicking {
+  transform: translate3d(-50%, -50%, 0) scale(0.8);
+}
+
+.cursor-follower.clicking {
+  transform: translate3d(-50%, -50%, 0) scale(0.9);
+  background: rgba(14, 165, 233, 0.3);
+}
+
+/* Effet de texte */
+.custom-cursor.text {
+  width: 8px;
+  height: 20px;
+  border-radius: 2px;
+  background: var(--color-primary);
+}
+
+/* Effet de drag */
+.custom-cursor.dragging {
+  transform: translate(-50%, -50%) rotate(45deg);
+  background: radial-gradient(circle, 
+    rgba(245, 158, 11, 0.9) 0%,
+    rgba(217, 119, 6, 0.8) 50%,
+    rgba(180, 83, 9, 0.6) 100%
+  );
+  box-shadow: 
+    0 0 30px rgba(245, 158, 11, 0.8),
+    0 0 60px rgba(217, 119, 6, 0.6),
+    0 0 90px rgba(180, 83, 9, 0.4),
+    inset 0 0 30px rgba(255, 255, 255, 0.2);
+}
+
+/* Animation de pulsation */
+@keyframes cursor-pulse {
+  0%, 100% {
+    transform: translate3d(-50%, -50%, 0) scale(1);
+    opacity: 1;
+    box-shadow: 
+      0 0 20px rgba(14, 165, 233, 0.6),
+      0 0 40px rgba(99, 102, 241, 0.4),
+      0 0 60px rgba(168, 85, 247, 0.2);
+  }
+  50% {
+    transform: translate3d(-50%, -50%, 0) scale(1.2);
+    opacity: 0.9;
+    box-shadow: 
+      0 0 30px rgba(14, 165, 233, 0.8),
+      0 0 60px rgba(99, 102, 241, 0.6),
+      0 0 90px rgba(168, 85, 247, 0.4);
+  }
+}
+
+.custom-cursor.pulsing {
+  animation: cursor-pulse 2s ease-in-out infinite;
+}
+
+/* Effet de traînée */
+.cursor-trail {
+  position: fixed;
+  width: 4px;
+  height: 4px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9997;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+/* Curseur pour les boutons */
+.custom-cursor.button {
+  background: radial-gradient(circle, 
+    rgba(59, 130, 246, 0.9) 0%,
+    rgba(37, 99, 235, 0.8) 50%,
+    rgba(29, 78, 216, 0.6) 100%
+  );
+  box-shadow: 
+    0 0 25px rgba(59, 130, 246, 0.7),
+    0 0 50px rgba(37, 99, 235, 0.5),
+    0 0 75px rgba(29, 78, 216, 0.3),
+    inset 0 0 25px rgba(255, 255, 255, 0.15);
+}
+
+/* Curseur pour les images */
+.custom-cursor.image {
+  background: radial-gradient(circle, 
+    rgba(236, 72, 153, 0.9) 0%,
+    rgba(219, 39, 119, 0.8) 50%,
+    rgba(190, 24, 93, 0.6) 100%
+  );
+  box-shadow: 
+    0 0 25px rgba(236, 72, 153, 0.7),
+    0 0 50px rgba(219, 39, 119, 0.5),
+    0 0 75px rgba(190, 24, 93, 0.3),
+    inset 0 0 25px rgba(255, 255, 255, 0.15);
+}
+
+/* Curseur pour les inputs */
+.custom-cursor.input {
+  width: 2px;
+  height: 20px;
+  background: var(--color-primary);
+  border-radius: 1px;
+}
+
+/* Responsive - désactiver sur mobile */
+@media (max-width: 768px) {
+  .custom-cursor,
+  .cursor-follower,
+  .cursor-trail {
+    display: none !important;
+  }
+}
+
+/* Désactiver le curseur par défaut */
+body {
+  cursor: none;
+}
+
+/* Garder le curseur par défaut pour les éléments interactifs sur mobile */
+@media (max-width: 768px) {
+  body {
+    cursor: auto;
+  }
+}
+

@@ -1,0 +1,33 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://votre-domaine.com/sitemap.xml
+
+# PWA - Permettre l'indexation
+Allow: /site.webmanifest
+Allow: /sw.js
+
+# Optimisations SEO
+Allow: /assets/
+Allow: /images/
+
+# Bloquer les fichiers de développement
+Disallow: /_nuxt/
+Disallow: /node_modules/
+Disallow: /.git/
+Disallow: /.env
+
+# Bloquer les fichiers de cache
+Disallow: /cache/
+Disallow: /tmp/
+
+# Permettre l'indexation des pages principales
+Allow: /
+Allow: /projets/
+Allow: /contact/
+Allow: /pwa-test/
+Allow: /test-cursor/
+
+# Optimisations pour les moteurs de recherche
+Crawl-delay: 1
