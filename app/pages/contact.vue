@@ -115,7 +115,7 @@ async function submit() {
                 </div>
                 <div>
                   <h3 class="font-semibold text-gray-900 dark:text-white">Email</h3>
-                  <p class="text-gray-600 dark:text-gray-400">louis@example.com</p>
+                  <p class="text-gray-600 dark:text-gray-400">louiswiddy49@gmail.com</p>
                 </div>
               </div>
 
