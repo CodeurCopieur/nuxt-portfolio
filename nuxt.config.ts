@@ -24,5 +24,10 @@ export default defineNuxtConfig({
   ],
   tailwindcss: { viewer: false },
   experimental: { payloadExtraction: true },
-  nitro: { preset: 'vercel' }
+  nitro: { 
+    preset: 'vercel',
+    externals: {
+      inline: ['defu']
+    }
+  }
 })
