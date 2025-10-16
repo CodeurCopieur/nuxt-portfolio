@@ -25,6 +25,7 @@
   "dependencies": {
     "@emailjs/browser": "^4.1.0",
     "@nuxtjs/pwa": "^3.3.5",
+    "@vercel/speed-insights": "^1.2.0",
     "defu": "6.1.4",
     "typescript": "^5.9.2"
   }

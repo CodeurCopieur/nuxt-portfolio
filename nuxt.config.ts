@@ -7,7 +7,8 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     '@nuxtjs/tailwindcss',
     '@nuxtjs/seo',
-    'nuxt-schema-org'
+    'nuxt-schema-org',
+    '@vercel/speed-insights/nuxt' // Ajoutez cette ligne
   ],
   css: ['@/assets/css/base.css'],
   app: {
