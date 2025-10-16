@@ -79,7 +79,7 @@ onMounted(() => {
       </div>
 
       <!-- Titre principal -->
-      <h1 class="hero-title text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-sky-800 to-indigo-800 dark:from-white dark:via-sky-200 dark:to-indigo-200 bg-clip-text text-transparent">
+      <h1 style="padding-bottom: 1rem;" class="hero-title text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-sky-800 to-indigo-800 dark:from-white dark:via-sky-200 dark:to-indigo-200 bg-clip-text text-transparent">
         {{ meta.name }}
       </h1>
 
