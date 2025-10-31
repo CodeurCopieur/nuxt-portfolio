@@ -114,6 +114,17 @@
       },
       "projets": [
         {
+          "slug": "react_creer-des-composants-courants",
+          "title": "Créer des composants courants",
+          "org": "Projet personnel",
+          "year": "2025",
+          "stack": ["React", "TailwindCSS"],
+          "tags": ["React", "TailwindCSS"],
+          "summary": "Créer des composants courants avec React et TailwindCSS.",
+          "link": "https://react-creer-des-composants-courants.vercel.app/",
+          "github": "https://github.com/CodeurCopieur/react_creer-des-composants-courants"
+        },
+        {
           "slug": "select-agences-js-poo",
           "title": "Sélecteur d'Agences avec JavaScript POO",
           "org": "Projet personnel",
