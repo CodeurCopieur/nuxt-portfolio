@@ -2,7 +2,7 @@
 <script setup lang="ts">
 const route = useRoute()
 const { sections } = useContent()
-const p = computed(() => (sections as any).projets.find((x: any) => x.slug === route.params.slug))
+const p = computed(() => sections.value.projets.find((x) => x.slug === route.params.slug))
 
 if (!p.value) throw createError({ statusCode: 404, statusMessage: 'Projet introuvable' })
 

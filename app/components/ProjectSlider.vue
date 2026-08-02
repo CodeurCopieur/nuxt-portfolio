@@ -1,7 +1,7 @@
 <!-- components/ProjectSlider.vue -->
 <script setup lang="ts">
 const { sections } = useContent()
-const projets = computed(() => (sections as any).projets as any[])
+const projets = computed(() => sections.value.projets)
 
 // Référence pour Swiper
 const swiperRef = ref<any>(null)

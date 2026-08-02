@@ -3,7 +3,7 @@
 const { meta } = useContent()
 
 useHead({
-  title: `Contact — ${meta.name}`
+  title: computed(() => `Contact — ${meta.value.name}`)
 })
 
 const form = reactive({ name: '', email: '', message: '' })

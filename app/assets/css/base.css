@@ -945,14 +945,32 @@ html {
   }
 }
 
-/* Désactiver le curseur par défaut */
-body {
+/* Désactiver le curseur par défaut uniquement quand le curseur custom est actif */
+body.custom-cursor-active {
+  cursor: none;
+}
+
+body.custom-cursor-active a,
+body.custom-cursor-active button,
+body.custom-cursor-active label,
+body.custom-cursor-active input,
+body.custom-cursor-active textarea,
+body.custom-cursor-active select {
   cursor: none;
 }
 
 /* Garder le curseur par défaut pour les éléments interactifs sur mobile */
 @media (max-width: 768px) {
-  body {
+  body.custom-cursor-active {
+    cursor: auto;
+  }
+
+  body.custom-cursor-active a,
+  body.custom-cursor-active button,
+  body.custom-cursor-active label,
+  body.custom-cursor-active input,
+  body.custom-cursor-active textarea,
+  body.custom-cursor-active select {
     cursor: auto;
   }
 }

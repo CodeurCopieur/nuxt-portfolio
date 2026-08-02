@@ -2,18 +2,19 @@
 import { useContent } from '@/composables/useContent'
 
 const { sections } = useContent()
-const competences = (sections as any).competences
+const competences = computed(() => sections.value.competences)
 
 // Transformer en tableau plat → plus pratique pour affichage
 const skills = computed(() => {
+  const c = competences.value
   return [
-    ...competences.langages,
-    ...competences.frameworks,
-    ...competences.ui_animations,
-    ...competences.outils_dev,
-    ...competences.design,
-    ...competences.environnements,
-    ...competences.methodes
+    ...c.langages,
+    ...c.frameworks,
+    ...c.ui_animations,
+    ...c.outils_dev,
+    ...c.design,
+    ...c.environnements,
+    ...c.methodes
   ]
 })
 

@@ -1,11 +1,24 @@
-// composables/useContent.ts
-import data from '@/data/content.json'
+import type { PortfolioContent, PortfolioProject } from '~/types/portfolio'
+import fallbackData from '@/data/content.json'
+
+export function getRecentProjects(projets: PortfolioProject[]): PortfolioProject[] {
+  const featured = projets
+    .filter((p) => p.featured_slot != null)
+    .sort((a, b) => (a.featured_slot ?? 99) - (b.featured_slot ?? 99))
+
+  if (featured.length > 0) return featured.slice(0, 3)
+  return projets.slice(0, 3)
+}
 
 export function useContent() {
-  // typing léger
-  type SectionKey = 'a_propos' | 'experiences' | 'competences' | 'projets'
-  return {
-    meta: data.meta,
-    sections: data.sections as Record<SectionKey, unknown>
-  }
+  const { data } = useFetch<PortfolioContent>('/api/content', {
+    key: 'portfolio-content',
+    default: () => fallbackData as PortfolioContent
+  })
+
+  const meta = computed(() => data.value!.meta)
+  const sections = computed(() => data.value!.sections)
+  const recentProjects = computed(() => getRecentProjects(sections.value.projets))
+
+  return { meta, sections, recentProjects, data }
 }

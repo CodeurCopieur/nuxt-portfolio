@@ -1,7 +1,7 @@
 <!-- components/ExperienceList.vue -->
 <script setup lang="ts">
 const { sections } = useContent()
-const exps = computed(() => (sections as any).experiences as any[])
+const exps = computed(() => sections.value.experiences)
 
 import { useFilters } from '@/store/useFilters'
 const filters = useFilters()

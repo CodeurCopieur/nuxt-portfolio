@@ -1,7 +1,7 @@
 <!-- components/ProjectGrid.vue -->
 <script setup lang="ts">
 const { sections } = useContent()
-const projets = computed(() => (sections as any).projets as any[])
+const projets = computed(() => sections.value.projets)
 </script>
 
 <template>

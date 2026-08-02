@@ -13,7 +13,8 @@ Allow: /assets/
 Allow: /images/
 
 # Bloquer les fichiers de développement
-Disallow: /_nuxt/
+Disallow: /admin/
+Disallow: /api/admin/
 Disallow: /node_modules/
 Disallow: /.git/
 Disallow: /.env

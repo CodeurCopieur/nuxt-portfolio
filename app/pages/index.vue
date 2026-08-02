@@ -1,13 +1,13 @@
 <!-- pages/index.vue -->
 <script setup lang="ts">
-const { meta, sections } = useContent()
+const { meta, sections, recentProjects } = useContent()
 useHead({
-  title: `${meta.name} — ${meta.role}`
+  title: computed(() => `${meta.value.name} — ${meta.value.role}`)
 })
 
 // Fonction pour calculer la durée d'expérience réelle
 const calculateExperienceYears = () => {
-  const experiences = (sections as any).experiences
+  const experiences = sections.value.experiences
   
   let totalMonths = 0
   
@@ -41,6 +41,7 @@ const calculateExperienceYears = () => {
 }
 
 const experienceDuration = computed(() => calculateExperienceYears())
+const techFilters = computed(() => sections.value.filtres_technologies ?? [])
 </script>
 
 <template>
@@ -62,7 +63,7 @@ const experienceDuration = computed(() => calculateExperienceYears())
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <ProjectCard 
-            v-for="project in (sections as any).projets.slice(0, 3)" 
+            v-for="project in recentProjects" 
             :key="project.slug" 
             :p="project"
           />
@@ -109,7 +110,7 @@ const experienceDuration = computed(() => calculateExperienceYears())
           </p>
         </div>
         
-        <ExperienceFilter :stacks="['JavaScript','Vue 3','Nuxt 3','React','GSAP','Twig','SCSS','TailwindCSS']" />
+        <ExperienceFilter :stacks="techFilters" />
         
         <div class="mt-12">
           <ClientOnly fallback-tag="div" fallback="Chargement…">

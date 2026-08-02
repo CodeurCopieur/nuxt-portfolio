@@ -224,7 +224,7 @@
           "github": "https://github.com/CodeurCopieur/landing-page_gsap-scrolltrigger-3"
         },
         {
-          "slug": "animated-navigation_gsap",
+          "slug": "animated-navigation_jquery-gsap",
           "title": "Animated Navigation Using jQuery & GSAP",
           "org": "Projet personnel",
           "year": "2025",
@@ -430,6 +430,16 @@
           "link": "https://www.lepoint.fr/montres/"
         }
         
+      ],
+      "filtres_technologies": [
+        "JavaScript",
+        "Vue 3",
+        "Nuxt 3",
+        "React",
+        "GSAP",
+        "Twig",
+        "SCSS",
+        "TailwindCSS"
       ]
     }
   }

@@ -3,10 +3,10 @@
 const { meta, sections } = useContent()
 
 useHead({
-  title: `Projets — ${meta.name}`
+  title: computed(() => `Projets — ${meta.value.name}`)
 })
 
-const projets = computed(() => (sections as any).projets as any[])
+const projets = computed(() => sections.value.projets)
 </script>
 
 <template>

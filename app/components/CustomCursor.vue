@@ -140,6 +140,8 @@ const handleDragEnd = () => {
 
 // Lifecycle
 onMounted(() => {
+  document.body.classList.add('custom-cursor-active')
+
   // Initialiser la position
   mouseX.value = window.innerWidth / 2
   mouseY.value = window.innerHeight / 2
@@ -163,6 +165,8 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  document.body.classList.remove('custom-cursor-active')
+
   // Nettoyer l'animation frame
   if (animationFrameId) {
     cancelAnimationFrame(animationFrameId)
