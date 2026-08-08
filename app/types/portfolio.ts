@@ -64,6 +64,7 @@ export interface TechFilter {
   id?: string
   sort_order?: number
   label: string
+  visible?: boolean
 }
 
 export interface PortfolioContent {

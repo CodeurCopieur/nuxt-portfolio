@@ -26,3 +26,4 @@ package-lock.json
 CURSOR_OPTIMIZATIONS.md
 app/pages/test-cursor.vue
 app/components/CursorTest.vue
+/supabase

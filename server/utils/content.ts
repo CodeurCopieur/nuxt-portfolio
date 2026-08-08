@@ -89,7 +89,9 @@ export async function fetchPortfolioContent(): Promise<PortfolioContent | null> 
         })),
         filtres_technologies: filtersRes.error
           ? []
-          : (filtersRes.data ?? []).map((f) => f.label as string)
+          : (filtersRes.data ?? [])
+              .filter((f) => f.visible !== false)
+              .map((f) => f.label as string)
       }
     }
   } catch (err) {

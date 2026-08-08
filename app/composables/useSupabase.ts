@@ -63,6 +63,12 @@ export function useAdminAuth() {
     loading.value = true
     error.value = null
 
+    if (!config.public.supabaseUrl || !config.public.supabaseAnonKey) {
+      loading.value = false
+      error.value = 'Configuration Supabase manquante. Vérifiez les variables sur Vercel puis redéployez.'
+      return false
+    }
+
     const normalizedEmail = email.trim().toLowerCase()
 
     if (!isAllowedEmail(normalizedEmail)) {
@@ -80,9 +86,13 @@ export function useAdminAuth() {
 
     if (authError || !data.session) {
       loading.value = false
-      error.value = import.meta.dev && authError?.message
-        ? authError.message
-        : 'Identifiants invalides'
+      if (import.meta.dev && authError?.message) {
+        error.value = authError.message
+      } else if (authError?.message?.toLowerCase().includes('email not confirmed')) {
+        error.value = 'Compte non confirmé. Vérifiez votre email ou confirmez l’utilisateur dans Supabase.'
+      } else {
+        error.value = 'Identifiants invalides'
+      }
       return false
     }
 

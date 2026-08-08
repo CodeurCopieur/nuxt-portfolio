@@ -9,8 +9,7 @@ const navItems = [
   { label: 'Expériences', to: '/admin/experiences' },
   { label: 'Compétences', to: '/admin/competences' },
   { label: 'Projets', to: '/admin/projets' },
-  { label: 'Récents', to: '/admin/projets-recents' },
-  { label: 'Filtres', to: '/admin/filtres' }
+  { label: 'Récents', to: '/admin/projets-recents' }
 ]
 </script>
 
@@ -39,7 +38,12 @@ const navItems = [
           </nav>
         </div>
         <div class="flex items-center gap-3">
-          <NuxtLink to="/" class="text-sm text-gray-500 hover:text-sky-500 transition-colors">
+          <NuxtLink
+            to="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-sm text-gray-500 hover:text-sky-500 transition-colors"
+          >
             Voir le site
           </NuxtLink>
           <button
