@@ -32,6 +32,7 @@ export default defineNuxtConfig({
   },
   routeRules: {
     '/admin/filtres': { redirect: '/admin/experiences' },
+    '/admin/a-propos': { redirect: '/admin/meta' },
     '/admin/**': {
       robots: false,
       headers: {

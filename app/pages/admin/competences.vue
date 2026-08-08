@@ -86,7 +86,7 @@ const selected = reactive<Record<CategoryKey, string[]>>({
 })
 
 const openSections = reactive<Record<CategoryKey, boolean>>({
-  langages: true,
+  langages: false,
   frameworks: false,
   outils_dev: false,
   ui_animations: false,

@@ -7,8 +7,7 @@ definePageMeta({
 const { logout, user } = useAdminAuth()
 
 const sections = [
-  { title: 'Informations personnelles', desc: 'Nom, rôle, contact, liens', to: '/admin/meta', icon: '👤' },
-  { title: 'À propos', desc: 'Bio, points forts, disponibilité', to: '/admin/a-propos', icon: '📝' },
+  { title: 'Profil', desc: 'Informations personnelles, bio et à propos', to: '/admin/meta', icon: '👤' },
   { title: 'Expériences', desc: 'Parcours professionnel et filtres technologie', to: '/admin/experiences', icon: '💼' },
   { title: 'Compétences', desc: 'Technologies et outils', to: '/admin/competences', icon: '🛠️' },
   { title: 'Projets', desc: 'Réalisations et portfolio', to: '/admin/projets', icon: '🚀' },

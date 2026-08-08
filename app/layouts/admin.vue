@@ -4,8 +4,7 @@ const { logout, user } = useAdminAuth()
 
 const navItems = [
   { label: 'Tableau de bord', to: '/admin' },
-  { label: 'Meta', to: '/admin/meta' },
-  { label: 'À propos', to: '/admin/a-propos' },
+  { label: 'Profil', to: '/admin/meta' },
   { label: 'Expériences', to: '/admin/experiences' },
   { label: 'Compétences', to: '/admin/competences' },
   { label: 'Projets', to: '/admin/projets' },

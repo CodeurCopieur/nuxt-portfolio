@@ -18,8 +18,8 @@ const newFilterLabel = ref('')
 const newFilterVisible = ref(true)
 
 const visibleFiltersCount = computed(() => filters.value.filter((f) => f.visible !== false).length)
-const filtersOpen = ref(true)
-const experiencesOpen = ref(true)
+const filtersOpen = ref(false)
+const experiencesOpen = ref(false)
 const selectedStacks = ref<string[]>([])
 
 const filterLabels = computed(() => filters.value.map((f) => f.label))
