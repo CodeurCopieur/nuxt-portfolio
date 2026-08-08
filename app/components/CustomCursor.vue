@@ -81,39 +81,46 @@ const handleMouseUp = () => {
   if (follower.value) follower.value.classList.remove('clicking')
 }
 
+// Retourne l'élément DOM cible (ignore les nœuds texte sans .closest)
+function getEventElement(e: MouseEvent): Element | null {
+  const target = e.target
+  if (target instanceof Element) return target
+  if (target instanceof Node) return target.parentElement
+  return null
+}
+
 // Gestion des hovers optimisée
 const handleMouseEnter = (e: MouseEvent) => {
-  const target = e.target as HTMLElement
-  
-  if (cursor.value && follower.value && trail.value) {
-    // Liens et boutons
-    if (target.tagName === 'A' || target.tagName === 'BUTTON' || target.closest('a') || target.closest('button')) {
-      cursor.value.classList.add('hover')
-      follower.value.classList.add('hover')
-      trail.value.classList.add('hover')
-    }
-    
-    // Labels
-    if (target.tagName === 'LABEL' || target.closest('label')) {
-      cursor.value.classList.add('label')
-      follower.value.classList.add('label')
-      trail.value.classList.add('label')
-    }
-    
-    // Images
-    if (target.tagName === 'IMG') {
-      cursor.value.classList.add('image')
-    }
-    
-    // Inputs et textarea
-    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
-      cursor.value.classList.add('input')
-    }
-    
-    // Zones de texte
-    if (target.contentEditable === 'true' || target.tagName === 'P' || target.tagName === 'H1' || target.tagName === 'H2' || target.tagName === 'H3') {
-      cursor.value.classList.add('text')
-    }
+  const target = getEventElement(e)
+  if (!target || !cursor.value || !follower.value || !trail.value) return
+
+  // Liens et boutons
+  if (target.tagName === 'A' || target.tagName === 'BUTTON' || target.closest('a') || target.closest('button')) {
+    cursor.value.classList.add('hover')
+    follower.value.classList.add('hover')
+    trail.value.classList.add('hover')
+  }
+
+  // Labels
+  if (target.tagName === 'LABEL' || target.closest('label')) {
+    cursor.value.classList.add('label')
+    follower.value.classList.add('label')
+    trail.value.classList.add('label')
+  }
+
+  // Images
+  if (target.tagName === 'IMG') {
+    cursor.value.classList.add('image')
+  }
+
+  // Inputs et textarea
+  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+    cursor.value.classList.add('input')
+  }
+
+  // Zones de texte
+  if (target.contentEditable === 'true' || target.tagName === 'P' || target.tagName === 'H1' || target.tagName === 'H2' || target.tagName === 'H3') {
+    cursor.value.classList.add('text')
   }
 }
 
