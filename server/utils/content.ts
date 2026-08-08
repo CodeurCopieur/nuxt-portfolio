@@ -1,4 +1,5 @@
 import type { PortfolioContent } from '~/types/portfolio'
+import { resolveCompetencesOrder } from '../../app/data/competence-categories'
 import fallbackData from '../../app/data/content.json'
 
 export async function fetchPortfolioContent(): Promise<PortfolioContent | null> {
@@ -71,8 +72,10 @@ export async function fetchPortfolioContent(): Promise<PortfolioContent | null> 
           ui_animations: (competences?.ui_animations as string[]) ?? [],
           design: (competences?.design as string[]) ?? [],
           environnements: (competences?.environnements as string[]) ?? [],
-          methodes: (competences?.methodes as string[]) ?? []
+          methodes: (competences?.methodes as string[]) ?? [],
+          ia_cursor: (competences?.ia_cursor as string[]) ?? []
         },
+        competences_order: resolveCompetencesOrder(competences?.categories_order as string[] | undefined),
         projets: (projectsRes.data ?? []).map((p) => ({
           id: p.id,
           sort_order: p.sort_order,

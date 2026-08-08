@@ -94,7 +94,7 @@ const techFilters = computed(() => sections.value.filtres_technologies ?? [])
             Un éventail de technologies et méthodologies maîtrisées pour créer des expériences web exceptionnelles
           </p>
         </div>
-        <SkillsCloud :skills="(sections as any).competences" />
+        <SkillsCloud />
       </div>
     </section>
 

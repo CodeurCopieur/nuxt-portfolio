@@ -43,6 +43,7 @@ export interface PortfolioCompetences {
   design: string[]
   environnements: string[]
   methodes: string[]
+  ia_cursor: string[]
 }
 
 export interface PortfolioProject {
@@ -73,6 +74,7 @@ export interface PortfolioContent {
     a_propos: PortfolioAbout
     experiences: PortfolioExperience[]
     competences: PortfolioCompetences
+    competences_order: (keyof PortfolioCompetences)[]
     projets: PortfolioProject[]
     filtres_technologies: string[]
   }

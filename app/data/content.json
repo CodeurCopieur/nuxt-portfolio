@@ -110,8 +110,28 @@
         "ui_animations": ["Bootstrap", "Materialize", "Bulma", "GSAP", "ScrollMagic", "AOS", "ScrollReveal", "CSS Animations"],
         "design": ["Figma", "Zeplin"],
         "environnements": ["Windows", "macOS", "Git Bash", "Hyper"],
-        "methodes": ["Agile (Scrum)", "TMA", "SEO", "RGPD"]
+        "methodes": ["Agile (Scrum)", "TMA", "SEO", "RGPD"],
+        "ia_cursor": [
+          "Cursor Grok 4.5",
+          "Composer 2.5",
+          "Opus 5",
+          "GPT-5.6 Sol",
+          "Fable 5",
+          "Sonnet 5",
+          "GPT-5.6 Terra",
+          "Opus 4.8"
+        ]
       },
+      "competences_order": [
+        "langages",
+        "frameworks",
+        "outils_dev",
+        "ui_animations",
+        "design",
+        "environnements",
+        "methodes",
+        "ia_cursor"
+      ],
       "projets": [
         {
           "slug": "react_creer-des-composants-courants",
