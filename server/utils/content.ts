@@ -1,6 +1,34 @@
 import type { PortfolioContent } from '~/types/portfolio'
-import { resolveCompetencesOrder } from '../../app/data/competence-categories'
+import {
+  mergeCompetenceCategories,
+  parseCustomCategories,
+  resolveCompetencesOrder
+} from '../../app/data/competence-categories'
+import { sortExperiencesChronologically } from '../../app/utils/experience-map'
 import fallbackData from '../../app/data/content.json'
+
+function mapExperiences(
+  rows: Array<Record<string, unknown>>
+): PortfolioContent['sections']['experiences'] {
+  return sortExperiencesChronologically(
+    rows.map((exp) => ({
+      id: exp.id as string | undefined,
+      sort_order: exp.sort_order as number | undefined,
+      company: exp.company as string,
+      location: exp.location as string,
+      role: exp.role as string,
+      period: exp.period as string,
+      date_debut: exp.date_debut as string,
+      date_fin: exp.date_fin as string,
+      summary: exp.summary as string,
+      missions: exp.missions as string[],
+      stack: exp.stack as string[],
+      tags: exp.tags as string[],
+      clients: exp.clients as string[] | undefined,
+      links: exp.links as string[]
+    }))
+  )
+}
 
 export async function fetchPortfolioContent(): Promise<PortfolioContent | null> {
   const config = useRuntimeConfig()
@@ -32,6 +60,24 @@ export async function fetchPortfolioContent(): Promise<PortfolioContent | null> 
     const about = aboutRes.data
     const competences = competencesRes.data
 
+    const customCompetences = parseCustomCategories(competences?.custom_categories)
+    const hiddenBuiltin = new Set(customCompetences.hidden_builtin ?? [])
+    const allCategoryKeys = [
+      'langages',
+      'frameworks',
+      'outils_dev',
+      'ui_animations',
+      'design',
+      'environnements',
+      'methodes',
+      'ia_cursor',
+      ...customCompetences.definitions.map((c) => c.key)
+    ].filter((key) => !hiddenBuiltin.has(key))
+    const competencesOrder = resolveCompetencesOrder(
+      competences?.categories_order as string[] | undefined,
+      allCategoryKeys
+    ).filter((key) => !hiddenBuiltin.has(key))
+
     return {
       meta: {
         name: meta.name,
@@ -49,22 +95,7 @@ export async function fetchPortfolioContent(): Promise<PortfolioContent | null> 
           highlights: (about?.highlights as string[]) ?? [],
           availability: about?.availability ?? ''
         },
-        experiences: (experiencesRes.data ?? []).map((exp) => ({
-          id: exp.id,
-          sort_order: exp.sort_order,
-          company: exp.company,
-          location: exp.location,
-          role: exp.role,
-          period: exp.period,
-          date_debut: exp.date_debut,
-          date_fin: exp.date_fin,
-          summary: exp.summary,
-          missions: exp.missions as string[],
-          stack: exp.stack as string[],
-          tags: exp.tags as string[],
-          clients: exp.clients as string[],
-          links: exp.links as string[]
-        })),
+        experiences: mapExperiences(experiencesRes.data ?? []),
         competences: {
           langages: (competences?.langages as string[]) ?? [],
           frameworks: (competences?.frameworks as string[]) ?? [],
@@ -73,9 +104,14 @@ export async function fetchPortfolioContent(): Promise<PortfolioContent | null> 
           design: (competences?.design as string[]) ?? [],
           environnements: (competences?.environnements as string[]) ?? [],
           methodes: (competences?.methodes as string[]) ?? [],
-          ia_cursor: (competences?.ia_cursor as string[]) ?? []
+          ia_cursor: (competences?.ia_cursor as string[]) ?? [],
+          ...customCompetences.skills
         },
-        competences_order: resolveCompetencesOrder(competences?.categories_order as string[] | undefined),
+        competences_order: competencesOrder,
+        competences_categories: mergeCompetenceCategories(
+          competencesOrder,
+          customCompetences.definitions
+        ),
         projets: (projectsRes.data ?? []).map((p) => ({
           id: p.id,
           sort_order: p.sort_order,
@@ -88,7 +124,8 @@ export async function fetchPortfolioContent(): Promise<PortfolioContent | null> 
           summary: p.summary,
           link: p.link ?? undefined,
           github: p.github ?? undefined,
-          featured_slot: p.featured_slot ?? null
+          featured_slot: p.featured_slot ?? null,
+          experience_id: p.experience_id ?? null
         })),
         filtres_technologies: filtersRes.error
           ? []
@@ -104,5 +141,14 @@ export async function fetchPortfolioContent(): Promise<PortfolioContent | null> 
 }
 
 export function getFallbackContent(): PortfolioContent {
-  return fallbackData as PortfolioContent
+  const content = fallbackData as PortfolioContent
+  const order = content.sections.competences_order ?? []
+  return {
+    ...content,
+    sections: {
+      ...content.sections,
+      experiences: sortExperiencesChronologically(content.sections.experiences),
+      competences_categories: mergeCompetenceCategories(order)
+    }
+  }
 }

@@ -5,9 +5,10 @@ import { sortCompetenceCategories } from '~/data/competence-categories'
 const { sections } = useContent()
 const competences = computed(() => sections.value.competences)
 const categoryOrder = computed(() => sections.value.competences_order ?? [])
+const categoryDefs = computed(() => sections.value.competences_categories ?? sortCompetenceCategories(categoryOrder.value))
 
 const visibleCategories = computed(() =>
-  sortCompetenceCategories(categoryOrder.value)
+  categoryDefs.value
     .map((cat) => ({
       ...cat,
       skills: competences.value[cat.key] ?? []

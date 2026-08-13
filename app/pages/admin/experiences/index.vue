@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import type { PortfolioExperience, TechFilter } from '~/types/portfolio'
+import type { PortfolioExperience, PortfolioProject, TechFilter } from '~/types/portfolio'
 
 definePageMeta({ layout: 'admin', middleware: 'admin-auth' })
 
 const { supabase } = useAdminAuth()
 const experiences = ref<PortfolioExperience[]>([])
+const projects = ref<PortfolioProject[]>([])
 const filters = ref<TechFilter[]>([])
 const editing = ref<PortfolioExperience | null>(null)
 const editingFilter = ref<TechFilter | null>(null)
@@ -21,6 +22,9 @@ const visibleFiltersCount = computed(() => filters.value.filter((f) => f.visible
 const filtersOpen = ref(false)
 const experiencesOpen = ref(false)
 const selectedStacks = ref<string[]>([])
+const selectedProjectIds = ref<string[]>([])
+const saveMessage = ref<string | null>(null)
+const projectsLinkReady = ref(true)
 
 const filterLabels = computed(() => filters.value.map((f) => f.label))
 
@@ -49,6 +53,122 @@ function toggleStackSelection(label: string) {
 
 function buildStackPayload(): string[] {
   return selectedStacks.value.filter((label) => filterLabels.value.includes(label))
+}
+
+function linkedProjectsCount(experienceId?: string) {
+  if (!experienceId) return 0
+  return projects.value.filter((project) => project.experience_id === experienceId).length
+}
+
+function syncSelectedProjectsFromExperience(exp?: PortfolioExperience | null) {
+  if (!exp?.id) {
+    selectedProjectIds.value = []
+    return
+  }
+  selectedProjectIds.value = projects.value
+    .filter((project) => project.experience_id === exp.id)
+    .map((project) => project.id!)
+}
+
+function isProjectSelected(projectId: string) {
+  return selectedProjectIds.value.includes(projectId)
+}
+
+function toggleProjectSelection(projectId: string) {
+  const index = selectedProjectIds.value.indexOf(projectId)
+  if (index === -1) selectedProjectIds.value.push(projectId)
+  else selectedProjectIds.value.splice(index, 1)
+}
+
+function projectWorkplaceHint(project: PortfolioProject) {
+  if (!project.experience_id) return null
+  if (project.experience_id === editing.value?.id) return 'Lié à cette expérience'
+  const exp = experiences.value.find((item) => item.id === project.experience_id)
+  return exp ? `Actuellement chez ${exp.company}` : 'Lié ailleurs'
+}
+
+async function loadProjects() {
+  const { data, error } = await supabase
+    .from('portfolio_projects')
+    .select('*')
+    .order('sort_order', { ascending: true })
+
+  if (error) {
+    projectsLinkReady.value = false
+    saveMessage.value = `Erreur projets : ${error.message}`
+    message.value = saveMessage.value
+    return
+  }
+
+  projectsLinkReady.value = true
+
+  projects.value = (data ?? []).map((project) => ({
+    id: project.id,
+    sort_order: project.sort_order,
+    slug: project.slug ?? '',
+    title: project.title,
+    org: project.org,
+    year: project.year,
+    stack: (project.stack as string[]) ?? [],
+    tags: (project.tags as string[]) ?? [],
+    summary: project.summary ?? '',
+    link: project.link ?? undefined,
+    github: project.github ?? undefined,
+    experience_id: project.experience_id ?? null
+  }))
+}
+
+async function syncProjectLinks(experienceId: string, company: string) {
+  const previouslyLinked = projects.value
+    .filter((project) => project.experience_id === experienceId)
+    .map((project) => project.id!)
+    .filter(Boolean)
+
+  const toLink = selectedProjectIds.value.filter(Boolean)
+  const toUnlink = previouslyLinked.filter((id) => !toLink.includes(id))
+  const updatedAt = new Date().toISOString()
+
+  for (const projectId of toLink) {
+    const { data, error } = await supabase
+      .from('portfolio_projects')
+      .update({
+        experience_id: experienceId,
+        org: company,
+        updated_at: updatedAt
+      })
+      .eq('id', projectId)
+      .select('id, experience_id')
+      .maybeSingle()
+
+    if (error) {
+      throw new Error(
+        error.message.includes('experience_id')
+          ? `Colonne experience_id absente. Exécutez supabase/migration-project-experience.sql dans Supabase. (${error.message})`
+          : `Projet « ${projectLabel(projectId)} » : ${error.message}`
+      )
+    }
+    if (!data) {
+      throw new Error(`Projet « ${projectLabel(projectId)} » introuvable ou non modifiable.`)
+    }
+  }
+
+  for (const projectId of toUnlink) {
+    const { error } = await supabase
+      .from('portfolio_projects')
+      .update({
+        experience_id: null,
+        updated_at: updatedAt
+      })
+      .eq('id', projectId)
+
+    if (error) {
+      throw new Error(`Déliaison « ${projectLabel(projectId)} » : ${error.message}`)
+    }
+  }
+}
+
+function projectLabel(projectId: string) {
+  return projects.value.find((project) => project.id === projectId)?.title ?? projectId
 }
 
 const emptyForm = (): PortfolioExperience => ({
@@ -114,7 +234,7 @@ async function loadFilters() {
 }
 
 async function load() {
-  await Promise.all([loadExperiences(), loadFilters()])
+  await Promise.all([loadExperiences(), loadFilters(), loadProjects()])
 }
 
 function startNew() {
@@ -122,9 +242,11 @@ function startNew() {
   isNew.value = true
   experiencesOpen.value = true
   syncSelectedStacksFromExperience()
+  syncSelectedProjectsFromExperience()
 }
 
 function startEdit(exp: PortfolioExperience) {
+  saveMessage.value = null
   editing.value = {
     ...exp,
     missionsText: arrayToLines(exp.missions),
@@ -135,11 +257,14 @@ function startEdit(exp: PortfolioExperience) {
   isNew.value = false
   experiencesOpen.value = true
   syncSelectedStacksFromExperience(exp)
+  syncSelectedProjectsFromExperience(exp)
 }
 
 function cancelEdit() {
   editing.value = null
   selectedStacks.value = []
+  selectedProjectIds.value = []
+  saveMessage.value = null
 }
 
 async function quickAddFilter() {
@@ -182,6 +307,7 @@ async function save() {
   if (!editing.value) return
   saving.value = true
   message.value = null
+  saveMessage.value = null
 
   const e = editing.value as PortfolioExperience & {
     missionsText: string
@@ -207,18 +333,69 @@ async function save() {
     updated_at: new Date().toISOString()
   }
 
-  const { error } = isNew.value
-    ? await supabase.from('portfolio_experiences').insert(payload)
-    : await supabase.from('portfolio_experiences').update(payload).eq('id', e.id!)
+  let experienceId: string | undefined
+
+  if (isNew.value) {
+    const { data, error } = await supabase
+      .from('portfolio_experiences')
+      .insert(payload)
+      .select('id')
+      .single()
+
+    if (error) {
+      saving.value = false
+      saveMessage.value = error.message
+      message.value = error.message
+      return
+    }
+
+    experienceId = data?.id
+  } else {
+    const { error } = await supabase
+      .from('portfolio_experiences')
+      .update(payload)
+      .eq('id', e.id!)
+
+    if (error) {
+      saving.value = false
+      saveMessage.value = error.message
+      message.value = error.message
+      return
+    }
+
+    experienceId = e.id
+  }
+
+  if (!experienceId) {
+    saving.value = false
+    saveMessage.value = 'Impossible de récupérer l’identifiant de l’expérience.'
+    message.value = saveMessage.value
+    return
+  }
+
+  try {
+    await syncProjectLinks(experienceId, e.company)
+  } catch (linkError) {
+    saving.value = false
+    saveMessage.value =
+      linkError instanceof Error
+        ? linkError.message
+        : 'Erreur lors de la liaison des projets'
+    message.value = `Expérience enregistrée, mais ${saveMessage.value}`
+    await load()
+    await refreshNuxtData('portfolio-content')
+    return
+  }
 
   saving.value = false
-  message.value = error ? error.message : 'Enregistré avec succès'
+  saveMessage.value = null
+  message.value = 'Enregistré avec succès'
 
-  if (!error) {
-    editing.value = null
-    await loadExperiences()
-    await refreshNuxtData('portfolio-content')
-  }
+  editing.value = null
+  selectedStacks.value = []
+  selectedProjectIds.value = []
+  await load()
+  await refreshNuxtData('portfolio-content')
 }
 
 async function saveFilter() {
@@ -600,6 +777,12 @@ function onEscape(e: KeyboardEvent) {
             <div class="min-w-0">
               <p class="font-semibold text-gray-900 dark:text-white">{{ exp.company }}</p>
               <p class="text-sm text-gray-500 truncate">{{ exp.role }} · {{ exp.period }}</p>
+              <p
+                v-if="linkedProjectsCount(exp.id)"
+                class="text-xs text-indigo-600 dark:text-indigo-300 mt-0.5"
+              >
+                {{ linkedProjectsCount(exp.id) }} projet(s) associé(s)
+              </p>
               <div v-if="exp.stack?.length" class="flex flex-wrap gap-1 mt-1.5">
                 <span
                   v-for="tech in exp.stack.slice(0, 4)"
@@ -752,6 +935,55 @@ function onEscape(e: KeyboardEvent) {
               </p>
             </div>
 
+            <div class="stack-picker">
+              <div class="flex items-start justify-between gap-3 mb-3">
+                <div>
+                  <label class="admin-label mb-0">Projets associés</label>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Sélectionnez les projets réalisés dans ce lieu de travail.
+                  </p>
+                </div>
+                <span class="shrink-0 text-xs font-semibold px-2 py-1 rounded-lg bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
+                  {{ selectedProjectIds.length }} choisi(s)
+                </span>
+              </div>
+
+              <p
+                v-if="!projectsLinkReady"
+                class="mb-3 text-sm text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl px-3 py-2"
+              >
+                La colonne <code class="text-xs">experience_id</code> est absente. Exécutez
+                <code class="text-xs">supabase/migration-project-experience.sql</code> dans Supabase.
+              </p>
+
+              <div v-if="projects.length" class="stack-picker-grid">
+                <button
+                  v-for="project in projects"
+                  :key="project.id"
+                  type="button"
+                  class="stack-chip project-chip"
+                  :class="{ 'stack-chip--selected': isProjectSelected(project.id!) }"
+                  @click="toggleProjectSelection(project.id!)"
+                >
+                  <span class="stack-chip-check" aria-hidden="true">
+                    <svg v-if="isProjectSelected(project.id!)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3 h-3">
+                      <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" />
+                    </svg>
+                  </span>
+                  <span class="min-w-0 text-left">
+                    <span class="block truncate font-medium">{{ project.title }}</span>
+                    <span class="block truncate text-[10px] opacity-70">
+                      {{ project.year || 'Sans année' }}
+                      <template v-if="projectWorkplaceHint(project)"> · {{ projectWorkplaceHint(project) }}</template>
+                    </span>
+                  </span>
+                </button>
+              </div>
+              <p v-else class="text-sm text-gray-500 dark:text-gray-400 p-4 rounded-xl border border-dashed border-gray-300 dark:border-gray-700">
+                Aucun projet. Créez-en dans Admin → Projets.
+              </p>
+            </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label class="admin-label">Tags (virgules)</label>
@@ -766,6 +998,13 @@ function onEscape(e: KeyboardEvent) {
                 <textarea v-model="(editing as any).linksText" rows="2" class="admin-input" />
               </div>
             </div>
+
+            <p
+              v-if="saveMessage"
+              class="px-3 py-2 rounded-xl text-sm border bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-300 border-red-200 dark:border-red-800"
+            >
+              {{ saveMessage }}
+            </p>
 
             <div class="modal-footer">
               <button type="button" class="modal-btn modal-btn--ghost" @click="cancelEdit">
@@ -879,6 +1118,10 @@ function onEscape(e: KeyboardEvent) {
   @apply flex items-center gap-1.5 min-w-0 px-3 py-2 rounded-xl border text-left text-sm font-medium transition-all duration-150;
   @apply border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300;
   @apply hover:border-sky-300 dark:hover:border-sky-700 hover:shadow-sm;
+}
+
+.project-chip {
+  @apply items-start py-2.5;
 }
 
 .stack-chip--selected {

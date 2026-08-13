@@ -27,3 +27,5 @@ CURSOR_OPTIMIZATIONS.md
 app/pages/test-cursor.vue
 app/components/CursorTest.vue
 /supabase
+.env.example
+.vercel

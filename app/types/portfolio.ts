@@ -1,3 +1,5 @@
+import type { CompetenceCategoryDef } from '~/data/competence-categories'
+
 export interface PortfolioMeta {
   name: string
   role: string
@@ -44,7 +46,10 @@ export interface PortfolioCompetences {
   environnements: string[]
   methodes: string[]
   ia_cursor: string[]
+  [key: string]: string[]
 }
+
+export type { CompetenceCategoryDef }
 
 export interface PortfolioProject {
   id?: string
@@ -59,6 +64,7 @@ export interface PortfolioProject {
   link?: string
   github?: string
   featured_slot?: number | null
+  experience_id?: string | null
 }
 
 export interface TechFilter {
@@ -74,7 +80,8 @@ export interface PortfolioContent {
     a_propos: PortfolioAbout
     experiences: PortfolioExperience[]
     competences: PortfolioCompetences
-    competences_order: (keyof PortfolioCompetences)[]
+    competences_order: string[]
+    competences_categories?: CompetenceCategoryDef[]
     projets: PortfolioProject[]
     filtres_technologies: string[]
   }

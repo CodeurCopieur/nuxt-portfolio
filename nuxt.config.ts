@@ -9,7 +9,7 @@ export default defineNuxtConfig({
     '@nuxtjs/seo',
     'nuxt-schema-org'
   ],
-  css: ['@/assets/css/base.css'],
+  css: ['@/assets/css/base.css', 'leaflet/dist/leaflet.css'],
   app: {
     head: {
       title: 'Widdy Louis — Développeur Front-End',
@@ -23,6 +23,11 @@ export default defineNuxtConfig({
     { path: '~/components', pathPrefix: false }
   ],
   tailwindcss: { viewer: false },
+  vite: {
+    optimizeDeps: {
+      include: ['leaflet']
+    }
+  },
   experimental: { payloadExtraction: true },
   nitro: { 
     preset: 'vercel',

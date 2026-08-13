@@ -1,0 +1,212 @@
+[
+  {
+    "slug": "react_creer-des-composants-courants",
+    "title": "Bibliothèque de composants React réutilisables",
+    "summary": "Conception et développement d'une bibliothèque de composants UI réutilisables avec React 18 et Tailwind CSS, pensée pour accélérer la mise en page de interfaces modernes. Chaque composant est isolé, paramétrable et documenté pour favoriser la cohérence visuelle et la maintenabilité du code front-end. Le projet met l'accent sur la composition de composants, la gestion des variantes (états, tailles, couleurs) et l'accessibilité de base (sémantique HTML, focus, contrastes). L'architecture JavaScript modulaire facilite l'intégration dans des applications plus larges et sert de base de travail pour standardiser les patterns d'interface au sein de projets personnels.",
+    "stack": ["React", "JavaScript", "Tailwind CSS", "HTML", "CSS"],
+    "tags": ["React", "Composants UI", "Design System", "Tailwind CSS", "Front-end"]
+  },
+  {
+    "slug": "select-agences-js-poo",
+    "title": "Sélecteur d'agences bancaires — architecture POO",
+    "summary": "Application front-end de sélection d'agences bancaires construite en JavaScript vanilla avec une architecture orientée objet (classes, encapsulation, responsabilités séparées). Les données JSON sont chargées de façon asynchrone via XMLHttpRequest, puis injectées dynamiquement dans le DOM avec une approche de lazy loading pour limiter le rendu initial. Le projet explore la structuration du code métier (modèles, services, composants UI), la gestion des événements utilisateur et le stylage avancé en SCSS. Il constitue un cas d'école pour concilier performance perçue, lisibilité du code et montée en charge progressive des options dans un composant select complexe.",
+    "stack": ["JavaScript", "HTML", "CSS", "SCSS", "JSON", "XMLHttpRequest"],
+    "tags": ["JavaScript", "POO", "DOM", "AJAX", "Lazy Loading", "SCSS"]
+  },
+  {
+    "slug": "tmdb-movie-app-search-filter-pagination",
+    "title": "Catalogue cinéma interactif — API TMDB",
+    "summary": "Application web responsive de découverte de films s'appuyant sur l'API The Movie Database (TMDB) pour afficher catalogues, fiches détaillées et métadonnées enrichies. L'interface propose recherche en temps réel, filtrage par genres, pagination et navigation fluide entre les vues, le tout en JavaScript natif sans framework. La consommation REST est gérée via Fetch API, avec une séparation claire entre couche data, logique de filtrage et rendu DOM. Le projet démontre une maîtrise de l'intégration d'API tierces, de la gestion d'état côté client et de la construction d'expériences de consultation de contenus à fort volume.",
+    "stack": ["JavaScript", "HTML", "CSS", "SCSS", "Fetch API", "TMDB API"],
+    "tags": ["JavaScript", "API REST", "Responsive", "Recherche", "Pagination", "Cinéma"]
+  },
+  {
+    "slug": "styled-selects-price-calculator",
+    "title": "Selects stylisés et calculateur tarifaire dynamique",
+    "summary": "Module JavaScript dédié à la personnalisation avancée des éléments `<select>` natifs couplé à un calculateur de prix dynamique selon les critères sélectionnés (notamment la tranche d'âge). Le code source ES6+ est transpilé en ES5 via Babel pour garantir une compatibilité navigateurs élargie, avec un pipeline de build et un script de watch pour le développement continu. L'approche met en avant la manipulation fine du DOM, la persistance locale via localStorage et la création de composants réutilisables indépendants du framework. Projet publié sur CodePen, il illustre une expertise en micro-interactions UI et en logique métier front-end autonome.",
+    "stack": ["JavaScript", "ES6+", "HTML", "CSS", "Babel", "localStorage"],
+    "tags": ["JavaScript", "DOM", "Babel", "Calculateur", "UI Components", "CodePen"]
+  },
+  {
+    "slug": "javascript-dom-optimization-agency-selector",
+    "title": "Sélecteur d'agences haute performance — optimisation DOM",
+    "summary": "Refonte orientée performance d'un sélecteur d'agences bancaires capable de gérer des centaines d'options sans dégrader l'expérience utilisateur. L'implémentation repose sur une architecture POO en ES6+, un chargement des données via Fetch API et une insertion DOM par lots (batching) pour réduire les reflows et améliorer le Time to Interactive. Le projet compare les stratégies de rendu progressif et documente les compromis entre simplicité du markup et fluidité perçue. Il s'inscrit dans une démarche d'ingénierie front-end où la scalabilité du DOM et la maintenabilité du code sont traitées comme des exigences produit.",
+    "stack": ["JavaScript", "ES6+", "HTML5", "CSS3", "JSON", "Fetch API"],
+    "tags": ["JavaScript", "Performance", "POO", "DOM", "Fetch API", "Optimisation"]
+  },
+  {
+    "slug": "vue-lazy-loading-search-sorting",
+    "title": "Filtrage, tri et pagination — Vue.js",
+    "summary": "Application Vue.js dédiée à l'exploration des patterns de liste riche : recherche textuelle, tri multi-critères, pagination et lazy loading côté client. Le dataset complet est chargé une fois puis filtré en front-end, ce qui permet de comparer les performances et la réactivité de différentes stratégies de filtrage sans latence réseau supplémentaire. Vue Router structure la navigation entre vues, tandis que SCSS assure un habillage modulaire et responsive. Ce projet formalise une base réutilisable pour des tableaux de bord, catalogues ou back-offices légers où l'interactivité et la réactivité de l'interface sont centrales.",
+    "stack": ["Vue.js", "JavaScript", "Vue Router", "SCSS", "HTML", "CSS"],
+    "tags": ["Vue.js", "Recherche", "Tri", "Pagination", "Lazy Loading", "Front-end"]
+  },
+  {
+    "slug": "film-library-vuex-vueRouter",
+    "title": "Bibliothèque de films — Vuex & Vue Router",
+    "summary": "Application de gestion de bibliothèque de films construite avec Vue.js, centralisant l'état applicatif dans Vuex et la navigation dans Vue Router. L'utilisateur peut parcourir un catalogue, consulter les détails d'un film et gérer une liste de favoris persistée dans le store global. L'architecture sépare clairement vues, mutations/actions et composants présentationnels, facilitant l'évolution fonctionnelle. Le stylage Tailwind CSS accélère la mise en forme responsive. Projet structurant pour démontrer la maîtrise de l'écosystème Vue 3 autour de patterns SPA professionnels.",
+    "stack": ["Vue.js", "Vuex", "Vue Router", "Tailwind CSS", "JavaScript", "HTML"],
+    "tags": ["Vue.js", "Vuex", "Vue Router", "SPA", "Favoris", "Catalogue"]
+  },
+  {
+    "slug": "landing-page_gsap-scrolltrigger",
+    "title": "Landing page animée — GSAP ScrollTrigger & CSS Grid",
+    "summary": "Landing page immersive animée au scroll grâce au plugin ScrollTrigger de GSAP, combinée à une mise en page CSS Grid avancée. Les séquences d'animation sont synchronisées avec la progression de scroll pour révéler progressivement contenus, visuels et appels à l'action. Le projet explore le timing, l'easing, le pinning de sections et la performance des animations CSS/JS sur desktop et mobile. Une attention particulière est portée à la structure sémantique HTML et au decoupage SCSS pour maintenir un code lisible malgré la complexité motion design.",
+    "stack": ["GSAP", "ScrollTrigger", "JavaScript", "SCSS", "CSS Grid", "HTML"],
+    "tags": ["GSAP", "ScrollTrigger", "Animation", "Landing Page", "CSS Grid", "Motion Design"]
+  },
+  {
+    "slug": "landing-page_gsap-scrolltrigger-2",
+    "title": "Landing page narrative — GSAP ScrollTrigger (v2)",
+    "summary": "Deuxième itération d'une landing page à storytelling vertical, pilotée par GSAP et ScrollTrigger. Cette version explore une direction artistique différente avec de nouvelles séquences de parallax, transitions de typographie et révélations d'éléments au fil du scroll. Le code JavaScript isole les timelines réutilisables et paramètre les breakpoints pour adapter les animations aux viewports mobiles. Le projet consolide une méthodologie de prototypage motion design : maquettes statiques d'abord, puis orchestration progressive des animations pour un rendu premium.",
+    "stack": ["GSAP", "ScrollTrigger", "JavaScript", "SCSS", "HTML", "CSS"],
+    "tags": ["GSAP", "ScrollTrigger", "Landing Page", "Parallax", "Responsive", "Animation"]
+  },
+  {
+    "slug": "landing-page_gsap-scrolltrigger-3",
+    "title": "Landing page éditoriale — GSAP ScrollTrigger (v3)",
+    "summary": "Troisième exploration créative autour de GSAP ScrollTrigger, orientée vers une expérience éditoriale plus minimaliste et typographique. Les animations accentuent la hiérarchie de l'information et guident l'attention sans surcharger l'interface. HTML sémantique, SCSS modulaire et scripts GSAP découpés par section permettent d'itérer rapidement sur les effets. Ce projet complète une série de laboratoires front-end dédiés au scroll storytelling, compétence directement transposable aux sites premium en banque, luxe et médias.",
+    "stack": ["GSAP", "ScrollTrigger", "JavaScript", "HTML", "SCSS", "CSS"],
+    "tags": ["GSAP", "ScrollTrigger", "Typographie", "Landing Page", "Motion Design", "Front-end"]
+  },
+  {
+    "slug": "animated-navigation_jquery-gsap",
+    "title": "Navigation animée — jQuery & GSAP",
+    "summary": "Menu de navigation minimaliste animé combinant jQuery pour la gestion des interactions DOM et GSAP pour des transitions fluides et naturelles. Les micro-interactions (ouverture, hover, changement d'état actif) sont calibrées pour renforcer la lisibilité et le repérage dans l'interface. Le projet compare l'approche impérative jQuery avec des timelines GSAP réutilisables. Il sert de base pour des headers animés sur sites vitrines où la sobriété visuelle doit coexister avec une signature motion subtile.",
+    "stack": ["GSAP", "jQuery", "JavaScript", "SCSS", "HTML", "CSS"],
+    "tags": ["GSAP", "jQuery", "Navigation", "Animation", "UI", "Menu"]
+  },
+  {
+    "slug": "animated-navigation_gsap",
+    "title": "Navigation animée — GSAP vanilla",
+    "summary": "Implémentation d'un menu de navigation épuré entièrement animé avec GSAP, sans dépendance jQuery. Les états du menu (fermé, ouvert, focus) sont orchestrés via des timelines courtes et des easings maîtrisés pour un ressenti haut de gamme. L'approche vanilla JavaScript favorise un bundle plus léger et une meilleure maintenabilité long terme. Le stylage SCSS structure les layers, z-index et transitions CSS complémentaires. Projet de référence pour moderniser des patterns de navigation historiques vers une stack plus contemporaine.",
+    "stack": ["GSAP", "JavaScript", "SCSS", "HTML", "CSS"],
+    "tags": ["GSAP", "Navigation", "Vanilla JS", "Animation", "SCSS", "UI"]
+  },
+  {
+    "slug": "fullscreen-menu_gsap",
+    "title": "Menu plein écran responsive — GSAP & Pug",
+    "summary": "Conception d'un menu plein écran responsive avec animations GSAP et templating Pug pour accélérer la génération du markup. L'ouverture/fermeture du menu s'accompagne d'animations staggerées sur les liens, créant une expérience immersive typique des sites créatifs et institutionnels premium. La structure SCSS mobile-first garantit une ergonomie tactile sur smartphone et tablette. Le projet illustre la combinaison efficace entre préprocesseur HTML, motion design et bonnes pratiques d'accessibilité (focus trap, aria, fermeture clavier).",
+    "stack": ["GSAP", "JavaScript", "Pug", "SCSS", "HTML", "CSS"],
+    "tags": ["GSAP", "Menu", "Fullscreen", "Responsive", "Pug", "Animation"]
+  },
+  {
+    "slug": "full-page-menu_gsap",
+    "title": "Menu de navigation pleine page — GSAP",
+    "summary": "Interaction de menu occupant l'intégralité du viewport, avec transitions GSAP soignées entre la vue contenu et la couche navigation. Les animations de texte et de fond sont synchronisées pour produire un effet de profondeur et de continuité visuelle. Le code sépare configuration des timelines, gestion des événements utilisateur et styles SCSS modulaires. Ce pattern est fréquemment demandé en agence digitale pour des sites à forte identité de marque nécessitant une navigation mémorable sans sacrifier la performance.",
+    "stack": ["GSAP", "JavaScript", "Pug", "SCSS", "HTML", "CSS"],
+    "tags": ["GSAP", "Navigation", "Full Page", "Motion Design", "SCSS", "UI"]
+  },
+  {
+    "slug": "animation-florale-stylisee-gsap-css",
+    "title": "Animation florale stylisée — GSAP & CSS",
+    "summary": "Étude créative d'animation florale combinant GSAP pour le mouvement organique et CSS pour les textures, dégradés et masques visuels. Les séquences mettent en scène apparitions progressives, rotations subtiles et boucles harmonieuses pour un rendu décoratif haut de gamme. Le projet démontre la complémentarité entre animation JavaScript et propriétés CSS modernes (transform, filter, clip-path). Idéal comme hero section ou module de branding pour des univers lifestyle, beauté ou éditorial.",
+    "stack": ["GSAP", "JavaScript", "HTML", "CSS"],
+    "tags": ["GSAP", "CSS", "Animation", "Illustration", "Motion Design", "Créatif"]
+  },
+  {
+    "slug": "form-validation-javascript",
+    "title": "Framework de validation de formulaires — JavaScript",
+    "summary": "Mise en place d'un système de validation de formulaires réutilisable en JavaScript vanilla, capable de s'adapter à plusieurs formulaires via configuration et attributs HTML natifs. Les règles de validation (required, format email, longueur, cohérence entre champs) sont centralisées dans un ensemble de fonctions modulaires, avec retours visuels accessibles et messages d'erreur contextualisés. Le projet s'appuie sur les contraintes HTML5 tout en enrichissant l'expérience utilisateur côté client avant soumission. Une base solide pour des parcours de conversion (contact, inscription, simulateurs) en environnement bancaire ou e-commerce.",
+    "stack": ["JavaScript", "HTML", "CSS", "SCSS"],
+    "tags": ["JavaScript", "Validation", "Formulaires", "Accessibilité", "UX", "Vanilla JS"]
+  },
+  {
+    "slug": "disney-clone-tailwind",
+    "title": "Interface streaming — clone Disney+ (Vue & Tailwind)",
+    "summary": "Reproduction fidèle de l'interface Disney+ en Vue.js avec Tailwind CSS, incluant grille de contenus, carrousels, navigation principale et direction artistique sombre caractéristique des plateformes OTT. Vue Router et Vuex structurent la navigation et l'état global (sélection de profils, favoris simulés). Tailwind accélère la mise en page responsive et la gestion cohérente des espacements, couleurs et typographies. Projet démontrant la capacité à analyser une UI de référence marché et à la reconstruire proprement avec une stack moderne composable.",
+    "stack": ["Vue.js", "Vue Router", "Vuex", "Tailwind CSS", "JavaScript", "HTML"],
+    "tags": ["Vue.js", "Tailwind CSS", "Clone UI", "Streaming", "Responsive", "Design System"]
+  },
+  {
+    "slug": "simulateur-epargne-sg",
+    "title": "Rubrique simulateurs d'épargne — Société Générale",
+    "summary": "Intégration front-end de la rubrique simulateurs d'épargne sur l'espace particuliers Société Générale, dans un contexte CMS OpenText et exigences bancaires strictes (conformité, performance, accessibilité). Développement JavaScript des interactions de navigation entre simulateurs, animations GSAP pour valoriser les parcours et harmonisation SCSS avec la charte groupe. Collaboration en équipe agile (Jira), revues de code et livraisons itératives en environnement Windows. Le projet illustre l'intégration de modules financiers complexes au sein d'un écosystème legacy tout en maintenant une expérience utilisateur fluide.",
+    "stack": ["JavaScript", "GSAP", "SCSS", "OpenText", "HTML", "CSS"],
+    "tags": ["Banque", "Simulateur", "Épargne", "OpenText", "GSAP", "Intégration"]
+  },
+  {
+    "slug": "simulateur-epargne-sg-livret-a",
+    "title": "Simulateur Livret A — Société Générale",
+    "summary": "Conception et développement du simulateur Livret A permettant aux particuliers d'estimer rendements, plafonds et scénarios de versements selon la réglementation en vigueur. Implémentation JavaScript/jQuery des règles métier, validations de saisie et restitution des résultats en temps réel, intégrée dans le CMS OpenText. Qualité de code suivie via SonarQube (dettes techniques, couverture, vulnérabilités) avec assistance GitHub Copilot pour accélérer les tâches répétitives tout en conservant la revue humaine. Livraison en cycle agile avec suivi Jira, tests fonctionnels et coordination avec les équipes métier banque.",
+    "stack": ["JavaScript", "jQuery", "HTML", "CSS", "OpenText", "SonarQube"],
+    "tags": ["Banque", "Livret A", "Simulateur", "SonarQube", "OpenText", "Réglementaire"]
+  },
+  {
+    "slug": "simulateur-epargne-sg-livret-jeune",
+    "title": "Simulateur Livret Jeune — Société Générale",
+    "summary": "Développement du simulateur dédié au Livret Jeune, adapté aux contraintes spécifiques de ce produit (conditions d'éligibilité, plafonds, fiscalité). Le moteur de calcul JavaScript traduit les règles métier en logique front-end testée et maintenable, avec messages d'aide contextualisés pour guider l'utilisateur. Intégration OpenText, contrôle qualité SonarQube et workflow Git/GitHub en équipe distribuée. Le projet renforce l'offre simulateurs SG en proposant un parcours pédagogique aligné sur les attentes réglementaires et les standards UX du secteur bancaire.",
+    "stack": ["JavaScript", "jQuery", "HTML", "CSS", "OpenText", "SonarQube"],
+    "tags": ["Banque", "Livret Jeune", "Simulateur", "JavaScript", "OpenText", "Agile"]
+  },
+  {
+    "slug": "ouvrir-compte-bancaire-en-ligne",
+    "title": "Parcours d'ouverture de compte en ligne — SG",
+    "summary": "Refonte et intégration front-end de la page « Ouvrir un compte bancaire en ligne » sur le site Société Générale Particuliers. Travail sur la structure HTML sémantique, les composants interactifs JavaScript et la cohérence visuelle SCSS/CSS au sein du CMS OpenText. Optimisation du parcours de conversion : hiérarchie de l'information, CTAs, responsive et compatibilité navigateurs. Coordination via Jira avec les équipes métier, design et back-office. Projet représentatif des enjeux d'acquisition client digital en banque retail.",
+    "stack": ["JavaScript", "HTML", "CSS", "OpenText", "Git", "GitHub"],
+    "tags": ["Banque", "Conversion", "OpenText", "Intégration", "Responsive", "Parcours client"]
+  },
+  {
+    "slug": "balmain-sneakers-landing",
+    "title": "Landing sneakers Balmain — intégration animée",
+    "summary": "TMA et intégration front-end d'une landing page sneakers pour la maison Balmain, en environnement Drupal/React avec animations GSAP haut de gamme. Reprise des livrables design Zeplin, respect millimétré de la charte luxe (typographies, espacements, rythme visuel) et mise en production soignée. Les séquences motion renforcent le storytelling produit sans compromettre les performances perçues. Collaboration étroite avec l'agence Mazarine dans un contexte international exigeant, typique des projets mode & luxe.",
+    "stack": ["React", "GSAP", "SCSS", "Drupal", "JavaScript", "HTML"],
+    "tags": ["Luxe", "Balmain", "GSAP", "React", "Drupal", "Intégration"]
+  },
+  {
+    "slug": "numero",
+    "title": "Évolutions éditoriales — Numéro Magazine",
+    "summary": "Maintenance et évolution front-end du site de Numéro Magazine (Drupal/Twig) : refonte de pages article, formulaire de recherche éditoriale et mise en conformité RGPD via Tarteaucitron. Intégration HTML/SCSS/JS des composants fournis par le design, avec attention à la densité éditoriale, aux grilles typographiques presse et aux contraintes multilingues. Travail en TMA au sein de Mazarine, avec livraisons continues et respect des délais de publication magazine. Projet démontrant l'adaptabilité aux CMS enterprise et aux exigences médias premium.",
+    "stack": ["Twig", "Drupal", "JavaScript", "SCSS", "HTML", "CSS"],
+    "tags": ["Presse", "Drupal", "Twig", "RGPD", "Éditorial", "Mazarine"]
+  },
+  {
+    "slug": "opera-de-paris",
+    "title": "Pages abonnements — Opéra de Paris",
+    "summary": "Intégration des pages abonnements et contenus associés pour l'Opéra de Paris, dans un écosystème Drupal/Twig orienté billetterie et relation public. Développement des gabarits HTML, styles SCSS modulaires et interactions JavaScript pour présenter offres, tarifs et parcours de souscription. Respect de l'identité institutionnelle, accessibilité renforcée et compatibilité multi-navigateurs. Projet culturel premium illustrant la capacité à traduire des enjeux institutionnels complexes en interfaces claires et élégantes.",
+    "stack": ["Twig", "Drupal", "JavaScript", "SCSS", "HTML", "CSS"],
+    "tags": ["Culture", "Opéra de Paris", "Drupal", "Abonnements", "Intégration", "Institutionnel"]
+  },
+  {
+    "slug": "groupe-cyllene",
+    "title": "Refonte site corporate — Groupe Cyllene",
+    "summary": "Refonte from scratch du site groupe-cyllene.com avec approche mobile-first, animations GSAP subtiles et architecture front-end jQuery/SCSS. Reconstruction des templates de pages institutionnelles (présentation, filiales, contact) avec une direction artistique épurée et professionnelle. Optimisation des performances de scroll, lazy loading des médias et cohérence responsive sur l'ensemble du parcours. Projet corporate B2B mettant en avant la rigueur d'intégration et la qualité de exécution sur un site vitrine de groupe.",
+    "stack": ["JavaScript", "jQuery", "GSAP", "SCSS", "HTML", "CSS"],
+    "tags": ["Refonte", "Corporate", "GSAP", "Mobile-first", "jQuery", "SCSS"]
+  },
+  {
+    "slug": "experience-lepoint",
+    "title": "Landing « Expérience Le Point »",
+    "summary": "Intégration from scratch de la landing page « Expérience Le Point », vitrine éditoriale mettant en avant l'univers et les formats du groupe. Animations CSS/JavaScript, structure HTML sémantique et déclinaisons responsive pour desktop, tablette et mobile. Collaboration avec les équipes Le Point via Jira, dans le cadre d'une TMA presse exigeante en délais et qualité de rendu. Le projet illustre la production de pages événementielles à fort impact visuel au sein d'un CMS maison.",
+    "stack": ["JavaScript", "HTML", "CSS"],
+    "tags": ["Presse", "Le Point", "Landing Page", "Animation", "Responsive", "TMA"]
+  },
+  {
+    "slug": "lepoint-elections-municipales",
+    "title": "Rubrique Élections municipales 2020 — Le Point",
+    "summary": "Création de la rubrique dédiée aux élections municipales 2020 sur lepoint.fr : gabarits Twig, intégration HTML/CSS/JS et composants de data visualisation éditoriale. Mise en place de modules de une, dossiers thématiques et liens transverses pour maximiser la discoverability des contenus. Coordination avec la rédaction et les équipes techniques dans un contexte d'actualité forte et de contraintes de mise en ligne rapide. Projet représentatif des rubriques événementielles à fort trafic média.",
+    "stack": ["JavaScript", "Twig", "HTML", "CSS"],
+    "tags": ["Presse", "Élections", "Le Point", "Twig", "Actualité", "Intégration"]
+  },
+  {
+    "slug": "lepoint-afrique",
+    "title": "Refonte rubrique Afrique — Le Point",
+    "summary": "Migration et refonte de la rubrique Afrique et de ses sous-sections sur lepoint.fr, avec restructuration des gabarits Twig et modernisation des styles CSS/JS. Amélioration de la lisibilité éditoriale, de la navigation inter-rubriques et de la performance perçue sur mobile. Travail mené en étroite collaboration avec les équipes éditoriales pour respecter l'identité journalistique du titre. Projet international démontrant la gestion de sites multirubriques à forte volumétrie de contenus.",
+    "stack": ["JavaScript", "Twig", "HTML", "CSS"],
+    "tags": ["Presse", "Afrique", "Refonte", "Twig", "Le Point", "Éditorial"]
+  },
+  {
+    "slug": "lepoint-vin",
+    "title": "Rubrique Vin — Le Point",
+    "summary": "Intégration de composants éditoriaux spécifiques à la rubrique Vin du Point : mises en page dégustation, dossiers producteurs, grilles d'articles et modules de recommandation. Développement Twig/HTML/CSS/JS en respect de la charte presse et des contraintes SEO du groupe. Optimisation des temps de chargement et des images pour un public premium sensible à la qualité de lecture. Projet niche illustrant l'adaptation UI à des contenus spécialisés.",
+    "stack": ["JavaScript", "Twig", "HTML", "CSS"],
+    "tags": ["Presse", "Vin", "Le Point", "Twig", "Éditorial", "SEO"]
+  },
+  {
+    "slug": "lepoint-montres",
+    "title": "Rubrique Montres — Le Point",
+    "summary": "Intégration front-end de la rubrique Montres sur lepoint.fr, avec composants dédiés aux articles horlogerie haut de gamme (fiches produit, comparatifs, galeries). Stylage soigné mettant en valeur photographies et typographies éditoriales, compatible CMS maison et workflow Jira. Responsive design avancé pour consultation mobile, audience importante sur les rubriques lifestyle. Projet démontrant la précision d'intégration requise pour des univers premium au sein de la presse.",
+    "stack": ["JavaScript", "Twig", "HTML", "CSS"],
+    "tags": ["Presse", "Montres", "Lifestyle", "Twig", "Le Point", "Intégration"]
+  }
+]

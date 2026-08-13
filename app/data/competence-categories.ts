@@ -1,14 +1,28 @@
-import type { PortfolioCompetences } from '~/types/portfolio'
+export type BuiltinCompetenceCategoryKey =
+  | 'langages'
+  | 'frameworks'
+  | 'outils_dev'
+  | 'ui_animations'
+  | 'design'
+  | 'environnements'
+  | 'methodes'
+  | 'ia_cursor'
 
-export type CompetenceCategoryKey = keyof PortfolioCompetences
+export type CompetenceCategoryKey = BuiltinCompetenceCategoryKey
 
 export interface CompetenceCategoryDef {
-  key: CompetenceCategoryKey
+  key: string
   label: string
   hint: string
   description: string
   accent: string
   gradient: string
+}
+
+export interface CustomCategoriesData {
+  definitions: CompetenceCategoryDef[]
+  skills: Record<string, string[]>
+  hidden_builtin?: string[]
 }
 
 export const COMPETENCE_CATEGORIES: CompetenceCategoryDef[] = [
@@ -78,24 +92,119 @@ export const COMPETENCE_CATEGORIES: CompetenceCategoryDef[] = [
   }
 ]
 
-export const DEFAULT_COMPETENCES_ORDER: CompetenceCategoryKey[] = COMPETENCE_CATEGORIES.map((c) => c.key)
+export const BUILTIN_COMPETENCE_KEYS = new Set(COMPETENCE_CATEGORIES.map((c) => c.key))
 
-const categoryKeys = new Set<CompetenceCategoryKey>(DEFAULT_COMPETENCES_ORDER)
+export const DEFAULT_COMPETENCES_ORDER: string[] = COMPETENCE_CATEGORIES.map((c) => c.key)
 
-export function isCompetenceCategoryKey(value: string): value is CompetenceCategoryKey {
-  return categoryKeys.has(value as CompetenceCategoryKey)
+export const CUSTOM_CATEGORY_ACCENT_PRESETS: Pick<CompetenceCategoryDef, 'accent' | 'gradient'>[] = [
+  { accent: 'rose', gradient: 'from-rose-500 to-red-600' },
+  { accent: 'cyan', gradient: 'from-cyan-500 to-blue-600' },
+  { accent: 'lime', gradient: 'from-lime-500 to-green-600' },
+  { accent: 'amber', gradient: 'from-amber-500 to-yellow-600' }
+]
+
+const emptyCustomCategories = (): CustomCategoriesData => ({
+  definitions: [],
+  skills: {},
+  hidden_builtin: []
+})
+
+export function parseCustomCategories(raw: unknown): CustomCategoriesData {
+  if (!raw || typeof raw !== 'object') return emptyCustomCategories()
+
+  const obj = raw as Record<string, unknown>
+  const definitions = Array.isArray(obj.definitions)
+    ? obj.definitions
+        .filter((item): item is CompetenceCategoryDef =>
+          !!item
+          && typeof item === 'object'
+          && typeof (item as CompetenceCategoryDef).key === 'string'
+          && typeof (item as CompetenceCategoryDef).label === 'string'
+        )
+        .filter((item) => !BUILTIN_COMPETENCE_KEYS.has(item.key))
+    : []
+
+  const skills: Record<string, string[]> = {}
+  if (obj.skills && typeof obj.skills === 'object') {
+    for (const [key, value] of Object.entries(obj.skills as Record<string, unknown>)) {
+      if (Array.isArray(value)) skills[key] = value.filter((v): v is string => typeof v === 'string')
+    }
+  }
+
+  return { definitions, skills, hidden_builtin: Array.isArray(obj.hidden_builtin) ? obj.hidden_builtin.filter((k): k is string => typeof k === 'string') : [] }
 }
 
-export function resolveCompetencesOrder(order: string[] | undefined | null): CompetenceCategoryKey[] {
-  const valid = (order ?? []).filter(isCompetenceCategoryKey)
-  const missing = DEFAULT_COMPETENCES_ORDER.filter((key) => !valid.includes(key))
+export function isBuiltinCategoryKey(key: string) {
+  return BUILTIN_COMPETENCE_KEYS.has(key)
+}
+
+export function slugifyCategoryKey(label: string) {
+  const base = label
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 40)
+
+  return base || 'categorie'
+}
+
+export function resolveCompetencesOrder(order: string[] | undefined | null, allKeys?: string[]) {
+  const keys = allKeys ?? DEFAULT_COMPETENCES_ORDER
+  const valid = (order ?? []).filter((key) => keys.includes(key))
+  const missing = keys.filter((key) => !valid.includes(key))
   return [...valid, ...missing]
 }
 
-export function getCompetenceCategory(key: CompetenceCategoryKey): CompetenceCategoryDef {
-  return COMPETENCE_CATEGORIES.find((c) => c.key === key)!
+export function mergeCompetenceCategories(
+  order: string[] | undefined | null,
+  customDefinitions: CompetenceCategoryDef[] = []
+): CompetenceCategoryDef[] {
+  const custom = customDefinitions.filter((cat) => !isBuiltinCategoryKey(cat.key))
+  const map = new Map<string, CompetenceCategoryDef>()
+
+  for (const cat of COMPETENCE_CATEGORIES) map.set(cat.key, cat)
+  for (const cat of custom) map.set(cat.key, cat)
+
+  return resolveCompetencesOrder(order, [...map.keys()])
+    .map((key) => map.get(key))
+    .filter((cat): cat is CompetenceCategoryDef => !!cat)
 }
 
-export function sortCompetenceCategories(order: CompetenceCategoryKey[]): CompetenceCategoryDef[] {
-  return resolveCompetencesOrder(order).map(getCompetenceCategory)
+export function getCompetenceCategory(key: string, customDefinitions: CompetenceCategoryDef[] = []) {
+  return mergeCompetenceCategories([...DEFAULT_COMPETENCES_ORDER, ...customDefinitions.map((c) => c.key)], customDefinitions)
+    .find((cat) => cat.key === key)
+}
+
+export function sortCompetenceCategories(
+  order: string[],
+  customDefinitions: CompetenceCategoryDef[] = []
+) {
+  return mergeCompetenceCategories(order, customDefinitions)
+}
+
+export function isCompetenceCategoryKey(value: string): value is CompetenceCategoryKey {
+  return BUILTIN_COMPETENCE_KEYS.has(value as CompetenceCategoryKey)
+}
+
+export function buildCustomCategoryDefinition(label: string, hint: string, description: string, index: number): CompetenceCategoryDef {
+  const preset = CUSTOM_CATEGORY_ACCENT_PRESETS[index % CUSTOM_CATEGORY_ACCENT_PRESETS.length]!
+  return {
+    key: slugifyCategoryKey(label),
+    label: label.trim(),
+    hint: hint.trim() || 'Compétences…',
+    description: description.trim() || label.trim(),
+    accent: preset.accent,
+    gradient: preset.gradient
+  }
+}
+
+export function createUniqueCategoryKey(label: string, existingKeys: Set<string>) {
+  let key = slugifyCategoryKey(label)
+  if (!existingKeys.has(key)) return key
+
+  let index = 2
+  while (existingKeys.has(`${key}_${index}`)) index += 1
+  return `${key}_${index}`
 }

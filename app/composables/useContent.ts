@@ -1,5 +1,16 @@
 import type { PortfolioContent, PortfolioProject } from '~/types/portfolio'
 import fallbackData from '@/data/content.json'
+import { sortExperiencesChronologically } from '~/utils/experience-map'
+
+function withSortedExperiences(content: PortfolioContent): PortfolioContent {
+  return {
+    ...content,
+    sections: {
+      ...content.sections,
+      experiences: sortExperiencesChronologically(content.sections.experiences)
+    }
+  }
+}
 
 export function getRecentProjects(projets: PortfolioProject[]): PortfolioProject[] {
   const featured = projets
@@ -13,7 +24,7 @@ export function getRecentProjects(projets: PortfolioProject[]): PortfolioProject
 export function useContent() {
   const { data } = useFetch<PortfolioContent>('/api/content', {
     key: 'portfolio-content',
-    default: () => fallbackData as PortfolioContent
+    default: () => withSortedExperiences(fallbackData as PortfolioContent)
   })
 
   const meta = computed(() => data.value!.meta)

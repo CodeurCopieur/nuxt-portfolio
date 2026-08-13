@@ -9,6 +9,8 @@ const route = useRoute()
 const isScrolled = ref(false)
 
 onMounted(() => {
+  document.documentElement.style.overflow = ''
+  document.body.style.overflow = ''
   window.addEventListener('scroll', () => {
     isScrolled.value = window.scrollY > 20
   })

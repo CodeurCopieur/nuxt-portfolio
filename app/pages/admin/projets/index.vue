@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import type { PortfolioProject, TechFilter } from '~/types/portfolio'
+import type { PortfolioExperience, PortfolioProject, TechFilter } from '~/types/portfolio'
 
 definePageMeta({ layout: 'admin', middleware: 'admin-auth' })
 
 const { supabase } = useAdminAuth()
 const projects = ref<PortfolioProject[]>([])
+const experiences = ref<PortfolioExperience[]>([])
 const filters = ref<TechFilter[]>([])
 const editing = ref<(PortfolioProject & { tagsText: string }) | null>(null)
 const isNew = ref(false)
@@ -47,8 +48,49 @@ const emptyForm = (): PortfolioProject & { tagsText: string } => ({
   summary: '',
   link: '',
   github: '',
+  experience_id: null,
   tagsText: ''
 })
+
+function experienceLabel(exp: PortfolioExperience) {
+  const parts = [exp.company]
+  if (exp.role) parts.push(exp.role)
+  if (exp.period) parts.push(`(${exp.period})`)
+  return parts.join(' — ')
+}
+
+function workplaceForProject(project: PortfolioProject) {
+  if (!project.experience_id) return null
+  return experiences.value.find((exp) => exp.id === project.experience_id) ?? null
+}
+
+async function loadExperiences() {
+  const { data, error } = await supabase
+    .from('portfolio_experiences')
+    .select('id, company, location, role, period, sort_order')
+    .order('sort_order', { ascending: true })
+
+  if (error) {
+    message.value = `Erreur expériences : ${error.message}`
+    return
+  }
+
+  experiences.value = (data ?? []).map((exp) => ({
+    id: exp.id,
+    sort_order: exp.sort_order,
+    company: exp.company,
+    location: exp.location,
+    role: exp.role,
+    period: exp.period,
+    date_debut: '',
+    date_fin: '',
+    summary: '',
+    missions: [],
+    stack: [],
+    tags: [],
+    links: []
+  }))
+}
 
 async function loadProjects() {
   const { data, error } = await supabase
@@ -73,7 +115,8 @@ async function loadProjects() {
     summary: p.summary,
     link: p.link ?? undefined,
     github: p.github ?? undefined,
-    featured_slot: p.featured_slot ?? null
+    featured_slot: p.featured_slot ?? null,
+    experience_id: p.experience_id ?? null
   }))
 }
 
@@ -97,7 +140,7 @@ async function loadFilters() {
 }
 
 async function load() {
-  await Promise.all([loadProjects(), loadFilters()])
+  await Promise.all([loadProjects(), loadFilters(), loadExperiences()])
 }
 
 function uniqueSlug(base: string, excludeId?: string) {
@@ -121,6 +164,7 @@ const previewSlug = computed(() => {
 function startEdit(p: PortfolioProject) {
   editing.value = {
     ...p,
+    experience_id: p.experience_id ?? null,
     tagsText: arrayToCsv(p.tags)
   }
   isNew.value = false
@@ -162,6 +206,7 @@ async function save() {
     summary: p.summary,
     link: p.link || null,
     github: p.github || null,
+    experience_id: p.experience_id || null,
     sort_order: p.sort_order ?? projects.value.length,
     updated_at: new Date().toISOString()
   }
@@ -171,14 +216,20 @@ async function save() {
     : await supabase.from('portfolio_projects').update(payload).eq('id', p.id!)
 
   saving.value = false
-  message.value = error ? error.message : 'Projet enregistré avec succès'
 
-  if (!error) {
-    editing.value = null
-    selectedStacks.value = []
-    await loadProjects()
-    await refreshNuxtData('portfolio-content')
+  if (error) {
+    message.value = error.message.includes('experience_id')
+      ? `Colonne experience_id absente. Exécutez supabase/migration-project-experience.sql dans Supabase. (${error.message})`
+      : error.message
+    return
   }
+
+  message.value = 'Projet enregistré avec succès'
+
+  editing.value = null
+  selectedStacks.value = []
+  await loadProjects()
+  await refreshNuxtData('portfolio-content')
 }
 
 async function remove(id: string) {
@@ -208,6 +259,22 @@ watch(editing, (val) => {
     document.body.style.overflow = val ? 'hidden' : ''
   }
 })
+
+function onExperienceChange(experienceId: string) {
+  if (!editing.value) return
+
+  if (!experienceId) {
+    editing.value.experience_id = null
+    if (!editing.value.org || experiences.value.some((exp) => exp.company === editing.value!.org)) {
+      editing.value.org = 'Projet personnel'
+    }
+    return
+  }
+
+  editing.value.experience_id = experienceId
+  const exp = experiences.value.find((item) => item.id === experienceId)
+  if (exp) editing.value.org = exp.company
+}
 </script>
 
 <template>
@@ -259,7 +326,13 @@ watch(editing, (val) => {
                 </span>
               </div>
               <p class="text-sm text-gray-500 dark:text-gray-400 truncate">
-                {{ p.org || 'Sans organisation' }}
+                <template v-if="workplaceForProject(p)">
+                  📍 {{ workplaceForProject(p)!.company }}
+                  <span v-if="workplaceForProject(p)!.location"> · {{ workplaceForProject(p)!.location }}</span>
+                </template>
+                <template v-else>
+                  {{ p.org || 'Sans organisation' }}
+                </template>
               </p>
               <p class="text-xs font-mono text-sky-600 dark:text-sky-400 mt-1 truncate">
                 /projets/{{ p.slug }}
@@ -374,6 +447,26 @@ watch(editing, (val) => {
                 <input v-model="editing.title" class="admin-input" required placeholder="Mon super projet">
                 <p v-if="previewSlug" class="mt-2 text-sm text-gray-500 dark:text-gray-400">
                   URL : <span class="font-mono text-sky-600 dark:text-sky-400">/projets/{{ previewSlug }}</span>
+                </p>
+              </div>
+              <div class="sm:col-span-2">
+                <label class="admin-label">Lieu de travail</label>
+                <select
+                  class="admin-input"
+                  :value="editing.experience_id ?? ''"
+                  @change="onExperienceChange(($event.target as HTMLSelectElement).value)"
+                >
+                  <option value="">— Projet personnel / sans lieu —</option>
+                  <option
+                    v-for="exp in experiences"
+                    :key="exp.id"
+                    :value="exp.id"
+                  >
+                    {{ experienceLabel(exp) }}
+                  </option>
+                </select>
+                <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                  Lie les expériences du parcours à ce projet. L’organisation est remplie automatiquement.
                 </p>
               </div>
               <div>

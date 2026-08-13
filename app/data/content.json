@@ -1,466 +1,1001 @@
 {
-    "meta": {
-      "name": "Widdy Louis",
-      "role": "Développeur Front-End & Intégrateur Web",
-      "years_experience": 7,
-      "location": "Paris / Remote",
-      "email": "louiswiddy49@gmail.com",
-      "phone": "06 22 85 31 21",
-      "links": {
-        "linkedin": "https://www.linkedin.com/in/widdy-louis/",
-        "github": "https://github.com/CodeurCopieur"
-      },
-      "tagline": "Interfaces rapides, accessibles et animées (juste ce qu’il faut)."
+  "meta": {
+    "name": "Widdy Louis",
+    "role": "Développeur Front-End & Intégrateur Web",
+    "years_experience": 7,
+    "location": "Paris / Remote",
+    "email": "louiswiddy49@gmail.com",
+    "phone": "06 22 85 31 21",
+    "links": {
+      "linkedin": "https://www.linkedin.com/in/widdy-louis/",
+      "github": "https://github.com/CodeurCopieur"
     },
-    "sections": {
-      "a_propos": {
-        "bio": "Passionné par la création d’interfaces performantes et accessibles, j’ai évolué dans des environnements exigeants (banque, luxe, presse) où j’ai contribué à des projets innovants. Fort de mes différentes expériences, j’apporte un soin particulier à la performance des sites, au graphisme, la prise en compte des contraintes d'accessibilité et du responsive design. je me forme en permanence pour parfaire mon travail.",
-        "highlights": [
-          "TypeScript, Nuxt 3 / Vue 3, TailwindCSS, GSAP",
-          "Accessibilité, SEO, mobile-first",
-          "Animations maîtrisées (AOS, ScrollReveal, ScrollMagic, CSS)",
-          "Culture design (Figma, Zeplin), TMA et optimisation"
-        ],
-        "availability": "Freelance — missions courte ou moyenne durée"
-      },
-      "experiences": [
-        {
-          "company": "Société Générale",
-          "location": "La Défense",
-          "role": "Développeur Web Front-End",
-          "period": "Jan 2022 – Août. 2025",
-          "date_debut": "01/2022",
-          "date_fin": "06/2025",
-          "summary": "Au sein des équipes Stream Run puis POI, développement d’outils d’affichage dynamique, assistant IA de claims, analytics usage, simulateur d’épargne, intégration de maquettes (Design System).",
-          "missions": [
-            "Pilotage projet : organisation des tâches dans JIRA.",
-            "Dev JS: 2 outils interne d’affichage dynamique des campagnes, Assistant IA de génération/évaluation de claims illustrés, Script d’analytics pour le suivi du comportement utilisateur, Simulateur d’épargne intégrant les règles fiscales",
-            "Intégration UI : implémentation des maquettes Figma (Design System, landing page) et TMA/corrections JS."
-          ],
-          "stack": ["JavaScript", "JSON", "HTML", "CSS", "VS Code", "Figma", "Git/GitHub", "Windows", "Teams", "Copilot"],
-          "tags": ["Banque", "Dashboard", "Simulateur", "Analytics", "Design System"],
-          "links": ["https://particuliers.sg.fr/"]
-        },
-        {
-          "company": "Mazarine",
-          "location": "Paris",
-          "role": "Développeur Front-End",
-          "period": "Mars 2021 – Août 2021",
-          "date_debut": "03/2022",
-          "date_fin": "08/2022",
-          "summary": "Pages animées (GSAP), optimisations SEO/RGPD, extraction JSON pour moteur de recherche.",
-          "missions": [
-            "Pilotage projet : organisation des tâches dans JIRA + Plateforme maison",
-            "Intégration & animation : analyse des maquettes Zeplin → création de pages animées (GSAP, JavaScript natif)",
-            "Clients servis : Balmain Sneakers · Opéra de Paris · Studio Acacia · Hôtel Salomon de Rothschild · Ritz Paris · Magazine Numéro",
-            "Optimisation sémantique (Hn, Search Console), RGPD (Tarte au citron, One Trust)",
-            "TMA: corrections/évolutions JS",
-            "Agile : stand-ups quotidiens et communication continue sur Microsoft Teams (compatible télétravail)"
-          ],
-          "stack": ["JavaScript", "Vue 3", "React", "GSAP", "HTML", "CSS", "SCSS", "OCSS", "mobile-first", "Twig", "Drupal", "VS Code", "Git/GitHub", "Jira", "Windows"],
-          "clients": ["Balmain Sneakers", "Opéra de Paris", "Studio Acacia", "Hôtel Salomon de Rothschild", "Ritz Paris", "Magazine Numéro"],
-          "tags": ["Luxe", "Culture", "CMS", "Animation"],
-          "links": ["https://www.mazarine.com/"]
-        },
-        {
-          "company": "Cyllene",
-          "location": "Paris",
-          "role": "Intégrateur Web",
-          "period": "Août 2020 – Fév. 2021",
-          "date_debut": "08/2020",
-          "date_fin": "02/2021",
-          "summary": "Intégration Zeplin, pages animées GSAP, SEO/RGPD, extractions JSON pour formulaires.",
-          "missions": [
-            "Pilotage projet : organisation des tâches dans JIRA + Plateforme maison",
-            "Intégration & animation : analyse Zeplin → pages animées (GSAP, JavaScript natif)",
-            "Clients servis : Uriage · Nuxe · LesVoyagesFr",
-            "Lead HTML/CSS/jQuery du front",
-            "Création de pages animées (GSAP, JS natif)",
-            "Optimisation SEO & mise en place RGPD"
-          ],
-          "stack": ["JavaScript", "Vue 3", "GSAP", "jQuery", "HTML", "CSS", "SCSS", "Twig", "Zeplin", "GitLab", "macOS"],
-          "clients": ["Uriage", "Nuxe", "LesVoyagesFr"],
-          "links": ["https://www.groupe-cyllene.com/fr/"],
-          "tags": ["Agence", "SEO", "RGPD", "Animation"]
-        },
-        {
-          "company": "Le Point",
-          "location": "Paris",
-          "role": "Intégrateur Web",
-          "period": "Nov. 2017 – Fév. 2020",
-          "date_debut": "11/2017",
-          "date_fin": "02/2020",
-          "summary": "Intégration responsive, newsletters, A/B testing via Adobe Tag Manager, recette CMS.",
-          "missions": [
-            "Pilotage projet : organisation des tâches dans JIRA.",
-            "Intégration & emailing : programmation des newsletters (CMS + PHP) · création de pages & rubriques mobile-first avec tracking",
-            "Intégration pages/rubriques avec tracking",
-            "Programmation newsletters (CMS + Twig)",
-            "A/B testing : déploiement des composants via Adobe Tag Manager en lien avec le marketing"
-          ],
-          "stack": ["JavaScript", "jQuery", "Vue 3", "GSAP", "HTML", "CSS", "SCSS", "Twig", "VS Code", "InVision", "GitLab", "macOS"],
-          "tags": ["Intégration", "A/B Testing", "Newsletter"],
-          "links": ["https://www.lepoint.fr/"]
-        }
+    "tagline": "Interfaces rapides, accessibles et animées (juste ce qu’il faut)."
+  },
+  "sections": {
+    "a_propos": {
+      "bio": "Passionné par la création d’interfaces performantes et accessibles, j’ai évolué dans des environnements exigeants (banque, luxe, presse) où j’ai contribué à des projets innovants. Fort de mes différentes expériences, j’apporte un soin particulier à la performance des sites, au graphisme, la prise en compte des contraintes d'accessibilité et du responsive design. je me forme en permanence pour parfaire mon travail.",
+      "highlights": [
+        "TypeScript, Nuxt 3 / Vue 3, TailwindCSS, GSAP",
+        "Accessibilité, SEO, mobile-first",
+        "Animations maîtrisées (AOS, ScrollReveal, ScrollMagic, CSS)",
+        "Culture design (Figma, Zeplin), TMA et optimisation"
       ],
-      "competences": {
-        "langages": ["HTML5", "CSS3/SCSS", "JavaScript", "TypeScript (débutant)"],
-        "frameworks": ["Nuxt 3", "Vue 3", "React", "Twig/Drupal"],
-        "outils_dev": ["VS Code", "Postman", "Git CLI", "GitHub Desktop", "GitLab"],
-        "ui_animations": ["Bootstrap", "Materialize", "Bulma", "GSAP", "ScrollMagic", "AOS", "ScrollReveal", "CSS Animations"],
-        "design": ["Figma", "Zeplin"],
-        "environnements": ["Windows", "macOS", "Git Bash", "Hyper"],
-        "methodes": ["Agile (Scrum)", "TMA", "SEO", "RGPD"],
-        "ia_cursor": [
-          "Cursor Grok 4.5",
-          "Composer 2.5",
-          "Opus 5",
-          "GPT-5.6 Sol",
-          "Fable 5",
-          "Sonnet 5",
-          "GPT-5.6 Terra",
-          "Opus 4.8"
+      "availability": "Freelance — missions courte ou moyenne durée"
+    },
+    "experiences": [
+      {
+        "company": "Le Point",
+        "location": "Paris",
+        "role": "Intégrateur Web",
+        "period": "Nov. 2017 – Fév. 2020",
+        "date_debut": "11/2017",
+        "date_fin": "02/2020",
+        "summary": "Intégration responsive, newsletters, A/B testing via Adobe Tag Manager, recette CMS.",
+        "missions": [
+          "Pilotage projet : organisation des tâches dans JIRA.",
+          "Intégration & emailing : programmation des newsletters (CMS + PHP) · création de pages & rubriques mobile-first avec tracking",
+          "Intégration pages/rubriques avec tracking",
+          "Programmation newsletters (CMS + Twig)",
+          "A/B testing : déploiement des composants via Adobe Tag Manager en lien avec le marketing"
+        ],
+        "stack": [
+          "JavaScript",
+          "jQuery",
+          "Vue 3",
+          "GSAP",
+          "HTML",
+          "CSS",
+          "SCSS",
+          "Twig",
+          "VS Code",
+          "InVision",
+          "GitLab",
+          "macOS"
+        ],
+        "tags": [
+          "Intégration",
+          "A/B Testing",
+          "Newsletter"
+        ],
+        "links": [
+          "https://www.lepoint.fr/"
         ]
       },
-      "competences_order": [
-        "langages",
-        "frameworks",
-        "outils_dev",
-        "ui_animations",
-        "design",
-        "environnements",
-        "methodes",
-        "ia_cursor"
-      ],
-      "projets": [
-        {
-          "slug": "react_creer-des-composants-courants",
-          "title": "Créer des composants courants",
-          "org": "Projet personnel",
-          "year": "2025",
-          "stack": ["React", "TailwindCSS"],
-          "tags": ["React", "TailwindCSS"],
-          "summary": "Créer des composants courants avec React et TailwindCSS.",
-          "link": "https://react-creer-des-composants-courants.vercel.app/",
-          "github": "https://github.com/CodeurCopieur/react_creer-des-composants-courants"
-        },
-        {
-          "slug": "select-agences-js-poo",
-          "title": "Sélecteur d'Agences avec JavaScript POO",
-          "org": "Projet personnel",
-          "year": "2025",
-          "stack": ["javascript", "HTML", "CSS", "SCSS", "JSON", "XMLHttpRequest"],
-          "tags": ["javascript", "POO", "classes", "DOM", "AJAX", "SCSS", "HTML", "CSS"],
-          "summary": "Application de sélection d'agences bancaires avec chargement paresseux et programmation orientée objet en JavaScript",
-          "link": "https://creative-tapioca-8c8121.netlify.app/",
-          "github": "https://github.com/CodeurCopieur/select-Agences-js-POO"
-        },
-        {
-          "slug": "tmdb-movie-app-search-filter-pagination",
-          "title": "Application de Films - TMDB API",
-          "org": "Projet personnel",
-          "year": "2022",
-          "stack": ["javascript", "HTML", "CSS", "SCSS", "TMDB API", "Fetch API"],
-          "tags": ["javascript", "HTML", "CSS", "SCSS", "API", "responsive", "movies", "search", "pagination"],
-          "summary": "Application web moderne pour découvrir et explorer des films avec recherche, filtrage par genres, pagination et détails complets utilisant l'API TMDB",
-          "link": "https://grand-fenglisu-51b429.netlify.app/",
-          "github": "https://github.com/CodeurCopieur/movie_app_tmdb_api-js"
-        },
-        {
-          "slug": "styled-selects-price-calculator",
-          "title": "Styled Selects with Dynamic Price Calculator",
-          "org": "Projet personnel",
-          "year": "2025",
-          "stack": ["javascript", "HTML", "CSS", "Babel", "ES6"],
-          "tags": ["javascript", "HTML", "CSS", "DOM", "localStorage", "price-calculator", "select-styling"],
-          "summary": "Application JavaScript pour styliser des éléments select avec calcul dynamique de prix basé sur la sélection d'âge",
-          "link": "https://codepen.io/CodeurCopieur/pen/qBgQEGM",
-          "github": "https://github.com/CodeurCopieur/lesSelects_js"
-        },
-        {
-          "slug": "javascript-dom-optimization-agency-selector",
-          "title": "Sélecteur d'Agences Bancaires avec Optimisation DOM",
-          "org": "Projet personnel",
-          "year": "2025",
-          "stack": ["JavaScript", "ES6+", "HTML5", "CSS3", "JSON", "Fetch API"],
-          "tags": ["javascript", "dom-optimization", "performance", "oop", "fetch-api", "responsive-design"],
-          "summary": "Application web optimisée pour gérer des centaines d'options dans un sélecteur avec insertion par lots et architecture orientée objet",
-          "link": "https://stately-taiyaki-667983.netlify.app/",
-          "github": "https://github.com/CodeurCopieur/insert-a-data-group-into-the-DOM_jsPOO"
-        },
-        {
-          "slug": "vue-lazy-loading-search-sorting",
-          "title": "Vue Lazy Loading, Search & Sorting",
-          "org": "Projet personnel",
-          "year": "2025",
-          "stack": ["vue","javascript", "VueRouter", "SCSS", "HTML", "CSS"],
-          "tags": ["vue", "javascript", "VueRouter", "SCSS", "HTML", "CSS"],
-          "summary": "Apprendre à filtrer, paginer et trier à l'aide de VueJS. Nous comparerons le filtrage d'API frontend. Je renvoie toutes les données et filtre dans le frontend",
-          "link": "https://earnest-manatee-1a6b85.netlify.app/",
-          "github": "https://github.com/CodeurCopieur/vue_lazy-loading_search_sorting"
-        },
-        {
-          "slug": "film-library-vuex-vueRouter",
-          "title": "Film Library (Vuex & VueRouter)",
-          "org": "Projet personnel",
-          "year": "2025",
-          "stack": ["vue", "Vuex", "VueRouter", "SCSS", "HTML", "CSS"],
-          "tags": ["vue", "Vuex", "VueRouter", "SCSS", "HTML", "CSS"],
-          "summary": "Bibliothèque de films avec gestion des favoris.",
-          "link": "https://luminous-pony-572a2c.netlify.app/",
-          "github": "https://github.com/CodeurCopieur/Film-Library-vuex-vueRouter"
-        },
-        {
-          "slug": "landing-page_gsap-scrolltrigger",
-          "title": "Landing Page Using GSAP & ScrollTrigger",
-          "org": "Projet personnel",
-          "year": "2025",
-          "stack": ["GSAP", "JavaScript", "SCSS", "HTML", "CSS", "ScrollTrigger"],
-          "tags": ["GSAP", "JavaScript", "SCSS", "HTML", "CSS", "ScrollTrigger"],
-          "summary": "Landing page avec GSAP et ScrollTrigger.",
-          "link": "https://jolly-frangollo-30e2c4.netlify.app/",
-          "github": "https://github.com/CodeurCopieur/landing-page_gsap-scrolltrigger"
-        },
-        {
-          "slug": "landing-page_gsap-scrolltrigger-2",
-          "title": "Landing Page Using GSAP & ScrollTrigger 2",
-          "org": "Projet personnel",
-          "year": "2025",
-          "stack": ["GSAP", "JavaScript", "SCSS", "HTML", "CSS", "ScrollTrigger"],
-          "tags": ["GSAP", "JavaScript", "SCSS", "HTML", "CSS", "ScrollTrigger"],
-          "summary": "Landing page avec GSAP et ScrollTrigger.",
-          "link": "https://amazing-twilight-2fc688.netlify.app/",
-          "github": "https://github.com/CodeurCopieur/landing-page_gsap-scrolltrigger-2"
-        },
-        {
-          "slug": "landing-page_gsap-scrolltrigger-3",
-          "title": "Landing Page Using GSAP & ScrollTrigger 3",
-          "org": "Projet personnel",
-          "year": "2025",
-          "stack": ["GSAP", "JavaScript", "SCSS", "HTML", "CSS", "ScrollTrigger"],
-          "tags": ["GSAP", "JavaScript", "SCSS", "HTML", "CSS", "ScrollTrigger"],
-          "summary": "Landing page avec GSAP et ScrollTrigger.",
-          "link": "https://melodious-babka-776a7e.netlify.app/",
-          "github": "https://github.com/CodeurCopieur/landing-page_gsap-scrolltrigger-3"
-        },
-        {
-          "slug": "animated-navigation_jquery-gsap",
-          "title": "Animated Navigation Using jQuery & GSAP",
-          "org": "Projet personnel",
-          "year": "2025",
-          "stack": ["GSAP", "JavaScript", "SCSS", "HTML", "CSS"],
-          "tags": ["GSAP", "JavaScript", "SCSS", "HTML", "CSS"],
-          "summary": "Minimalist navigation menu avec jQuery et GSAP.",
-          "link": "https://steady-belekoy-d9dd6b.netlify.app/",
-          "github": "https://github.com/CodeurCopieur/animated-navigation_jquery-gsap"
-        },
-        {
-          "slug": "animated-navigation_gsap",
-          "title": "Animated Navigation Using GSAP",
-          "org": "Projet personnel",
-          "year": "2025",
-          "stack": ["GSAP", "JavaScript", "SCSS", "HTML", "CSS"],
-          "tags": ["GSAP", "JavaScript", "SCSS", "HTML", "CSS"],
-          "summary": "Minimalist navigation menu avec GSAP.",
-          "link": "https://dashing-mandazi-1009b9.netlify.app/",
-          "github": "https://github.com/CodeurCopieur/animated-navigation_gsap"
-        },
-        {
-          "slug": "fullscreen-menu_gsap",
-          "title": "Fullscreen Menu Using GSAP",
-          "org": "Projet personnel",
-          "year": "2025",
-          "stack": ["GSAP", "JavaScript", "SCSS", "PUG", "CSS"],
-          "tags": ["GSAP", "JavaScript", "SCSS", "PUG", "CSS"],
-          "summary": "Créer un menu responsive avec GSAP et PUG.",
-          "link": "https://superb-donut-fb0f45.netlify.app/",
-          "github": "https://github.com/CodeurCopieur/fullscreen-menu-responsive_gsap"
-        },
-        {
-          "slug": "full-page-menu_gsap",
-          "title": "Full Page Navigation Menu Using GSAP",
-          "org": "Projet personnel",
-          "year": "2025",
-          "stack": ["GSAP", "JavaScript", "SCSS", "PUG", "CSS"],
-          "tags": ["GSAP", "JavaScript", "SCSS", "PUG", "CSS"],
-          "summary": "Créer une interaction de menu pleine page sympa avec la bibliothèque d'animation préférée GSAP.",
-          "link": "https://gregarious-shortbread-853282.netlify.app/",
-          "github": "https://github.com/CodeurCopieur/full-page-menu_gsap"
-        },
-        {
-          "slug": "animation-florale-stylisee-gsap-css",
-          "title": "Animation florale stylée (GSAP/CSS)",
-          "org": "Projet personnel",
-          "year": "2025",
-          "stack": ["GSAP", "HTML", "CSS"],
-          "tags": ["GSAP", "HTML", "CSS"],
-          "summary": "Animation florale stylée avec GSAP et CSS.",
-          "link": "https://cozy-fox-dd000c.netlify.app/",
-          "github": "https://github.com/CodeurCopieur/animation-florale_gsap-css"
-        },
-        {
-          "slug": "form-validation-javascript",
-          "title": "La MEILLEURE façon de valider un formulaire en JavaScript",
-          "org": "Projet personnel",
-          "year": "2025",
-          "stack": ["javascript", "SCSS", "HTML", "CSS"],
-          "tags": ["javascript", "SCSS", "HTML", "CSS"],
-          "summary": "Code de validation de formulaire JavaScript pouvant être réutilisé pour plusieurs formulaires. Créer un ensemble de fonctions permettant de valider un formulaire à l'aide des attributs de validation HTML pour déclencher sa propre validation.",
-          "link": "https://glistening-shortbread-715f51.netlify.app/",
-          "github": "https://github.com/CodeurCopieur/best-validation-form-js"
-        },
-        {
-          "slug": "disney-clone-tailwind",
-          "title": "Disney+ Clone w/ Tailwind",
-          "org": "Projet personnel",
-          "year": "2025",
-          "stack": ["vue", "javascript", "SCSS", "HTML", "CSS"],
-          "tags": ["vue", "javascript", "SCSS", "HTML", "CSS"],
-          "summary": "Clone Disney+ avec Tailwind CSS et Vue.js. Mise en page de base et utilisons le schéma de couleurs par défaut de Tailwind.",
-          "link": "https://delightful-biscuit-0db1cb.netlify.app/",
-          "github": "https://github.com/CodeurCopieur/vue_disneyplus-clone"
-        },
-        {
-          "slug": "simulateur-epargne-sg",
-          "title": "Rubrique simulateurs société générale",
-          "org": "Société Générale",
-          "year": "2024",
-          "stack": ["JavaScript", "GSAP", "SCSS", "OpenText"],
-          "tags": ["epargne", "javascript", "Jira", "copilot", "Banque"],
-          "summary": "Intégration de la rubrique simulateurs d'épargne.",
-          "link": "https://particuliers.sg.fr/simulateurs/calculer-simuler-rendement-votre-epargne"
-        },
-        {
-          "slug": "simulateur-epargne-sg-livret-a",
-          "title": "Simulateurs d'épargne livret a",
-          "org": "Société Générale",
-          "year": "2024",
-          "stack": ["JavaScript", "jQuery", "HTML", "CSS", "OpenText", "SonarQube", "Git/GitHub", "Windows"],
-          "tags": ["livret a", "epargne", "javascript", "Jira", "copilot", "Banque"],
-          "summary": "Développement d’un simulateur d’épargne en JavaScript avec intégration des règles fiscales. Assistance Copilot et contrôle qualité via SonarQube (analyse et suivi de la dette technique).",
-          "link": "https://particuliers.sg.fr/simulateurs/calculer-simuler-livret-a"
-        },
-        {
-          "slug": "simulateur-epargne-sg-livret-jeune",
-          "title": "Simulateurs d'épargne livret jeune",
-          "org": "Société Générale",
-          "year": "2024",
-          "stack": ["JavaScript", "jQuery", "HTML", "CSS", "OpenText", "SonarQube", "Git/GitHub", "Windows"],
-          "tags": ["livret a", "epargne", "javascript", "Jira", "copilot", "Banque"],
-          "summary": "Développement d’un simulateur d’épargne en JavaScript avec intégration des règles fiscales. Assistance Copilot et contrôle qualité via SonarQube (analyse et suivi de la dette technique).",
-          "link": "https://particuliers.sg.fr/simulateurs/calculer-simuler-livret-jeune"
-        },
-        {
-          "slug": "ouvrir-compte-bancaire-en-ligne",
-          "title": "Ouvrir compte bancaire en ligne",
-          "org": "Société Générale",
-          "year": "2024",
-          "stack": ["JavaScript", "HTML", "CSS", "OpenText", "Git/GitHub"],
-          "tags": ["epargne", "javascript", "Jira", "copilot", "Banque"],
-          "summary": "Refonte de la page ouvrir compte bancaire en ligne.",
-          "link": "https://particuliers.sg.fr/ouvrir-compte-bancaire-en-ligne"
-        },
-        {
-          "slug": "balmain-sneakers-landing",
-          "title": "Landing animée Balmain Sneakers",
-          "org": "Mazarine",
-          "year": "2021",
-          "stack": ["React", "GSAP", "SCSS", "Drupal"],
-          "tags": ["Luxe", "Animation"],
-          "summary": "TMA :Intégration animée high-end (Zeplin → PROD)."
-        },
-        {
-          "slug": "numero",
-          "title": "Landing animée Numéro",
-          "org": "Mazarine",
-          "year": "2021",
-          "stack": ["Twig","SCSS", "HTML", "CSS", "JS", "Drupal"],
-          "tags": ["Presse", "Animation"],
-          "summary": "TMA : Refonte page article,Formulaire de recherche article (HTML, SCSS, JS), mise en place RGPD (tarteau citron).",
-          "link": "https://numero.com/"
-        },
-        {
-          "slug": "opera-de-paris",
-          "title": "Opera de Paris",
-          "org": "Mazarine",
-          "year": "2021",
-          "stack": ["Twig","SCSS", "HTML", "CSS", "JS", "Drupal"],
-          "tags": ["Luxe", "Animation"],
-          "summary": "TMA : Intégration Page abonnements, Article Abonnements - HTML, SCSS, JS",
-          "link": "https://www.operadeparis.fr/billetterie/abonnements"
-        },
-        {
-          "slug": "groupe-cyllene",
-          "title": "Refonte groupe-cyllene.com",
-          "org": "Cyllene",
-          "year": "2021",
-          "stack": ["SCSS", "GSAP", "HTML", "CSS", "jQuery"],
-          "tags": ["refonte", "Animation", "mobile-first"],
-          "summary": "TMA : Refonte from scratch avec animations douces.",
-          "link": "https://www.groupe-cyllene.com/fr/"
-        },
-        {
-          "slug": "experience-lepoint",
-          "title": "Expérience Le Point",
-          "org": "Le Point",
-          "year": "2020",
-          "stack": ["JavaScript", "HTML", "CSS"],
-          "tags": ["landing page", "journal", "éditoriale", "Jira"],
-          "summary": "TMA : Intégration d'une landing page from scratch avec animations.",
-          "link": "https://www.lepoint.fr/experience-lepoint/"
-        },
-        {
-          "slug": "lepoint-elections-municipales",
-          "title": "Le Point Elections municipales",
-          "org": "Le Point",
-          "year": "2020",
-          "stack": ["JavaScript", "HTML", "CSS", "Twig"],
-          "tags": ["cms maison", "journal", "Intégration", "Jira"],
-          "summary": "Création de la rubrique : Elections municipales 2020",
-          "link": "https://www.lepoint.fr/tags/elections-municipales"
-        },
-        {
-          "slug": "lepoint-afrique",
-          "title": "Le Point Afrique",
-          "org": "Le Point Afrique",
-          "year": "2019",
-          "stack": ["JavaScript", "HTML", "CSS", "Twig"],
-          "tags": ["cms maison", "journal", "Intégration", "Jira"],
-          "summary": "Migration rubriques - Afrique et Refonte de la rubrique Afrique et des sous-rubriques.",
-          "link": "https://www.lepoint.fr/afrique/"
-        },
-        {
-          "slug": "lepoint-vin",
-          "title": "Le Point Vin",
-          "org": "Le Point",
-          "year": "2019",
-          "stack": ["JavaScript", "HTML", "CSS", "Twig"],
-          "tags": ["cms maison", "journal", "Intégration", "Jira"],
-          "summary": "Intégration de composant dans la rubrique Vin.",
-          "link": "https://www.lepoint.fr/vin/"
-        },
-        {
-          "slug": "lepoint-montres",
-          "title": "Le Point Montres",
-          "org": "Le Point",
-          "year": "2019",
-          "stack": ["JavaScript", "HTML", "CSS", "Twig"],
-          "tags": ["cms maison", "journal", "Intégration", "Jira"],
-          "summary": "Intégration de composant dans la rubrique montres.",
-          "link": "https://www.lepoint.fr/montres/"
-        }
-        
-      ],
-      "filtres_technologies": [
+      {
+        "company": "Cyllene",
+        "location": "Paris",
+        "role": "Intégrateur Web",
+        "period": "Août 2020 – Fév. 2021",
+        "date_debut": "08/2020",
+        "date_fin": "02/2021",
+        "summary": "Intégration Zeplin, pages animées GSAP, SEO/RGPD, extractions JSON pour formulaires.",
+        "missions": [
+          "Pilotage projet : organisation des tâches dans JIRA + Plateforme maison",
+          "Intégration & animation : analyse Zeplin → pages animées (GSAP, JavaScript natif)",
+          "Clients servis : Uriage · Nuxe · LesVoyagesFr",
+          "Lead HTML/CSS/jQuery du front",
+          "Création de pages animées (GSAP, JS natif)",
+          "Optimisation SEO & mise en place RGPD"
+        ],
+        "stack": [
+          "JavaScript",
+          "Vue 3",
+          "GSAP",
+          "jQuery",
+          "HTML",
+          "CSS",
+          "SCSS",
+          "Twig",
+          "Zeplin",
+          "GitLab",
+          "macOS"
+        ],
+        "clients": [
+          "Uriage",
+          "Nuxe",
+          "LesVoyagesFr"
+        ],
+        "links": [
+          "https://www.groupe-cyllene.com/fr/"
+        ],
+        "tags": [
+          "Agence",
+          "SEO",
+          "RGPD",
+          "Animation"
+        ]
+      },
+      {
+        "company": "Mazarine",
+        "location": "Paris",
+        "role": "Développeur Front-End",
+        "period": "Mars 2021 – Août 2021",
+        "date_debut": "03/2021",
+        "date_fin": "08/2021",
+        "summary": "Pages animées (GSAP), optimisations SEO/RGPD, extraction JSON pour moteur de recherche.",
+        "missions": [
+          "Pilotage projet : organisation des tâches dans JIRA + Plateforme maison",
+          "Intégration & animation : analyse des maquettes Zeplin → création de pages animées (GSAP, JavaScript natif)",
+          "Clients servis : Balmain Sneakers · Opéra de Paris · Studio Acacia · Hôtel Salomon de Rothschild · Ritz Paris · Magazine Numéro",
+          "Optimisation sémantique (Hn, Search Console), RGPD (Tarte au citron, One Trust)",
+          "TMA: corrections/évolutions JS",
+          "Agile : stand-ups quotidiens et communication continue sur Microsoft Teams (compatible télétravail)"
+        ],
+        "stack": [
+          "JavaScript",
+          "Vue 3",
+          "React",
+          "GSAP",
+          "HTML",
+          "CSS",
+          "SCSS",
+          "OCSS",
+          "mobile-first",
+          "Twig",
+          "Drupal",
+          "VS Code",
+          "Git/GitHub",
+          "Jira",
+          "Windows"
+        ],
+        "clients": [
+          "Balmain Sneakers",
+          "Opéra de Paris",
+          "Studio Acacia",
+          "Hôtel Salomon de Rothschild",
+          "Ritz Paris",
+          "Magazine Numéro"
+        ],
+        "tags": [
+          "Luxe",
+          "Culture",
+          "CMS",
+          "Animation"
+        ],
+        "links": [
+          "https://www.mazarine.com/"
+        ]
+      },
+      {
+        "company": "Société Générale",
+        "location": "La Défense",
+        "role": "Développeur Web Front-End",
+        "period": "Jan 2022 – Août. 2025",
+        "date_debut": "01/2022",
+        "date_fin": "06/2025",
+        "summary": "Au sein des équipes Stream Run puis POI, développement d’outils d’affichage dynamique, assistant IA de claims, analytics usage, simulateur d’épargne, intégration de maquettes (Design System).",
+        "missions": [
+          "Pilotage projet : organisation des tâches dans JIRA.",
+          "Dev JS: 2 outils interne d’affichage dynamique des campagnes, Assistant IA de génération/évaluation de claims illustrés, Script d’analytics pour le suivi du comportement utilisateur, Simulateur d’épargne intégrant les règles fiscales",
+          "Intégration UI : implémentation des maquettes Figma (Design System, landing page) et TMA/corrections JS."
+        ],
+        "stack": [
+          "JavaScript",
+          "JSON",
+          "HTML",
+          "CSS",
+          "VS Code",
+          "Figma",
+          "Git/GitHub",
+          "Windows",
+          "Teams",
+          "Copilot"
+        ],
+        "tags": [
+          "Banque",
+          "Dashboard",
+          "Simulateur",
+          "Analytics",
+          "Design System"
+        ],
+        "links": [
+          "https://particuliers.sg.fr/"
+        ]
+      }
+    ],
+    "competences": {
+      "langages": [
+        "HTML5",
+        "CSS3/SCSS",
         "JavaScript",
-        "Vue 3",
+        "TypeScript (débutant)"
+      ],
+      "frameworks": [
+        "Nuxt 4",
         "Nuxt 3",
+        "Vue 3",
+        "Vue Router",
+        "Pinia",
         "React",
+        "Twig/Drupal"
+      ],
+      "outils_dev": [
+        "VS Code",
+        "Postman",
+        "Git CLI",
+        "GitHub Desktop",
+        "GitLab",
+        "Supabase",
+        "Firebase"
+      ],
+      "ui_animations": [
+        "Tailwind CSS",
+        "Bootstrap",
+        "Bulma",
+        "Materialize",
         "GSAP",
-        "Twig",
-        "SCSS",
-        "TailwindCSS"
+        "ScrollMagic",
+        "AOS",
+        "ScrollReveal",
+        "CSS Animations"
+      ],
+      "design": [
+        "Figma",
+        "Zeplin"
+      ],
+      "environnements": [
+        "Windows",
+        "macOS",
+        "Git Bash",
+        "Hyper"
+      ],
+      "methodes": [
+        "Agile (Scrum)",
+        "TMA",
+        "SEO",
+        "RGPD"
+      ],
+      "ia_cursor": [
+        "Cursor Grok 4.5",
+        "Composer 2.5",
+        "Opus 5",
+        "GPT-5.6 Sol",
+        "Fable 5",
+        "Sonnet 5",
+        "GPT-5.6 Terra",
+        "Opus 4.8"
       ]
-    }
+    },
+    "competences_order": [
+      "langages",
+      "frameworks",
+      "outils_dev",
+      "ui_animations",
+      "design",
+      "environnements",
+      "methodes",
+      "ia_cursor"
+    ],
+    "projets": [
+      {
+        "slug": "react_creer-des-composants-courants",
+        "title": "Bibliothèque de composants React réutilisables",
+        "org": "Projet personnel",
+        "year": "2025",
+        "stack": [
+          "React",
+          "JavaScript",
+          "Tailwind CSS",
+          "HTML",
+          "CSS"
+        ],
+        "tags": [
+          "React",
+          "Composants UI",
+          "Design System",
+          "Tailwind CSS",
+          "Front-end"
+        ],
+        "summary": "Conception et développement d'une bibliothèque de composants UI réutilisables avec React 18 et Tailwind CSS, pensée pour accélérer la mise en page de interfaces modernes. Chaque composant est isolé, paramétrable et documenté pour favoriser la cohérence visuelle et la maintenabilité du code front-end. Le projet met l'accent sur la composition de composants, la gestion des variantes (états, tailles, couleurs) et l'accessibilité de base (sémantique HTML, focus, contrastes). L'architecture JavaScript modulaire facilite l'intégration dans des applications plus larges et sert de base de travail pour standardiser les patterns d'interface au sein de projets personnels.",
+        "link": "https://react-creer-des-composants-courants.vercel.app/",
+        "github": "https://github.com/CodeurCopieur/react_creer-des-composants-courants"
+      },
+      {
+        "slug": "select-agences-js-poo",
+        "title": "Sélecteur d'agences bancaires — architecture POO",
+        "org": "Projet personnel",
+        "year": "2025",
+        "stack": [
+          "JavaScript",
+          "HTML",
+          "CSS",
+          "SCSS",
+          "JSON",
+          "XMLHttpRequest"
+        ],
+        "tags": [
+          "JavaScript",
+          "POO",
+          "DOM",
+          "AJAX",
+          "Lazy Loading",
+          "SCSS"
+        ],
+        "summary": "Application front-end de sélection d'agences bancaires construite en JavaScript vanilla avec une architecture orientée objet (classes, encapsulation, responsabilités séparées). Les données JSON sont chargées de façon asynchrone via XMLHttpRequest, puis injectées dynamiquement dans le DOM avec une approche de lazy loading pour limiter le rendu initial. Le projet explore la structuration du code métier (modèles, services, composants UI), la gestion des événements utilisateur et le stylage avancé en SCSS. Il constitue un cas d'école pour concilier performance perçue, lisibilité du code et montée en charge progressive des options dans un composant select complexe.",
+        "link": "https://creative-tapioca-8c8121.netlify.app/",
+        "github": "https://github.com/CodeurCopieur/select-Agences-js-POO"
+      },
+      {
+        "slug": "tmdb-movie-app-search-filter-pagination",
+        "title": "Catalogue cinéma interactif — API TMDB",
+        "org": "Projet personnel",
+        "year": "2022",
+        "stack": [
+          "JavaScript",
+          "HTML",
+          "CSS",
+          "SCSS",
+          "Fetch API",
+          "TMDB API"
+        ],
+        "tags": [
+          "JavaScript",
+          "API REST",
+          "Responsive",
+          "Recherche",
+          "Pagination",
+          "Cinéma"
+        ],
+        "summary": "Application web responsive de découverte de films s'appuyant sur l'API The Movie Database (TMDB) pour afficher catalogues, fiches détaillées et métadonnées enrichies. L'interface propose recherche en temps réel, filtrage par genres, pagination et navigation fluide entre les vues, le tout en JavaScript natif sans framework. La consommation REST est gérée via Fetch API, avec une séparation claire entre couche data, logique de filtrage et rendu DOM. Le projet démontre une maîtrise de l'intégration d'API tierces, de la gestion d'état côté client et de la construction d'expériences de consultation de contenus à fort volume.",
+        "link": "https://grand-fenglisu-51b429.netlify.app/",
+        "github": "https://github.com/CodeurCopieur/movie_app_tmdb_api-js"
+      },
+      {
+        "slug": "styled-selects-price-calculator",
+        "title": "Selects stylisés et calculateur tarifaire dynamique",
+        "org": "Projet personnel",
+        "year": "2025",
+        "stack": [
+          "JavaScript",
+          "ES6+",
+          "HTML",
+          "CSS",
+          "Babel",
+          "localStorage"
+        ],
+        "tags": [
+          "JavaScript",
+          "DOM",
+          "Babel",
+          "Calculateur",
+          "UI Components",
+          "CodePen"
+        ],
+        "summary": "Module JavaScript dédié à la personnalisation avancée des éléments `<select>` natifs couplé à un calculateur de prix dynamique selon les critères sélectionnés (notamment la tranche d'âge). Le code source ES6+ est transpilé en ES5 via Babel pour garantir une compatibilité navigateurs élargie, avec un pipeline de build et un script de watch pour le développement continu. L'approche met en avant la manipulation fine du DOM, la persistance locale via localStorage et la création de composants réutilisables indépendants du framework. Projet publié sur CodePen, il illustre une expertise en micro-interactions UI et en logique métier front-end autonome.",
+        "link": "https://codepen.io/CodeurCopieur/pen/qBgQEGM",
+        "github": "https://github.com/CodeurCopieur/lesSelects_js"
+      },
+      {
+        "slug": "javascript-dom-optimization-agency-selector",
+        "title": "Sélecteur d'agences haute performance — optimisation DOM",
+        "org": "Projet personnel",
+        "year": "2025",
+        "stack": [
+          "JavaScript",
+          "ES6+",
+          "HTML5",
+          "CSS3",
+          "JSON",
+          "Fetch API"
+        ],
+        "tags": [
+          "JavaScript",
+          "Performance",
+          "POO",
+          "DOM",
+          "Fetch API",
+          "Optimisation"
+        ],
+        "summary": "Refonte orientée performance d'un sélecteur d'agences bancaires capable de gérer des centaines d'options sans dégrader l'expérience utilisateur. L'implémentation repose sur une architecture POO en ES6+, un chargement des données via Fetch API et une insertion DOM par lots (batching) pour réduire les reflows et améliorer le Time to Interactive. Le projet compare les stratégies de rendu progressif et documente les compromis entre simplicité du markup et fluidité perçue. Il s'inscrit dans une démarche d'ingénierie front-end où la scalabilité du DOM et la maintenabilité du code sont traitées comme des exigences produit.",
+        "link": "https://stately-taiyaki-667983.netlify.app/",
+        "github": "https://github.com/CodeurCopieur/insert-a-data-group-into-the-DOM_jsPOO"
+      },
+      {
+        "slug": "vue-lazy-loading-search-sorting",
+        "title": "Filtrage, tri et pagination — Vue.js",
+        "org": "Projet personnel",
+        "year": "2025",
+        "stack": [
+          "Vue.js",
+          "JavaScript",
+          "Vue Router",
+          "SCSS",
+          "HTML",
+          "CSS"
+        ],
+        "tags": [
+          "Vue.js",
+          "Recherche",
+          "Tri",
+          "Pagination",
+          "Lazy Loading",
+          "Front-end"
+        ],
+        "summary": "Application Vue.js dédiée à l'exploration des patterns de liste riche : recherche textuelle, tri multi-critères, pagination et lazy loading côté client. Le dataset complet est chargé une fois puis filtré en front-end, ce qui permet de comparer les performances et la réactivité de différentes stratégies de filtrage sans latence réseau supplémentaire. Vue Router structure la navigation entre vues, tandis que SCSS assure un habillage modulaire et responsive. Ce projet formalise une base réutilisable pour des tableaux de bord, catalogues ou back-offices légers où l'interactivité et la réactivité de l'interface sont centrales.",
+        "link": "https://earnest-manatee-1a6b85.netlify.app/",
+        "github": "https://github.com/CodeurCopieur/vue_lazy-loading_search_sorting"
+      },
+      {
+        "slug": "film-library-vuex-vueRouter",
+        "title": "Bibliothèque de films — Vuex & Vue Router",
+        "org": "Projet personnel",
+        "year": "2025",
+        "stack": [
+          "Vue.js",
+          "Vuex",
+          "Vue Router",
+          "Tailwind CSS",
+          "JavaScript",
+          "HTML"
+        ],
+        "tags": [
+          "Vue.js",
+          "Vuex",
+          "Vue Router",
+          "SPA",
+          "Favoris",
+          "Catalogue"
+        ],
+        "summary": "Application de gestion de bibliothèque de films construite avec Vue.js, centralisant l'état applicatif dans Vuex et la navigation dans Vue Router. L'utilisateur peut parcourir un catalogue, consulter les détails d'un film et gérer une liste de favoris persistée dans le store global. L'architecture sépare clairement vues, mutations/actions et composants présentationnels, facilitant l'évolution fonctionnelle. Le stylage Tailwind CSS accélère la mise en forme responsive. Projet structurant pour démontrer la maîtrise de l'écosystème Vue 3 autour de patterns SPA professionnels.",
+        "link": "https://luminous-pony-572a2c.netlify.app/",
+        "github": "https://github.com/CodeurCopieur/Film-Library-vuex-vueRouter"
+      },
+      {
+        "slug": "landing-page_gsap-scrolltrigger",
+        "title": "Landing page animée — GSAP ScrollTrigger & CSS Grid",
+        "org": "Projet personnel",
+        "year": "2025",
+        "stack": [
+          "GSAP",
+          "ScrollTrigger",
+          "JavaScript",
+          "SCSS",
+          "CSS Grid",
+          "HTML"
+        ],
+        "tags": [
+          "GSAP",
+          "ScrollTrigger",
+          "Animation",
+          "Landing Page",
+          "CSS Grid",
+          "Motion Design"
+        ],
+        "summary": "Landing page immersive animée au scroll grâce au plugin ScrollTrigger de GSAP, combinée à une mise en page CSS Grid avancée. Les séquences d'animation sont synchronisées avec la progression de scroll pour révéler progressivement contenus, visuels et appels à l'action. Le projet explore le timing, l'easing, le pinning de sections et la performance des animations CSS/JS sur desktop et mobile. Une attention particulière est portée à la structure sémantique HTML et au decoupage SCSS pour maintenir un code lisible malgré la complexité motion design.",
+        "link": "https://jolly-frangollo-30e2c4.netlify.app/",
+        "github": "https://github.com/CodeurCopieur/landing-page_gsap-scrolltrigger"
+      },
+      {
+        "slug": "landing-page_gsap-scrolltrigger-2",
+        "title": "Landing page narrative — GSAP ScrollTrigger (v2)",
+        "org": "Projet personnel",
+        "year": "2025",
+        "stack": [
+          "GSAP",
+          "ScrollTrigger",
+          "JavaScript",
+          "SCSS",
+          "HTML",
+          "CSS"
+        ],
+        "tags": [
+          "GSAP",
+          "ScrollTrigger",
+          "Landing Page",
+          "Parallax",
+          "Responsive",
+          "Animation"
+        ],
+        "summary": "Deuxième itération d'une landing page à storytelling vertical, pilotée par GSAP et ScrollTrigger. Cette version explore une direction artistique différente avec de nouvelles séquences de parallax, transitions de typographie et révélations d'éléments au fil du scroll. Le code JavaScript isole les timelines réutilisables et paramètre les breakpoints pour adapter les animations aux viewports mobiles. Le projet consolide une méthodologie de prototypage motion design : maquettes statiques d'abord, puis orchestration progressive des animations pour un rendu premium.",
+        "link": "https://amazing-twilight-2fc688.netlify.app/",
+        "github": "https://github.com/CodeurCopieur/landing-page_gsap-scrolltrigger-2"
+      },
+      {
+        "slug": "landing-page_gsap-scrolltrigger-3",
+        "title": "Landing page éditoriale — GSAP ScrollTrigger (v3)",
+        "org": "Projet personnel",
+        "year": "2025",
+        "stack": [
+          "GSAP",
+          "ScrollTrigger",
+          "JavaScript",
+          "HTML",
+          "SCSS",
+          "CSS"
+        ],
+        "tags": [
+          "GSAP",
+          "ScrollTrigger",
+          "Typographie",
+          "Landing Page",
+          "Motion Design",
+          "Front-end"
+        ],
+        "summary": "Troisième exploration créative autour de GSAP ScrollTrigger, orientée vers une expérience éditoriale plus minimaliste et typographique. Les animations accentuent la hiérarchie de l'information et guident l'attention sans surcharger l'interface. HTML sémantique, SCSS modulaire et scripts GSAP découpés par section permettent d'itérer rapidement sur les effets. Ce projet complète une série de laboratoires front-end dédiés au scroll storytelling, compétence directement transposable aux sites premium en banque, luxe et médias.",
+        "link": "https://melodious-babka-776a7e.netlify.app/",
+        "github": "https://github.com/CodeurCopieur/landing-page_gsap-scrolltrigger-3"
+      },
+      {
+        "slug": "animated-navigation_jquery-gsap",
+        "title": "Navigation animée — jQuery & GSAP",
+        "org": "Projet personnel",
+        "year": "2025",
+        "stack": [
+          "GSAP",
+          "jQuery",
+          "JavaScript",
+          "SCSS",
+          "HTML",
+          "CSS"
+        ],
+        "tags": [
+          "GSAP",
+          "jQuery",
+          "Navigation",
+          "Animation",
+          "UI",
+          "Menu"
+        ],
+        "summary": "Menu de navigation minimaliste animé combinant jQuery pour la gestion des interactions DOM et GSAP pour des transitions fluides et naturelles. Les micro-interactions (ouverture, hover, changement d'état actif) sont calibrées pour renforcer la lisibilité et le repérage dans l'interface. Le projet compare l'approche impérative jQuery avec des timelines GSAP réutilisables. Il sert de base pour des headers animés sur sites vitrines où la sobriété visuelle doit coexister avec une signature motion subtile.",
+        "link": "https://steady-belekoy-d9dd6b.netlify.app/",
+        "github": "https://github.com/CodeurCopieur/animated-navigation_jquery-gsap"
+      },
+      {
+        "slug": "animated-navigation_gsap",
+        "title": "Navigation animée — GSAP vanilla",
+        "org": "Projet personnel",
+        "year": "2025",
+        "stack": [
+          "GSAP",
+          "JavaScript",
+          "SCSS",
+          "HTML",
+          "CSS"
+        ],
+        "tags": [
+          "GSAP",
+          "Navigation",
+          "Vanilla JS",
+          "Animation",
+          "SCSS",
+          "UI"
+        ],
+        "summary": "Implémentation d'un menu de navigation épuré entièrement animé avec GSAP, sans dépendance jQuery. Les états du menu (fermé, ouvert, focus) sont orchestrés via des timelines courtes et des easings maîtrisés pour un ressenti haut de gamme. L'approche vanilla JavaScript favorise un bundle plus léger et une meilleure maintenabilité long terme. Le stylage SCSS structure les layers, z-index et transitions CSS complémentaires. Projet de référence pour moderniser des patterns de navigation historiques vers une stack plus contemporaine.",
+        "link": "https://dashing-mandazi-1009b9.netlify.app/",
+        "github": "https://github.com/CodeurCopieur/animated-navigation_gsap"
+      },
+      {
+        "slug": "fullscreen-menu_gsap",
+        "title": "Menu plein écran responsive — GSAP & Pug",
+        "org": "Projet personnel",
+        "year": "2025",
+        "stack": [
+          "GSAP",
+          "JavaScript",
+          "Pug",
+          "SCSS",
+          "HTML",
+          "CSS"
+        ],
+        "tags": [
+          "GSAP",
+          "Menu",
+          "Fullscreen",
+          "Responsive",
+          "Pug",
+          "Animation"
+        ],
+        "summary": "Conception d'un menu plein écran responsive avec animations GSAP et templating Pug pour accélérer la génération du markup. L'ouverture/fermeture du menu s'accompagne d'animations staggerées sur les liens, créant une expérience immersive typique des sites créatifs et institutionnels premium. La structure SCSS mobile-first garantit une ergonomie tactile sur smartphone et tablette. Le projet illustre la combinaison efficace entre préprocesseur HTML, motion design et bonnes pratiques d'accessibilité (focus trap, aria, fermeture clavier).",
+        "link": "https://superb-donut-fb0f45.netlify.app/",
+        "github": "https://github.com/CodeurCopieur/fullscreen-menu-responsive_gsap"
+      },
+      {
+        "slug": "full-page-menu_gsap",
+        "title": "Menu de navigation pleine page — GSAP",
+        "org": "Projet personnel",
+        "year": "2025",
+        "stack": [
+          "GSAP",
+          "JavaScript",
+          "Pug",
+          "SCSS",
+          "HTML",
+          "CSS"
+        ],
+        "tags": [
+          "GSAP",
+          "Navigation",
+          "Full Page",
+          "Motion Design",
+          "SCSS",
+          "UI"
+        ],
+        "summary": "Interaction de menu occupant l'intégralité du viewport, avec transitions GSAP soignées entre la vue contenu et la couche navigation. Les animations de texte et de fond sont synchronisées pour produire un effet de profondeur et de continuité visuelle. Le code sépare configuration des timelines, gestion des événements utilisateur et styles SCSS modulaires. Ce pattern est fréquemment demandé en agence digitale pour des sites à forte identité de marque nécessitant une navigation mémorable sans sacrifier la performance.",
+        "link": "https://gregarious-shortbread-853282.netlify.app/",
+        "github": "https://github.com/CodeurCopieur/full-page-menu_gsap"
+      },
+      {
+        "slug": "animation-florale-stylisee-gsap-css",
+        "title": "Animation florale stylisée — GSAP & CSS",
+        "org": "Projet personnel",
+        "year": "2025",
+        "stack": [
+          "GSAP",
+          "JavaScript",
+          "HTML",
+          "CSS"
+        ],
+        "tags": [
+          "GSAP",
+          "CSS",
+          "Animation",
+          "Illustration",
+          "Motion Design",
+          "Créatif"
+        ],
+        "summary": "Étude créative d'animation florale combinant GSAP pour le mouvement organique et CSS pour les textures, dégradés et masques visuels. Les séquences mettent en scène apparitions progressives, rotations subtiles et boucles harmonieuses pour un rendu décoratif haut de gamme. Le projet démontre la complémentarité entre animation JavaScript et propriétés CSS modernes (transform, filter, clip-path). Idéal comme hero section ou module de branding pour des univers lifestyle, beauté ou éditorial.",
+        "link": "https://cozy-fox-dd000c.netlify.app/",
+        "github": "https://github.com/CodeurCopieur/animation-florale_gsap-css"
+      },
+      {
+        "slug": "form-validation-javascript",
+        "title": "Framework de validation de formulaires — JavaScript",
+        "org": "Projet personnel",
+        "year": "2025",
+        "stack": [
+          "JavaScript",
+          "HTML",
+          "CSS",
+          "SCSS"
+        ],
+        "tags": [
+          "JavaScript",
+          "Validation",
+          "Formulaires",
+          "Accessibilité",
+          "UX",
+          "Vanilla JS"
+        ],
+        "summary": "Mise en place d'un système de validation de formulaires réutilisable en JavaScript vanilla, capable de s'adapter à plusieurs formulaires via configuration et attributs HTML natifs. Les règles de validation (required, format email, longueur, cohérence entre champs) sont centralisées dans un ensemble de fonctions modulaires, avec retours visuels accessibles et messages d'erreur contextualisés. Le projet s'appuie sur les contraintes HTML5 tout en enrichissant l'expérience utilisateur côté client avant soumission. Une base solide pour des parcours de conversion (contact, inscription, simulateurs) en environnement bancaire ou e-commerce.",
+        "link": "https://glistening-shortbread-715f51.netlify.app/",
+        "github": "https://github.com/CodeurCopieur/best-validation-form-js"
+      },
+      {
+        "slug": "disney-clone-tailwind",
+        "title": "Interface streaming — clone Disney+ (Vue & Tailwind)",
+        "org": "Projet personnel",
+        "year": "2025",
+        "stack": [
+          "Vue.js",
+          "Vue Router",
+          "Vuex",
+          "Tailwind CSS",
+          "JavaScript",
+          "HTML"
+        ],
+        "tags": [
+          "Vue.js",
+          "Tailwind CSS",
+          "Clone UI",
+          "Streaming",
+          "Responsive",
+          "Design System"
+        ],
+        "summary": "Reproduction fidèle de l'interface Disney+ en Vue.js avec Tailwind CSS, incluant grille de contenus, carrousels, navigation principale et direction artistique sombre caractéristique des plateformes OTT. Vue Router et Vuex structurent la navigation et l'état global (sélection de profils, favoris simulés). Tailwind accélère la mise en page responsive et la gestion cohérente des espacements, couleurs et typographies. Projet démontrant la capacité à analyser une UI de référence marché et à la reconstruire proprement avec une stack moderne composable.",
+        "link": "https://delightful-biscuit-0db1cb.netlify.app/",
+        "github": "https://github.com/CodeurCopieur/vue_disneyplus-clone"
+      },
+      {
+        "slug": "simulateur-epargne-sg",
+        "title": "Rubrique simulateurs d'épargne — Société Générale",
+        "org": "Société Générale",
+        "year": "2024",
+        "stack": [
+          "JavaScript",
+          "GSAP",
+          "SCSS",
+          "OpenText",
+          "HTML",
+          "CSS"
+        ],
+        "tags": [
+          "Banque",
+          "Simulateur",
+          "Épargne",
+          "OpenText",
+          "GSAP",
+          "Intégration"
+        ],
+        "summary": "Intégration front-end de la rubrique simulateurs d'épargne sur l'espace particuliers Société Générale, dans un contexte CMS OpenText et exigences bancaires strictes (conformité, performance, accessibilité). Développement JavaScript des interactions de navigation entre simulateurs, animations GSAP pour valoriser les parcours et harmonisation SCSS avec la charte groupe. Collaboration en équipe agile (Jira), revues de code et livraisons itératives en environnement Windows. Le projet illustre l'intégration de modules financiers complexes au sein d'un écosystème legacy tout en maintenant une expérience utilisateur fluide.",
+        "link": "https://particuliers.sg.fr/simulateurs/calculer-simuler-rendement-votre-epargne"
+      },
+      {
+        "slug": "simulateur-epargne-sg-livret-a",
+        "title": "Simulateur Livret A — Société Générale",
+        "org": "Société Générale",
+        "year": "2024",
+        "stack": [
+          "JavaScript",
+          "jQuery",
+          "HTML",
+          "CSS",
+          "OpenText",
+          "SonarQube"
+        ],
+        "tags": [
+          "Banque",
+          "Livret A",
+          "Simulateur",
+          "SonarQube",
+          "OpenText",
+          "Réglementaire"
+        ],
+        "summary": "Conception et développement du simulateur Livret A permettant aux particuliers d'estimer rendements, plafonds et scénarios de versements selon la réglementation en vigueur. Implémentation JavaScript/jQuery des règles métier, validations de saisie et restitution des résultats en temps réel, intégrée dans le CMS OpenText. Qualité de code suivie via SonarQube (dettes techniques, couverture, vulnérabilités) avec assistance GitHub Copilot pour accélérer les tâches répétitives tout en conservant la revue humaine. Livraison en cycle agile avec suivi Jira, tests fonctionnels et coordination avec les équipes métier banque.",
+        "link": "https://particuliers.sg.fr/simulateurs/calculer-simuler-livret-a"
+      },
+      {
+        "slug": "simulateur-epargne-sg-livret-jeune",
+        "title": "Simulateur Livret Jeune — Société Générale",
+        "org": "Société Générale",
+        "year": "2024",
+        "stack": [
+          "JavaScript",
+          "jQuery",
+          "HTML",
+          "CSS",
+          "OpenText",
+          "SonarQube"
+        ],
+        "tags": [
+          "Banque",
+          "Livret Jeune",
+          "Simulateur",
+          "JavaScript",
+          "OpenText",
+          "Agile"
+        ],
+        "summary": "Développement du simulateur dédié au Livret Jeune, adapté aux contraintes spécifiques de ce produit (conditions d'éligibilité, plafonds, fiscalité). Le moteur de calcul JavaScript traduit les règles métier en logique front-end testée et maintenable, avec messages d'aide contextualisés pour guider l'utilisateur. Intégration OpenText, contrôle qualité SonarQube et workflow Git/GitHub en équipe distribuée. Le projet renforce l'offre simulateurs SG en proposant un parcours pédagogique aligné sur les attentes réglementaires et les standards UX du secteur bancaire.",
+        "link": "https://particuliers.sg.fr/simulateurs/calculer-simuler-livret-jeune"
+      },
+      {
+        "slug": "ouvrir-compte-bancaire-en-ligne",
+        "title": "Parcours d'ouverture de compte en ligne — SG",
+        "org": "Société Générale",
+        "year": "2024",
+        "stack": [
+          "JavaScript",
+          "HTML",
+          "CSS",
+          "OpenText",
+          "Git",
+          "GitHub"
+        ],
+        "tags": [
+          "Banque",
+          "Conversion",
+          "OpenText",
+          "Intégration",
+          "Responsive",
+          "Parcours client"
+        ],
+        "summary": "Refonte et intégration front-end de la page « Ouvrir un compte bancaire en ligne » sur le site Société Générale Particuliers. Travail sur la structure HTML sémantique, les composants interactifs JavaScript et la cohérence visuelle SCSS/CSS au sein du CMS OpenText. Optimisation du parcours de conversion : hiérarchie de l'information, CTAs, responsive et compatibilité navigateurs. Coordination via Jira avec les équipes métier, design et back-office. Projet représentatif des enjeux d'acquisition client digital en banque retail.",
+        "link": "https://particuliers.sg.fr/ouvrir-compte-bancaire-en-ligne"
+      },
+      {
+        "slug": "balmain-sneakers-landing",
+        "title": "Landing sneakers Balmain — intégration animée",
+        "org": "Mazarine",
+        "year": "2021",
+        "stack": [
+          "React",
+          "GSAP",
+          "SCSS",
+          "Drupal",
+          "JavaScript",
+          "HTML"
+        ],
+        "tags": [
+          "Luxe",
+          "Balmain",
+          "GSAP",
+          "React",
+          "Drupal",
+          "Intégration"
+        ],
+        "summary": "TMA et intégration front-end d'une landing page sneakers pour la maison Balmain, en environnement Drupal/React avec animations GSAP haut de gamme. Reprise des livrables design Zeplin, respect millimétré de la charte luxe (typographies, espacements, rythme visuel) et mise en production soignée. Les séquences motion renforcent le storytelling produit sans compromettre les performances perçues. Collaboration étroite avec l'agence Mazarine dans un contexte international exigeant, typique des projets mode & luxe."
+      },
+      {
+        "slug": "numero",
+        "title": "Évolutions éditoriales — Numéro Magazine",
+        "org": "Mazarine",
+        "year": "2021",
+        "stack": [
+          "Twig",
+          "Drupal",
+          "JavaScript",
+          "SCSS",
+          "HTML",
+          "CSS"
+        ],
+        "tags": [
+          "Presse",
+          "Drupal",
+          "Twig",
+          "RGPD",
+          "Éditorial",
+          "Mazarine"
+        ],
+        "summary": "Maintenance et évolution front-end du site de Numéro Magazine (Drupal/Twig) : refonte de pages article, formulaire de recherche éditoriale et mise en conformité RGPD via Tarteaucitron. Intégration HTML/SCSS/JS des composants fournis par le design, avec attention à la densité éditoriale, aux grilles typographiques presse et aux contraintes multilingues. Travail en TMA au sein de Mazarine, avec livraisons continues et respect des délais de publication magazine. Projet démontrant l'adaptabilité aux CMS enterprise et aux exigences médias premium.",
+        "link": "https://numero.com/"
+      },
+      {
+        "slug": "opera-de-paris",
+        "title": "Pages abonnements — Opéra de Paris",
+        "org": "Mazarine",
+        "year": "2021",
+        "stack": [
+          "Twig",
+          "Drupal",
+          "JavaScript",
+          "SCSS",
+          "HTML",
+          "CSS"
+        ],
+        "tags": [
+          "Culture",
+          "Opéra de Paris",
+          "Drupal",
+          "Abonnements",
+          "Intégration",
+          "Institutionnel"
+        ],
+        "summary": "Intégration des pages abonnements et contenus associés pour l'Opéra de Paris, dans un écosystème Drupal/Twig orienté billetterie et relation public. Développement des gabarits HTML, styles SCSS modulaires et interactions JavaScript pour présenter offres, tarifs et parcours de souscription. Respect de l'identité institutionnelle, accessibilité renforcée et compatibilité multi-navigateurs. Projet culturel premium illustrant la capacité à traduire des enjeux institutionnels complexes en interfaces claires et élégantes.",
+        "link": "https://www.operadeparis.fr/billetterie/abonnements"
+      },
+      {
+        "slug": "groupe-cyllene",
+        "title": "Refonte site corporate — Groupe Cyllene",
+        "org": "Cyllene",
+        "year": "2021",
+        "stack": [
+          "JavaScript",
+          "jQuery",
+          "GSAP",
+          "SCSS",
+          "HTML",
+          "CSS"
+        ],
+        "tags": [
+          "Refonte",
+          "Corporate",
+          "GSAP",
+          "Mobile-first",
+          "jQuery",
+          "SCSS"
+        ],
+        "summary": "Refonte from scratch du site groupe-cyllene.com avec approche mobile-first, animations GSAP subtiles et architecture front-end jQuery/SCSS. Reconstruction des templates de pages institutionnelles (présentation, filiales, contact) avec une direction artistique épurée et professionnelle. Optimisation des performances de scroll, lazy loading des médias et cohérence responsive sur l'ensemble du parcours. Projet corporate B2B mettant en avant la rigueur d'intégration et la qualité de exécution sur un site vitrine de groupe.",
+        "link": "https://www.groupe-cyllene.com/fr/"
+      },
+      {
+        "slug": "experience-lepoint",
+        "title": "Landing « Expérience Le Point »",
+        "org": "Le Point",
+        "year": "2020",
+        "stack": [
+          "JavaScript",
+          "HTML",
+          "CSS"
+        ],
+        "tags": [
+          "Presse",
+          "Le Point",
+          "Landing Page",
+          "Animation",
+          "Responsive",
+          "TMA"
+        ],
+        "summary": "Intégration from scratch de la landing page « Expérience Le Point », vitrine éditoriale mettant en avant l'univers et les formats du groupe. Animations CSS/JavaScript, structure HTML sémantique et déclinaisons responsive pour desktop, tablette et mobile. Collaboration avec les équipes Le Point via Jira, dans le cadre d'une TMA presse exigeante en délais et qualité de rendu. Le projet illustre la production de pages événementielles à fort impact visuel au sein d'un CMS maison.",
+        "link": "https://www.lepoint.fr/experience-lepoint/"
+      },
+      {
+        "slug": "lepoint-elections-municipales",
+        "title": "Rubrique Élections municipales 2020 — Le Point",
+        "org": "Le Point",
+        "year": "2020",
+        "stack": [
+          "JavaScript",
+          "Twig",
+          "HTML",
+          "CSS"
+        ],
+        "tags": [
+          "Presse",
+          "Élections",
+          "Le Point",
+          "Twig",
+          "Actualité",
+          "Intégration"
+        ],
+        "summary": "Création de la rubrique dédiée aux élections municipales 2020 sur lepoint.fr : gabarits Twig, intégration HTML/CSS/JS et composants de data visualisation éditoriale. Mise en place de modules de une, dossiers thématiques et liens transverses pour maximiser la discoverability des contenus. Coordination avec la rédaction et les équipes techniques dans un contexte d'actualité forte et de contraintes de mise en ligne rapide. Projet représentatif des rubriques événementielles à fort trafic média.",
+        "link": "https://www.lepoint.fr/tags/elections-municipales"
+      },
+      {
+        "slug": "lepoint-afrique",
+        "title": "Refonte rubrique Afrique — Le Point",
+        "org": "Le Point Afrique",
+        "year": "2019",
+        "stack": [
+          "JavaScript",
+          "Twig",
+          "HTML",
+          "CSS"
+        ],
+        "tags": [
+          "Presse",
+          "Afrique",
+          "Refonte",
+          "Twig",
+          "Le Point",
+          "Éditorial"
+        ],
+        "summary": "Migration et refonte de la rubrique Afrique et de ses sous-sections sur lepoint.fr, avec restructuration des gabarits Twig et modernisation des styles CSS/JS. Amélioration de la lisibilité éditoriale, de la navigation inter-rubriques et de la performance perçue sur mobile. Travail mené en étroite collaboration avec les équipes éditoriales pour respecter l'identité journalistique du titre. Projet international démontrant la gestion de sites multirubriques à forte volumétrie de contenus.",
+        "link": "https://www.lepoint.fr/afrique/"
+      },
+      {
+        "slug": "lepoint-vin",
+        "title": "Rubrique Vin — Le Point",
+        "org": "Le Point",
+        "year": "2019",
+        "stack": [
+          "JavaScript",
+          "Twig",
+          "HTML",
+          "CSS"
+        ],
+        "tags": [
+          "Presse",
+          "Vin",
+          "Le Point",
+          "Twig",
+          "Éditorial",
+          "SEO"
+        ],
+        "summary": "Intégration de composants éditoriaux spécifiques à la rubrique Vin du Point : mises en page dégustation, dossiers producteurs, grilles d'articles et modules de recommandation. Développement Twig/HTML/CSS/JS en respect de la charte presse et des contraintes SEO du groupe. Optimisation des temps de chargement et des images pour un public premium sensible à la qualité de lecture. Projet niche illustrant l'adaptation UI à des contenus spécialisés.",
+        "link": "https://www.lepoint.fr/vin/"
+      },
+      {
+        "slug": "lepoint-montres",
+        "title": "Rubrique Montres — Le Point",
+        "org": "Le Point",
+        "year": "2019",
+        "stack": [
+          "JavaScript",
+          "Twig",
+          "HTML",
+          "CSS"
+        ],
+        "tags": [
+          "Presse",
+          "Montres",
+          "Lifestyle",
+          "Twig",
+          "Le Point",
+          "Intégration"
+        ],
+        "summary": "Intégration front-end de la rubrique Montres sur lepoint.fr, avec composants dédiés aux articles horlogerie haut de gamme (fiches produit, comparatifs, galeries). Stylage soigné mettant en valeur photographies et typographies éditoriales, compatible CMS maison et workflow Jira. Responsive design avancé pour consultation mobile, audience importante sur les rubriques lifestyle. Projet démontrant la précision d'intégration requise pour des univers premium au sein de la presse.",
+        "link": "https://www.lepoint.fr/montres/"
+      }
+    ],
+    "filtres_technologies": [
+      "JavaScript",
+      "Vue 3",
+      "Nuxt 3",
+      "React",
+      "GSAP",
+      "Twig",
+      "SCSS",
+      "TailwindCSS"
+    ]
   }
-  
+}

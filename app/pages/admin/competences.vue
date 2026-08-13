@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import type { PortfolioCompetences } from '~/types/portfolio'
+import type { CompetenceCategoryDef } from '~/data/competence-categories'
 import {
   COMPETENCE_CATEGORIES,
   DEFAULT_COMPETENCES_ORDER,
-  resolveCompetencesOrder,
-  sortCompetenceCategories,
-  type CompetenceCategoryKey
+  createUniqueCategoryKey,
+  isBuiltinCategoryKey,
+  mergeCompetenceCategories,
+  parseCustomCategories,
+  resolveCompetencesOrder
 } from '~/data/competence-categories'
 
 definePageMeta({ layout: 'admin', middleware: 'admin-auth' })
@@ -14,13 +17,27 @@ const { supabase } = useAdminAuth()
 const saving = ref(false)
 const message = ref<string | null>(null)
 
-type CategoryKey = CompetenceCategoryKey
+type CategoryKey = string
+
+const customDefinitions = ref<CompetenceCategoryDef[]>([])
+const hiddenBuiltin = ref<string[]>([])
+const categoryOrder = ref<string[]>([...DEFAULT_COMPETENCES_ORDER])
+const orderedCategories = computed(() => mergeCompetenceCategories(categoryOrder.value, customDefinitions.value))
+
+const catalog = reactive<Record<string, string[]>>({})
+const selected = reactive<Record<string, string[]>>({})
+const openSections = reactive<Record<string, boolean>>({})
+const newSkillInputs = reactive<Record<string, string>>({})
+
+const newCategoryLabel = ref('')
+const newCategoryHint = ref('')
+const newCategoryDescription = ref('')
 
 const defaultSuggestions: PortfolioCompetences = {
   langages: ['HTML5', 'CSS3/SCSS', 'JavaScript', 'TypeScript'],
-  frameworks: ['Nuxt 3', 'Vue 3', 'React', 'Twig/Drupal', 'Next.js'],
-  outils_dev: ['VS Code', 'Postman', 'Git', 'GitHub', 'GitLab', 'npm'],
-  ui_animations: ['TailwindCSS', 'Bootstrap', 'GSAP', 'ScrollMagic', 'AOS', 'ScrollReveal', 'CSS Animations'],
+  frameworks: ['Nuxt 4', 'Nuxt 3', 'Vue 3', 'Vue Router', 'Pinia', 'React', 'Twig/Drupal', 'Next.js'],
+  outils_dev: ['VS Code', 'Postman', 'Git', 'GitHub', 'GitLab', 'npm', 'Supabase', 'Firebase'],
+  ui_animations: ['Tailwind CSS', 'Bootstrap', 'Bulma', 'Materialize', 'GSAP', 'ScrollMagic', 'AOS', 'ScrollReveal', 'CSS Animations'],
   design: ['Figma', 'Zeplin', 'Adobe XD'],
   environnements: ['Windows', 'macOS', 'Linux', 'Git Bash'],
   methodes: ['Agile (Scrum)', 'TMA', 'SEO', 'RGPD', 'Accessibilité'],
@@ -60,61 +77,94 @@ const defaultSuggestions: PortfolioCompetences = {
   ]
 }
 
-const categoryOrder = ref<CategoryKey[]>([...DEFAULT_COMPETENCES_ORDER])
-const orderedCategories = computed(() => sortCompetenceCategories(categoryOrder.value))
+const EXCLUDED_STORAGE_KEY = 'portfolio-admin-competences-excluded'
+const excludedSkills = reactive<Record<string, string[]>>({})
 
-const catalog = reactive<Record<CategoryKey, string[]>>({
-  langages: [],
-  frameworks: [],
-  outils_dev: [],
-  ui_animations: [],
-  design: [],
-  environnements: [],
-  methodes: [],
-  ia_cursor: []
-})
+function ensureCategoryKeys(keys: string[]) {
+  for (const key of keys) {
+    if (!(key in catalog)) catalog[key] = []
+    if (!(key in selected)) selected[key] = []
+    if (!(key in openSections)) openSections[key] = false
+    if (!(key in newSkillInputs)) newSkillInputs[key] = ''
+    if (!(key in excludedSkills)) excludedSkills[key] = []
+  }
+}
 
-const selected = reactive<Record<CategoryKey, string[]>>({
-  langages: [],
-  frameworks: [],
-  outils_dev: [],
-  ui_animations: [],
-  design: [],
-  environnements: [],
-  methodes: [],
-  ia_cursor: []
-})
-
-const openSections = reactive<Record<CategoryKey, boolean>>({
-  langages: false,
-  frameworks: false,
-  outils_dev: false,
-  ui_animations: false,
-  design: false,
-  environnements: false,
-  methodes: false,
-  ia_cursor: false
-})
-
-const newSkillInputs = reactive<Record<CategoryKey, string>>({
-  langages: '',
-  frameworks: '',
-  outils_dev: '',
-  ui_animations: '',
-  design: '',
-  environnements: '',
-  methodes: '',
-  ia_cursor: ''
-})
-
-const totalSelected = computed(() =>
-  COMPETENCE_CATEGORIES.reduce((sum, cat) => sum + selected[cat.key].length, 0)
+watch(
+  orderedCategories,
+  (cats) => ensureCategoryKeys(cats.map((cat) => cat.key)),
+  { immediate: true }
 )
 
+const totalSelected = computed(() =>
+  orderedCategories.value.reduce((sum, cat) => sum + (selected[cat.key]?.length ?? 0), 0)
+)
+
+const deleteTarget = ref<{ key: CategoryKey; skill: string } | null>(null)
+const cascadeDeleting = ref(false)
+const linkUsage = ref({ filters: 0, projects: 0, experiences: 0 })
+
+function loadExcludedFromStorage() {
+  if (!import.meta.client) return
+  try {
+    const raw = localStorage.getItem(EXCLUDED_STORAGE_KEY)
+    if (!raw) return
+    const parsed = JSON.parse(raw) as Partial<Record<string, string[]>>
+    for (const [key, values] of Object.entries(parsed)) {
+      excludedSkills[key] = [...(values ?? [])]
+    }
+  } catch {
+    /* ignore */
+  }
+}
+
+function persistExcludedToStorage() {
+  if (!import.meta.client) return
+  localStorage.setItem(EXCLUDED_STORAGE_KEY, JSON.stringify(excludedSkills))
+}
+
+function skillKey(label: string) {
+  return normalizeSkill(label).toLowerCase()
+}
+
+function isExcluded(key: CategoryKey, skill: string) {
+  const k = skillKey(skill)
+  return (excludedSkills[key] ?? []).some((s) => s.toLowerCase() === k)
+}
+
+function matchesSkill(value: string, skill: string) {
+  return skillKey(value) === skillKey(skill)
+}
+
+function normalizeSkill(label: string): string {
+  const trimmed = label.trim()
+  if (/^tailwind\s*css$/i.test(trimmed) || trimmed === 'TailwindCSS') return 'Tailwind CSS'
+  return trimmed
+}
+
+function dedupeSkills(skills: string[]): string[] {
+  const seen = new Set<string>()
+  const result: string[] = []
+  for (const skill of skills) {
+    const norm = normalizeSkill(skill)
+    const key = norm.toLowerCase()
+    if (!seen.has(key)) {
+      seen.add(key)
+      result.push(norm)
+    }
+  }
+  return result
+}
+
 function buildCatalog(key: CategoryKey, saved: string[]) {
-  const pool = new Set([...(defaultSuggestions[key] ?? []), ...saved])
+  const pool = new Set([
+    ...saved.map(normalizeSkill),
+    ...(defaultSuggestions[key] ?? [])
+      .map(normalizeSkill)
+      .filter((skill) => !isExcluded(key, skill))
+  ])
   catalog[key] = [...pool].sort((a, b) => a.localeCompare(b, 'fr'))
-  selected[key] = [...saved]
+  selected[key] = dedupeSkills(saved)
 }
 
 function isSelected(key: CategoryKey, skill: string) {
@@ -129,21 +179,117 @@ function toggleSkill(key: CategoryKey, skill: string) {
 }
 
 function addSkillToCatalog(key: CategoryKey) {
-  const label = newSkillInputs[key].trim()
+  const label = normalizeSkill(newSkillInputs[key])
   if (!label) return
 
-  if (!catalog[key].includes(label)) {
+  excludedSkills[key] = excludedSkills[key].filter((s) => !matchesSkill(s, label))
+  persistExcludedToStorage()
+
+  if (!catalog[key].some((s) => matchesSkill(s, label))) {
     catalog[key] = [...catalog[key], label].sort((a, b) => a.localeCompare(b, 'fr'))
   }
-  if (!selected[key].includes(label)) {
+  if (!selected[key].some((s) => matchesSkill(s, label))) {
     selected[key].push(label)
   }
 
   newSkillInputs[key] = ''
+  message.value = `« ${label} » ajoutée à ${orderedCategories.value.find((c) => c.key === key)?.label ?? key}`
 }
 
 function removeFromSelection(key: CategoryKey, skill: string) {
-  selected[key] = selected[key].filter((s) => s !== skill)
+  selected[key] = selected[key].filter((s) => !matchesSkill(s, skill))
+}
+
+async function countSkillUsage(skill: string) {
+  const [filtersRes, projectsRes, experiencesRes] = await Promise.all([
+    supabase.from('portfolio_tech_filters').select('id, label'),
+    supabase.from('portfolio_projects').select('id, stack'),
+    supabase.from('portfolio_experiences').select('id, stack')
+  ])
+
+  const filters = (filtersRes.data ?? []).filter((f) => matchesSkill(String(f.label), skill)).length
+  const projects = (projectsRes.data ?? []).filter((p) =>
+    ((p.stack as string[]) ?? []).some((s) => matchesSkill(s, skill))
+  ).length
+  const experiences = (experiencesRes.data ?? []).filter((e) =>
+    ((e.stack as string[]) ?? []).some((s) => matchesSkill(s, skill))
+  ).length
+
+  return { filters, projects, experiences }
+}
+
+async function openDeleteSkill(key: CategoryKey, skill: string) {
+  deleteTarget.value = { key, skill }
+  linkUsage.value = await countSkillUsage(skill)
+}
+
+function closeDeleteSkill() {
+  if (cascadeDeleting.value) return
+  deleteTarget.value = null
+}
+
+async function deleteSkillCompletely() {
+  if (!deleteTarget.value) return
+
+  const { key, skill } = deleteTarget.value
+  const label = normalizeSkill(skill)
+  cascadeDeleting.value = true
+  message.value = null
+
+  try {
+    if (!excludedSkills[key].some((s) => matchesSkill(s, label))) {
+      excludedSkills[key].push(label)
+    }
+    persistExcludedToStorage()
+
+    catalog[key] = catalog[key].filter((s) => !matchesSkill(s, label))
+    selected[key] = selected[key].filter((s) => !matchesSkill(s, label))
+
+    const { data: filters } = await supabase.from('portfolio_tech_filters').select('id, label')
+    for (const filter of filters ?? []) {
+      if (matchesSkill(String(filter.label), label)) {
+        const { error } = await supabase.from('portfolio_tech_filters').delete().eq('id', filter.id)
+        if (error) throw new Error(`Filtre : ${error.message}`)
+      }
+    }
+
+    const { data: projects } = await supabase.from('portfolio_projects').select('id, stack')
+    for (const project of projects ?? []) {
+      const stack = ((project.stack as string[]) ?? []).filter((s) => !matchesSkill(s, label))
+      if (stack.length !== ((project.stack as string[]) ?? []).length) {
+        const { error } = await supabase
+          .from('portfolio_projects')
+          .update({ stack, updated_at: new Date().toISOString() })
+          .eq('id', project.id)
+        if (error) throw new Error(`Projet : ${error.message}`)
+      }
+    }
+
+    const { data: experiences } = await supabase.from('portfolio_experiences').select('id, stack')
+    for (const experience of experiences ?? []) {
+      const stack = ((experience.stack as string[]) ?? []).filter((s) => !matchesSkill(s, label))
+      if (stack.length !== ((experience.stack as string[]) ?? []).length) {
+        const { error } = await supabase
+          .from('portfolio_experiences')
+          .update({ stack, updated_at: new Date().toISOString() })
+          .eq('id', experience.id)
+        if (error) throw new Error(`Expérience : ${error.message}`)
+      }
+    }
+
+    await save({ silent: true })
+
+    const total =
+      linkUsage.value.filters + linkUsage.value.projects + linkUsage.value.experiences
+    message.value = total
+      ? `« ${label} » supprimée (${total} lien${total > 1 ? 's' : ''} retiré${total > 1 ? 's' : ''})`
+      : `« ${label} » supprimée du catalogue`
+    deleteTarget.value = null
+  } catch (err) {
+    message.value = err instanceof Error ? err.message : 'Erreur lors de la suppression'
+  } finally {
+    cascadeDeleting.value = false
+  }
 }
 
 function moveCategory(key: CategoryKey, direction: -1 | 1) {
@@ -157,35 +303,122 @@ function moveCategory(key: CategoryKey, direction: -1 | 1) {
 }
 
 onMounted(async () => {
+  loadExcludedFromStorage()
+
   const { data } = await supabase.from('portfolio_competences').select('*').eq('id', 1).maybeSingle()
-  categoryOrder.value = resolveCompetencesOrder(data?.categories_order as string[] | undefined)
+  const custom = parseCustomCategories(data?.custom_categories)
+  customDefinitions.value = custom.definitions
+  hiddenBuiltin.value = [...(custom.hidden_builtin ?? [])]
+
+  const allKeys = [
+    ...COMPETENCE_CATEGORIES.map((cat) => cat.key),
+    ...custom.definitions.map((cat) => cat.key)
+  ].filter((key) => !hiddenBuiltin.value.includes(key))
+  categoryOrder.value = resolveCompetencesOrder(data?.categories_order as string[] | undefined, allKeys)
 
   for (const cat of COMPETENCE_CATEGORIES) {
     const saved = (data?.[cat.key] as string[] | undefined) ?? []
     buildCatalog(cat.key, saved)
   }
+
+  for (const cat of custom.definitions) {
+    buildCatalog(cat.key, custom.skills[cat.key] ?? [])
+  }
 })
 
-async function save() {
+function addCustomCategory() {
+  const label = newCategoryLabel.value.trim()
+  if (!label) return
+
+  const existingKeys = new Set([
+    ...COMPETENCE_CATEGORIES.map((cat) => cat.key),
+    ...customDefinitions.value.map((cat) => cat.key)
+  ])
+  const key = createUniqueCategoryKey(label, existingKeys)
+  const presetIndex = customDefinitions.value.length
+  const def: CompetenceCategoryDef = {
+    key,
+    label,
+    hint: newCategoryHint.value.trim() || 'Compétences…',
+    description: newCategoryDescription.value.trim() || label,
+    accent: ['rose', 'cyan', 'lime', 'amber'][presetIndex % 4]!,
+    gradient: [
+      'from-rose-500 to-red-600',
+      'from-cyan-500 to-blue-600',
+      'from-lime-500 to-green-600',
+      'from-amber-500 to-yellow-600'
+    ][presetIndex % 4]!
+  }
+
+  customDefinitions.value.push(def)
+  categoryOrder.value.push(key)
+  ensureCategoryKeys([key])
+  openSections[key] = true
+
+  newCategoryLabel.value = ''
+  newCategoryHint.value = ''
+  newCategoryDescription.value = ''
+  message.value = `Catégorie « ${label} » créée — pensez à enregistrer`
+}
+
+function removeCategory(key: string) {
+  categoryOrder.value = categoryOrder.value.filter((item) => item !== key)
+
+  if (isBuiltinCategoryKey(key)) {
+    if (!hiddenBuiltin.value.includes(key)) hiddenBuiltin.value.push(key)
+    selected[key] = []
+    catalog[key] = []
+  } else {
+    customDefinitions.value = customDefinitions.value.filter((cat) => cat.key !== key)
+    delete catalog[key]
+    delete selected[key]
+    delete openSections[key]
+    delete newSkillInputs[key]
+    delete excludedSkills[key]
+  }
+
+  message.value = 'Catégorie retirée — enregistrez pour appliquer'
+}
+
+async function save(options: { silent?: boolean } = {}) {
   saving.value = true
-  message.value = null
+  if (!options.silent) message.value = null
+
+  const customSkills: Record<string, string[]> = {}
+  for (const cat of customDefinitions.value) {
+    customSkills[cat.key] = dedupeSkills(selected[cat.key] ?? [])
+  }
 
   const payload: Record<string, unknown> = {
     id: 1,
     updated_at: new Date().toISOString(),
-    categories_order: [...categoryOrder.value]
+    categories_order: [...categoryOrder.value],
+    custom_categories: {
+      definitions: customDefinitions.value,
+      skills: customSkills,
+      hidden_builtin: hiddenBuiltin.value
+    }
   }
 
   for (const cat of COMPETENCE_CATEGORIES) {
-    payload[cat.key] = [...selected[cat.key]]
+    payload[cat.key] = hiddenBuiltin.value.includes(cat.key)
+      ? []
+      : dedupeSkills(selected[cat.key] ?? [])
   }
 
   const { error } = await supabase.from('portfolio_competences').upsert(payload)
 
   saving.value = false
-  message.value = error ? error.message : 'Compétences enregistrées'
+  if (error) {
+    if (options.silent) throw new Error(error.message)
+    message.value = error.message.includes('custom_categories')
+      ? `${error.message} — exécutez supabase/migration-custom-categories.sql dans Supabase`
+      : error.message
+    return
+  }
 
-  if (!error) await refreshNuxtData('portfolio-content')
+  if (!options.silent) message.value = 'Compétences enregistrées'
+  await refreshNuxtData('portfolio-content')
 }
 </script>
 
@@ -195,7 +428,7 @@ async function save() {
       <div>
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Compétences</h1>
         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          Choisissez les compétences affichées sur le portfolio. Utilisez ↑ ↓ pour réordonner les catégories.
+          Créez des catégories (ex. Accessibilité), ajoutez ou supprimez des compétences. La suppression d'une compétence nettoie aussi projets, expériences et filtres tech.
         </p>
       </div>
       <span class="px-3 py-1 text-sm font-semibold rounded-full bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300 shrink-0">
@@ -206,7 +439,7 @@ async function save() {
     <p
       v-if="message"
       class="mb-4 px-4 py-3 rounded-xl text-sm border"
-      :class="message.includes('enregistr')
+      :class="message.includes('enregistr') || message.includes('supprimée') || message.includes('ajoutée') || message.includes('créée') || message.includes('retirée')
         ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
         : 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-300 border-red-200 dark:border-red-800'"
     >
@@ -214,6 +447,21 @@ async function save() {
     </p>
 
     <form class="space-y-4" @submit.prevent="save">
+      <section class="new-category-box">
+        <h2 class="text-base font-bold text-gray-900 dark:text-white mb-1">Nouvelle catégorie</h2>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">
+          Créez un axe radar personnalisé (ex. Accessibilité, Backend, Cloud…).
+        </p>
+        <div class="grid gap-2 sm:grid-cols-3 mb-3">
+          <input v-model="newCategoryLabel" type="text" class="skill-input" placeholder="Nom — ex. Accessibilité" autocomplete="off">
+          <input v-model="newCategoryHint" type="text" class="skill-input" placeholder="Exemples — WCAG, ARIA…" autocomplete="off">
+          <input v-model="newCategoryDescription" type="text" class="skill-input" placeholder="Description courte" autocomplete="off">
+        </div>
+        <button type="button" class="add-btn" :disabled="!newCategoryLabel.trim()" @click="addCustomCategory">
+          + Créer la catégorie
+        </button>
+      </section>
+
       <section
         v-for="(cat, index) in orderedCategories"
         :key="cat.key"
@@ -249,6 +497,14 @@ async function save() {
           <div class="flex gap-1 shrink-0 pr-3">
             <button
               type="button"
+              class="order-btn text-red-500"
+              :aria-label="`Supprimer la catégorie ${cat.label}`"
+              @click="removeCategory(cat.key)"
+            >
+              🗑
+            </button>
+            <button
+              type="button"
               class="order-btn"
               :disabled="index === 0"
               :aria-label="`Monter ${cat.label}`"
@@ -278,48 +534,62 @@ async function save() {
                 class="selected-chip"
               >
                 {{ skill }}
-                <button type="button" class="selected-chip-remove" :aria-label="`Retirer ${skill}`" @click="removeFromSelection(cat.key, skill)">×</button>
+                <button type="button" class="selected-chip-remove" :aria-label="`Masquer ${skill}`" @click="removeFromSelection(cat.key, skill)">×</button>
               </span>
             </div>
           </div>
 
           <div class="add-box">
-            <form class="flex flex-col sm:flex-row gap-2" @submit.prevent="addSkillToCatalog(cat.key)">
+            <div class="flex flex-col sm:flex-row gap-2">
               <input
                 v-model="newSkillInputs[cat.key]"
                 type="text"
                 class="skill-input flex-1"
                 :placeholder="`Ajouter une compétence — ${cat.label}`"
                 autocomplete="off"
+                @keydown.enter.prevent="addSkillToCatalog(cat.key)"
               >
               <button
-                type="submit"
+                type="button"
                 class="add-btn"
                 :disabled="!newSkillInputs[cat.key].trim()"
+                @click="addSkillToCatalog(cat.key)"
               >
                 + Ajouter
               </button>
-            </form>
+            </div>
           </div>
 
           <div>
-            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Catalogue — cliquer pour sélectionner</p>
+            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Catalogue — cliquer pour sélectionner · 🗑 pour supprimer</p>
             <div v-if="catalog[cat.key].length" class="skill-grid">
-              <button
+              <div
                 v-for="skill in catalog[cat.key]"
                 :key="skill"
-                type="button"
-                class="skill-chip"
-                :class="{ 'skill-chip--selected': isSelected(cat.key, skill) }"
-                @click="toggleSkill(cat.key, skill)"
+                class="skill-chip-row"
               >
-                <span class="skill-chip-check" aria-hidden="true">
-                  <svg v-if="isSelected(cat.key, skill)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3 h-3">
-                    <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" />
-                  </svg>
-                </span>
-                <span class="truncate">{{ skill }}</span>
-              </button>
+                <button
+                  type="button"
+                  class="skill-chip"
+                  :class="{ 'skill-chip--selected': isSelected(cat.key, skill) }"
+                  @click="toggleSkill(cat.key, skill)"
+                >
+                  <span class="skill-chip-check" aria-hidden="true">
+                    <svg v-if="isSelected(cat.key, skill)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3 h-3">
+                      <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" />
+                    </svg>
+                  </span>
+                  <span class="truncate">{{ skill }}</span>
+                </button>
+                <button
+                  type="button"
+                  class="skill-delete-btn"
+                  :aria-label="`Supprimer ${skill}`"
+                  @click="openDeleteSkill(cat.key, skill)"
+                >
+                  🗑
+                </button>
+              </div>
             </div>
             <p v-else class="text-sm text-gray-500 p-4 rounded-xl border border-dashed border-gray-300 dark:border-gray-700">
               Aucune compétence. Ajoutez-en ci-dessus.
@@ -338,6 +608,32 @@ async function save() {
         </button>
       </div>
     </form>
+
+    <div
+      v-if="deleteTarget"
+      class="delete-modal-backdrop"
+      @click.self="closeDeleteSkill"
+    >
+      <div class="delete-modal" role="dialog" aria-modal="true" :aria-label="`Supprimer ${deleteTarget.skill}`">
+        <h3 class="delete-modal__title">Supprimer « {{ deleteTarget.skill }} » ?</h3>
+        <p class="delete-modal__text">
+          Cette action retire la compétence du catalogue et du site, et nettoie les liens associés :
+        </p>
+        <ul class="delete-modal__list">
+          <li>{{ linkUsage.filters }} filtre(s) tech</li>
+          <li>{{ linkUsage.projects }} projet(s)</li>
+          <li>{{ linkUsage.experiences }} expérience(s)</li>
+        </ul>
+        <div class="delete-modal__actions">
+          <button type="button" class="delete-modal__cancel" :disabled="cascadeDeleting" @click="closeDeleteSkill">
+            Annuler
+          </button>
+          <button type="button" class="delete-modal__confirm" :disabled="cascadeDeleting" @click="deleteSkillCompletely">
+            {{ cascadeDeleting ? 'Suppression…' : 'Supprimer définitivement' }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -395,11 +691,15 @@ async function save() {
 }
 
 .skill-grid {
-  @apply grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2;
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2;
+}
+
+.skill-chip-row {
+  @apply flex items-stretch gap-1 min-w-0;
 }
 
 .skill-chip {
-  @apply flex items-center gap-1.5 min-w-0 px-3 py-2 rounded-xl border text-left text-sm font-medium transition-all duration-150;
+  @apply flex items-center gap-1.5 min-w-0 flex-1 px-3 py-2 rounded-xl border text-left text-sm font-medium transition-all duration-150;
   @apply border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300;
   @apply hover:border-sky-300 dark:hover:border-sky-700;
 }
@@ -416,6 +716,42 @@ async function save() {
   @apply border-sky-500 bg-sky-500 text-white;
 }
 
+.skill-delete-btn {
+  @apply shrink-0 w-10 flex items-center justify-center rounded-xl border border-red-200 dark:border-red-900/60 bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/50 transition-colors text-sm;
+}
+
+.delete-modal-backdrop {
+  @apply fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm;
+}
+
+.delete-modal {
+  @apply w-full max-w-md rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6 shadow-2xl;
+}
+
+.delete-modal__title {
+  @apply text-lg font-bold text-gray-900 dark:text-white mb-2;
+}
+
+.delete-modal__text {
+  @apply text-sm text-gray-600 dark:text-gray-400 mb-3;
+}
+
+.delete-modal__list {
+  @apply text-sm text-gray-700 dark:text-gray-300 space-y-1 mb-5 pl-5 list-disc;
+}
+
+.delete-modal__actions {
+  @apply flex justify-end gap-2;
+}
+
+.delete-modal__cancel {
+  @apply px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50;
+}
+
+.delete-modal__confirm {
+  @apply px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 disabled:opacity-50;
+}
+
 .save-btn {
   @apply px-6 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-semibold rounded-xl shadow-lg shadow-sky-500/20 hover:from-sky-600 hover:to-indigo-700 transition-all disabled:opacity-50;
 }
@@ -428,4 +764,12 @@ async function save() {
 .badge-teal { @apply bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300; }
 .badge-orange { @apply bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300; }
 .badge-violet { @apply bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300; }
+.badge-rose { @apply bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300; }
+.badge-cyan { @apply bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300; }
+.badge-lime { @apply bg-lime-100 text-lime-700 dark:bg-lime-900/40 dark:text-lime-300; }
+.badge-amber { @apply bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300; }
+
+.new-category-box {
+  @apply rounded-2xl border border-dashed border-sky-300 dark:border-sky-800 bg-sky-50/50 dark:bg-sky-950/20 p-4;
+}
 </style>
