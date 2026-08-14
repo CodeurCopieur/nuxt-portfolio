@@ -138,8 +138,8 @@ onMounted(() => {
             <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Contact</h3>
             <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
               <p>📍 Paris / Remote</p>
-              <a href="mailto:louiswiddy49@gmail.com" class="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
-                📧 louiswiddy49@gmail.com
+              <a href="mailto:contact.louisfreelance@ik.me" class="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
+                📧 contact.louisfreelance@ik.me
               </a>
               <p>📱 06 22 85 31 21</p>
             </div>

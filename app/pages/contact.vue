@@ -6,6 +6,8 @@ useHead({
   title: computed(() => `Contact — ${meta.value.name}`)
 })
 
+const CONTACT_EMAIL = 'contact.louisfreelance@ik.me'
+
 const form = reactive({ name: '', email: '', message: '' })
 const loading = ref(false)
 const success = ref<boolean|null>(null)
@@ -115,7 +117,7 @@ async function submit() {
                 </div>
                 <div>
                   <h3 class="font-semibold text-gray-900 dark:text-white">Email</h3>
-                  <p class="text-gray-600 dark:text-gray-400">louiswiddy49@gmail.com</p>
+                  <a :href="`mailto:${CONTACT_EMAIL}`" class="text-gray-600 dark:text-gray-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors">{{ CONTACT_EMAIL }}</a>
                 </div>
               </div>
 
