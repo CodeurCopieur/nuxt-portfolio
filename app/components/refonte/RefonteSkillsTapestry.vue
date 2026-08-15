@@ -1,19 +1,9 @@
 <script setup lang="ts">
-import { COMPETENCE_CATEGORIES, sortCompetenceCategories } from '~/data/competence-categories'
+import SkillMarketChart from '@/components/desktop/SkillMarketChart.vue'
 import { useRefonteScroll } from '@/composables/refonte/useRefonteScroll'
 
-const { sections } = useContent()
 const sectionRef = ref<HTMLElement | null>(null)
 const { addScene } = useRefonteScroll()
-
-const categories = computed(() => {
-  const order = sections.value.competences_order ?? []
-  const custom = sections.value.competences_categories ?? COMPETENCE_CATEGORIES
-  return sortCompetenceCategories(order, custom).map((cat) => ({
-    ...cat,
-    skills: sections.value.competences[cat.key] ?? []
-  })).filter((cat) => cat.skills.length > 0)
-})
 
 onMounted(() => {
   addScene({
@@ -21,11 +11,10 @@ onMounted(() => {
     onEnter: async () => {
       if (!sectionRef.value || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
       const { gsap } = await import('gsap')
-      gsap.from(sectionRef.value.querySelectorAll('.refonte-skill-block'), {
-        y: 32,
+      gsap.from(sectionRef.value.querySelector('.refonte-skills__map'), {
+        y: 40,
         opacity: 0,
-        duration: 0.7,
-        stagger: 0.08,
+        duration: 0.85,
         ease: 'power2.out'
       })
     }
@@ -42,21 +31,10 @@ onMounted(() => {
         Un socle solide en intégration, animation maîtrisée et culture produit — nourri par des environnements exigeants.
       </p>
 
-      <div class="refonte-skills__grid">
-        <article
-          v-for="cat in categories"
-          :key="cat.key"
-          class="refonte-skill-block refonte-card"
-          :style="{ '--rf-accent-local': cat.accent || 'var(--rf-sage)' }"
-        >
-          <header>
-            <h3>{{ cat.label }}</h3>
-            <p>{{ cat.hint }}</p>
-          </header>
-          <ul>
-            <li v-for="skill in cat.skills" :key="skill">{{ skill }}</li>
-          </ul>
-        </article>
+      <div class="refonte-skills__map refonte-card">
+        <ClientOnly>
+          <SkillMarketChart variant="refonte" />
+        </ClientOnly>
       </div>
     </div>
   </section>
@@ -80,55 +58,13 @@ onMounted(() => {
   margin-bottom: 2rem;
 }
 
-.refonte-skills__grid {
-  display: grid;
-  gap: 1rem;
-}
-
-@media (min-width: 768px) {
-  .refonte-skills__grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1100px) {
-  .refonte-skills__grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.refonte-skill-block {
-  padding: 1.25rem;
-  border-top: 3px solid var(--rf-accent-local, var(--rf-sage));
-}
-
-.refonte-skill-block header h3 {
-  font-size: 1rem;
-  font-weight: 700;
-  margin-bottom: 0.25rem;
-}
-
-.refonte-skill-block header p {
-  font-size: 0.78rem;
-  color: var(--rf-muted);
-  margin-bottom: 0.85rem;
-}
-
-.refonte-skill-block ul {
-  list-style: none;
+.refonte-skills__map {
+  overflow: hidden;
   padding: 0;
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
 }
 
-.refonte-skill-block li {
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0.35rem 0.6rem;
-  border-radius: 999px;
-  background: rgba(26, 22, 18, 0.05);
-  color: var(--rf-ink-soft);
+.refonte-skills__map :deep(.fm-skills--refonte) {
+  border-radius: inherit;
+  min-height: 0;
 }
 </style>

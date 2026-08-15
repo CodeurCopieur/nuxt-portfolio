@@ -3,6 +3,92 @@ import { useContent } from '@/composables/useContent'
 import { COMPETENCE_CATEGORIES, sortCompetenceCategories } from '~/data/competence-categories'
 import { getCareerPinPalette, type CareerPinPalette } from '~/utils/career-pin-colors'
 
+const props = withDefaults(
+  defineProps<{ variant?: 'game' | 'refonte' }>(),
+  { variant: 'game' }
+)
+
+const isRefonte = computed(() => props.variant === 'refonte')
+
+interface ChartTheme {
+  bgStops: [string, string, string]
+  showParticles: boolean
+  gridStroke: (level: number) => string
+  gridSpoke: string
+  gridLabel: string
+  polygonFill: [string, string, string]
+  polygonStroke: string
+  polygonGlow: string
+  badgeFillLit: string
+  badgeFill: string
+  badgeStrokeLit: string
+  badgeStroke: string
+  badgeTextLit: string
+  badgeText: string
+  centerMain: string
+  centerSub: string
+  pinLitGrad: [string, string]
+}
+
+const chartTheme = computed((): ChartTheme =>
+  isRefonte.value
+    ? {
+        bgStops: ['#f7f2ea', '#ebe4d6', '#e0d8c8'],
+        showParticles: false,
+        gridStroke: (level) => `rgba(26, 22, 18, ${0.07 + level * 0.035})`,
+        gridSpoke: 'rgba(26, 22, 18, 0.14)',
+        gridLabel: 'rgba(74, 67, 60, 0.62)',
+        polygonFill: [
+          'rgba(184, 67, 47, 0.32)',
+          'rgba(74, 107, 93, 0.22)',
+          'rgba(184, 149, 74, 0.12)'
+        ],
+        polygonStroke: 'rgba(184, 67, 47, 0.95)',
+        polygonGlow: 'rgba(184, 67, 47, 0.45)',
+        badgeFillLit: 'rgba(184, 67, 47, 0.92)',
+        badgeFill: 'rgba(247, 242, 234, 0.95)',
+        badgeStrokeLit: 'rgba(255, 255, 255, 0.45)',
+        badgeStroke: 'rgba(26, 22, 18, 0.12)',
+        badgeTextLit: '#f7f2ea',
+        badgeText: 'rgba(184, 67, 47, 0.88)',
+        centerMain: '#1a1612',
+        centerSub: 'rgba(122, 114, 104, 0.65)',
+        pinLitGrad: ['#d46a55', '#b8432f']
+      }
+    : {
+        bgStops: ['#12182b', '#0a0e18', '#060810'],
+        showParticles: true,
+        gridStroke: (level) => `rgba(148, 163, 184, ${0.05 + level * 0.025})`,
+        gridSpoke: 'rgba(148, 163, 184, 0.08)',
+        gridLabel: 'rgba(148, 163, 184, 0.45)',
+        polygonFill: [
+          'rgba(56, 189, 248, 0.28)',
+          'rgba(129, 140, 248, 0.18)',
+          'rgba(167, 139, 250, 0.08)'
+        ],
+        polygonStroke: 'rgba(125, 211, 252, 0.85)',
+        polygonGlow: 'rgba(56, 189, 248, 0.55)',
+        badgeFillLit: 'rgba(251, 191, 36, 0.92)',
+        badgeFill: 'rgba(15, 23, 42, 0.85)',
+        badgeStrokeLit: 'rgba(255, 255, 255, 0.35)',
+        badgeStroke: 'rgba(255, 255, 255, 0.12)',
+        badgeTextLit: '#0f172a',
+        badgeText: 'rgba(251, 191, 36, 0.9)',
+        centerMain: 'rgba(255,255,255,0.95)',
+        centerSub: 'rgba(148, 163, 184, 0.6)',
+        pinLitGrad: ['#67e8f9', '#22d3ee']
+      }
+)
+
+const REFONTE_PIN_COLORS: CareerPinPalette[] = [
+  { dot: 'linear-gradient(135deg, #c85a48, #b8432f)', ring: 'rgba(184, 67, 47, 0.35)', swatch: '#b8432f' },
+  { dot: 'linear-gradient(135deg, #5a7d6e, #4a6b5d)', ring: 'rgba(74, 107, 93, 0.35)', swatch: '#4a6b5d' },
+  { dot: 'linear-gradient(135deg, #c9a85a, #b8954a)', ring: 'rgba(184, 149, 74, 0.35)', swatch: '#b8954a' },
+  { dot: 'linear-gradient(135deg, #8f6b5a, #7a5544)', ring: 'rgba(122, 85, 68, 0.35)', swatch: '#7a5544' },
+  { dot: 'linear-gradient(135deg, #6b8f7a, #567a66)', ring: 'rgba(86, 122, 102, 0.35)', swatch: '#567a66' },
+  { dot: 'linear-gradient(135deg, #a8432f, #8f2f1f)', ring: 'rgba(143, 47, 31, 0.35)', swatch: '#8f2f1f' }
+]
+
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 const containerRef = ref<HTMLElement | null>(null)
 const { sections } = useContent()
@@ -65,7 +151,65 @@ const CATEGORY_COLORS: Record<string, string> = {
   accessibilite: '#f43f5e'
 }
 
+const REFONTE_CATEGORY_COLORS: Record<string, string> = {
+  langages: '#b8432f',
+  frameworks: '#4a6b5d',
+  outils_dev: '#567a66',
+  ui_animations: '#8f6b5a',
+  design: '#7a5544',
+  environnements: '#6b8f7a',
+  methodes: '#b8954a',
+  ia_cursor: '#8f2f1f',
+  accessibilite: '#c85a48'
+}
+
 const activeKey = computed(() => focusedKey.value ?? hoveredKey.value)
+
+const selectedTabKey = ref<string | null>(null)
+
+const selectedCategory = computed(() => {
+  const key = selectedTabKey.value
+  const cats = visibleCategories.value
+  if (!cats.length) return null
+  if (key) {
+    return cats.find((cat) => cat.key === key) ?? cats[0]!
+  }
+  return cats[0]!
+})
+
+watch(
+  visibleCategories,
+  (cats) => {
+    if (!cats.length) {
+      selectedTabKey.value = null
+      return
+    }
+    if (!selectedTabKey.value || !cats.some((cat) => cat.key === selectedTabKey.value)) {
+      selectedTabKey.value = cats[0]!.key
+    }
+  },
+  { immediate: true }
+)
+
+watch(hoveredKey, (key) => {
+  if (!isRefonte.value || !key) return
+  selectedTabKey.value = key
+})
+
+watch(focusedKey, (key) => {
+  if (isRefonte.value && key) selectedTabKey.value = key
+})
+
+function selectTab(key: string) {
+  selectedTabKey.value = key
+  focusedKey.value = key
+  hoveredKey.value = key
+}
+
+function previewTab(key: string) {
+  selectedTabKey.value = key
+  hoveredKey.value = key
+}
 
 interface RadarPoint {
   key: string
@@ -85,6 +229,7 @@ interface RadarPoint {
 }
 
 function pinPaletteForCategory(index: number): CareerPinPalette {
+  if (isRefonte.value) return REFONTE_PIN_COLORS[index % REFONTE_PIN_COLORS.length]!
   return getCareerPinPalette(index + 1)
 }
 
@@ -132,8 +277,9 @@ function drawMapStylePin(
 
   const grad = ctx.createLinearGradient(x - dotR, y - dotR, x + dotR, y + dotR)
   if (lit) {
-    grad.addColorStop(0, '#67e8f9')
-    grad.addColorStop(1, '#22d3ee')
+    const [pinLitA, pinLitB] = chartTheme.value.pinLitGrad
+    grad.addColorStop(0, pinLitA)
+    grad.addColorStop(1, pinLitB)
   } else {
     grad.addColorStop(0, c1)
     grad.addColorStop(1, c2)
@@ -151,7 +297,8 @@ function drawMapStylePin(
 }
 
 function colorFor(key: string) {
-  if (CATEGORY_COLORS[key]) return CATEGORY_COLORS[key]!
+  const palette = isRefonte.value ? REFONTE_CATEGORY_COLORS : CATEGORY_COLORS
+  if (palette[key]) return palette[key]!
   let hash = 0
   for (let i = 0; i < key.length; i++) hash = key.charCodeAt(i) + ((hash << 5) - hash)
   return `hsl(${Math.abs(hash) % 360} 70% 58%)`
@@ -276,6 +423,10 @@ function setHover(key: string | null) {
 
 function toggleFocus(key: string) {
   focusedKey.value = focusedKey.value === key ? null : key
+  if (isRefonte.value) {
+    selectedTabKey.value = key
+    hoveredKey.value = key
+  }
 }
 
 function isCategoryLit(key: string) {
@@ -332,10 +483,11 @@ function computeRadarPoints(cx: number, cy: number, radius: number): RadarPoint[
 let introProgress = 0
 
 function drawBackground(ctx: CanvasRenderingContext2D, t: number) {
+  const theme = chartTheme.value
   const grad = ctx.createRadialGradient(width * 0.5, height * 0.45, 0, width * 0.5, height * 0.45, width * 0.7)
-  grad.addColorStop(0, '#12182b')
-  grad.addColorStop(0.55, '#0a0e18')
-  grad.addColorStop(1, '#060810')
+  grad.addColorStop(0, theme.bgStops[0])
+  grad.addColorStop(0.55, theme.bgStops[1])
+  grad.addColorStop(1, theme.bgStops[2])
   ctx.fillStyle = grad
   ctx.fillRect(0, 0, width, height)
 
@@ -344,25 +496,28 @@ function drawBackground(ctx: CanvasRenderingContext2D, t: number) {
     const gx = width * 0.5 + Math.cos(angle) * width * 0.2
     const gy = height * 0.45 + Math.sin(angle) * height * 0.16
     const glow = ctx.createRadialGradient(gx, gy, 0, gx, gy, 100)
-    glow.addColorStop(0, `${colorFor(cat.key)}20`)
+    glow.addColorStop(0, `${colorFor(cat.key)}${isRefonte.value ? '18' : '20'}`)
     glow.addColorStop(1, 'transparent')
     ctx.fillStyle = glow
     ctx.fillRect(0, 0, width, height)
   })
 
-  for (let i = 0; i < 36; i++) {
-    const sx = (i * 137.5 + t * 10) % width
-    const sy = (i * 97.3 + t * 7) % height
-    ctx.beginPath()
-    ctx.arc(sx, sy, 0.5 + (i % 3) * 0.35, 0, Math.PI * 2)
-    ctx.fillStyle = `rgba(255,255,255,${0.06 + Math.sin(t + i) * 0.03})`
-    ctx.fill()
+  if (theme.showParticles) {
+    for (let i = 0; i < 36; i++) {
+      const sx = (i * 137.5 + t * 10) % width
+      const sy = (i * 97.3 + t * 7) % height
+      ctx.beginPath()
+      ctx.arc(sx, sy, 0.5 + (i % 3) * 0.35, 0, Math.PI * 2)
+      ctx.fillStyle = `rgba(255,255,255,${0.06 + Math.sin(t + i) * 0.03})`
+      ctx.fill()
+    }
   }
 }
 
 function drawRadarGrid(ctx: CanvasRenderingContext2D, cx: number, cy: number, radius: number, n: number) {
   if (n < 1) return
 
+  const theme = chartTheme.value
   const ringScores = [4, 8, 12, 16, 20]
 
   for (const score of ringScores) {
@@ -377,7 +532,7 @@ function drawRadarGrid(ctx: CanvasRenderingContext2D, cx: number, cy: number, ra
     }
     ctx.closePath()
     const level = score / 4
-    ctx.strokeStyle = `rgba(148, 163, 184, ${0.05 + level * 0.025})`
+    ctx.strokeStyle = theme.gridStroke(level)
     ctx.stroke()
   }
 
@@ -386,12 +541,12 @@ function drawRadarGrid(ctx: CanvasRenderingContext2D, cx: number, cy: number, ra
     ctx.beginPath()
     ctx.moveTo(cx, cy)
     ctx.lineTo(cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius)
-    ctx.strokeStyle = 'rgba(148, 163, 184, 0.08)'
+    ctx.strokeStyle = theme.gridSpoke
     ctx.stroke()
   }
 
   ctx.font = '600 8px ui-monospace, monospace'
-  ctx.fillStyle = 'rgba(148, 163, 184, 0.45)'
+  ctx.fillStyle = theme.gridLabel
   ctx.textAlign = 'center'
   ctx.textBaseline = 'bottom'
   for (const score of ringScores) {
@@ -408,6 +563,8 @@ function drawRadar(ctx: CanvasRenderingContext2D, cx: number, cy: number, radius
   radarPoints = computeRadarPoints(cx, cy, radius)
   const focus = activeKey.value
 
+  const theme = chartTheme.value
+
   drawRadarGrid(ctx, cx, cy, radius, n)
 
   ctx.beginPath()
@@ -420,16 +577,16 @@ function drawRadar(ctx: CanvasRenderingContext2D, cx: number, cy: number, radius
   ctx.closePath()
 
   const fillGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius)
-  fillGrad.addColorStop(0, 'rgba(56, 189, 248, 0.28)')
-  fillGrad.addColorStop(0.5, 'rgba(129, 140, 248, 0.18)')
-  fillGrad.addColorStop(1, 'rgba(167, 139, 250, 0.08)')
+  fillGrad.addColorStop(0, theme.polygonFill[0])
+  fillGrad.addColorStop(0.5, theme.polygonFill[1])
+  fillGrad.addColorStop(1, theme.polygonFill[2])
   ctx.fillStyle = fillGrad
   ctx.fill()
 
-  ctx.strokeStyle = 'rgba(125, 211, 252, 0.85)'
-  ctx.lineWidth = 2
-  ctx.shadowColor = 'rgba(56, 189, 248, 0.55)'
-  ctx.shadowBlur = focus ? 18 : 10
+  ctx.strokeStyle = theme.polygonStroke
+  ctx.lineWidth = isRefonte.value ? 2.75 : 2
+  ctx.shadowColor = theme.polygonGlow
+  ctx.shadowBlur = focus ? (isRefonte.value ? 22 : 18) : (isRefonte.value ? 14 : 10)
   ctx.stroke()
   ctx.shadowBlur = 0
 
@@ -454,16 +611,16 @@ function drawRadar(ctx: CanvasRenderingContext2D, cx: number, cy: number, radius
     const badgeH = 15
     ctx.beginPath()
     ctx.roundRect(badgeX - badgeW / 2, badgeY - badgeH / 2, badgeW, badgeH, 4)
-    ctx.fillStyle = lit ? 'rgba(251, 191, 36, 0.92)' : 'rgba(15, 23, 42, 0.85)'
+    ctx.fillStyle = lit ? theme.badgeFillLit : theme.badgeFill
     ctx.globalAlpha = dim ? 0.35 : 1
     ctx.fill()
-    ctx.strokeStyle = lit ? 'rgba(255, 255, 255, 0.35)' : 'rgba(255, 255, 255, 0.12)'
+    ctx.strokeStyle = lit ? theme.badgeStrokeLit : theme.badgeStroke
     ctx.lineWidth = 1
     ctx.stroke()
     ctx.globalAlpha = 1
 
     ctx.font = '800 9px ui-monospace, monospace'
-    ctx.fillStyle = lit ? '#0f172a' : 'rgba(251, 191, 36, 0.9)'
+    ctx.fillStyle = lit ? theme.badgeTextLit : theme.badgeText
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
     ctx.fillText(String(p.avgRating), badgeX, badgeY + 0.5)
@@ -491,25 +648,28 @@ function drawFrame() {
   const ease = 1 - Math.pow(1 - introProgress, 3)
 
   const cx = width * 0.5
-  const cy = height * 0.52
-  const radius = Math.min(width, height) * 0.36
+  const cy = height * 0.5
+  const radius = Math.min(width, height) * (isRefonte.value ? 0.44 : 0.36)
 
   drawBackground(ctx, t)
 
   if (visibleCategories.value.length >= 3) {
     drawRadar(ctx, cx, cy, radius, ease, t)
 
-    ctx.font = '800 22px ui-sans-serif, system-ui, sans-serif'
-    ctx.fillStyle = 'rgba(255,255,255,0.95)'
+    const theme = chartTheme.value
+    ctx.font = isRefonte.value
+      ? '800 22px Fraunces, Georgia, serif'
+      : '800 22px ui-sans-serif, system-ui, sans-serif'
+    ctx.fillStyle = theme.centerMain
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
     ctx.fillText(String(totalSkills.value), cx, cy - 6)
     ctx.font = '600 9px ui-sans-serif, system-ui, sans-serif'
-    ctx.fillStyle = 'rgba(148, 163, 184, 0.6)'
+    ctx.fillStyle = theme.centerSub
     ctx.fillText('compétences', cx, cy + 14)
   } else {
     ctx.font = '600 12px ui-sans-serif, system-ui, sans-serif'
-    ctx.fillStyle = 'rgba(148, 163, 184, 0.6)'
+    ctx.fillStyle = chartTheme.value.centerSub
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
     ctx.fillText('Chargement…', cx, cy)
@@ -584,7 +744,8 @@ onMounted(() => {
   containerRef.value?.addEventListener('click', pickRadar)
   containerRef.value?.addEventListener('mousemove', moveRadar)
   containerRef.value?.addEventListener('mouseleave', () => {
-    if (!focusedKey.value) hoveredKey.value = null
+    if (isRefonte.value || focusedKey.value) return
+    hoveredKey.value = null
   })
 })
 
@@ -597,11 +758,17 @@ onUnmounted(() => {
 
 <template>
   <div
-    class="fm-skills h-full min-h-[520px] flex flex-col xl:flex-row"
+    class="fm-skills h-full flex flex-col"
+    :class="[
+      isRefonte ? 'fm-skills--refonte min-h-0' : 'min-h-[520px] xl:flex-row',
+    ]"
     @mouseleave="!focusedKey && (hoveredKey = null)"
   >
-    <!-- Colonnes style FM -->
-    <div class="fm-skills__board flex-1 min-w-0 xl:max-w-[42%] overflow-y-auto p-3 sm:p-4">
+    <!-- Colonnes style FM (game uniquement) -->
+    <div
+      v-if="!isRefonte"
+      class="fm-skills__board flex-1 min-w-0 xl:max-w-[42%] overflow-y-auto p-3 sm:p-4"
+    >
       <header class="fm-skills__header mb-4">
         <p class="fm-skills__eyebrow">Cartographie technique</p>
         <div class="flex items-end gap-3 flex-wrap">
@@ -660,9 +827,118 @@ onUnmounted(() => {
       </p>
     </div>
 
-    <!-- Radar — style cartographie -->
-    <aside class="fm-skills__radar shrink-0 w-full xl:flex-1 xl:min-w-[560px] border-t xl:border-t-0 xl:border-l border-white/8">
-      <div ref="containerRef" class="fm-skills__radar-inner relative h-[420px] xl:h-full min-h-[400px]">
+    <!-- Barre compacte refonte -->
+    <div v-if="isRefonte" class="fm-skills__compact-bar">
+      <p class="fm-skills__compact-stats">
+        <strong>{{ totalSkills }}</strong> compétences ·
+        <strong>{{ visibleCategories.length }}</strong> domaines
+      </p>
+      <p class="fm-skills__compact-hint">
+        Survolez ou cliquez le radar · les onglets suivent la sélection
+      </p>
+    </div>
+
+    <!-- Refonte : radar hero + tabs -->
+    <div v-if="isRefonte" class="fm-skills__refonte-body">
+      <aside class="fm-skills__radar fm-skills__radar--hero shrink-0 w-full border-0">
+        <div
+          ref="containerRef"
+          class="fm-skills__radar-inner relative h-[340px] sm:h-[400px] lg:h-full lg:min-h-[460px]"
+        >
+          <canvas ref="canvasRef" class="absolute inset-0 w-full h-full" />
+
+          <div class="skills-radar__hud absolute top-4 left-4 z-10 pointer-events-none">
+            <p class="skills-radar__hud-label">Profil radar</p>
+            <p class="skills-radar__hud-value">
+              {{ activeKey ? categoryAvg(activeKey, visibleCategories.find(c => c.key === activeKey)?.skills ?? []) : Math.round(visibleCategories.reduce((s, c) => s + categoryAvg(c.key, c.skills), 0) / Math.max(visibleCategories.length, 1)) }}
+            </p>
+            <p class="skills-radar__hud-sub">
+              <template v-if="activeKey">
+                {{ visibleCategories.find((c) => c.key === activeKey)?.label }} · moyenne /20
+              </template>
+              <template v-else>
+                Moyenne globale · échelle /20
+              </template>
+            </p>
+          </div>
+        </div>
+      </aside>
+
+      <div v-if="selectedCategory" class="fm-skills__tabs-wrap">
+        <div class="fm-skills__tablist" role="tablist" aria-label="Domaines de compétences">
+          <button
+            v-for="(cat, i) in visibleCategories"
+            :id="`fm-tab-${cat.key}`"
+            :key="cat.key"
+            type="button"
+            role="tab"
+            class="fm-skills__tab"
+            :class="{ 'fm-skills__tab--active': selectedTabKey === cat.key }"
+            :aria-selected="selectedTabKey === cat.key"
+            :aria-controls="`fm-panel-${cat.key}`"
+            :style="{ '--cat-color': colorFor(cat.key) }"
+            @click="selectTab(cat.key)"
+            @mouseenter="previewTab(cat.key)"
+          >
+            <span
+              class="fm-skills__tab-swatch"
+              :style="{
+                background: pinPaletteForCategory(i).swatch,
+                boxShadow: `0 0 0 2px ${pinPaletteForCategory(i).ring}`
+              }"
+              aria-hidden="true"
+            />
+            <span class="fm-skills__tab-label">{{ cat.label }}</span>
+            <span class="fm-skills__tab-avg">{{ categoryAvg(cat.key, cat.skills) }}</span>
+          </button>
+        </div>
+
+        <div
+          :id="`fm-panel-${selectedCategory.key}`"
+          class="fm-skills__tabpanel"
+          role="tabpanel"
+          :aria-labelledby="`fm-tab-${selectedCategory.key}`"
+          :style="{ '--cat-color': colorFor(selectedCategory.key) }"
+        >
+          <header class="fm-tabpanel__head">
+            <div>
+              <h3 class="fm-tabpanel__title">{{ selectedCategory.label }}</h3>
+              <p class="fm-tabpanel__meta">
+                {{ selectedCategory.skills.length }} technologie{{ selectedCategory.skills.length > 1 ? 's' : '' }}
+              </p>
+            </div>
+            <span class="fm-tabpanel__avg">{{ categoryAvg(selectedCategory.key, selectedCategory.skills) }}/20</span>
+          </header>
+
+          <ul class="fm-tabpanel__list">
+            <li
+              v-for="(skill, index) in selectedCategory.skills"
+              :key="skill"
+              class="fm-tab-row"
+              :class="{ 'fm-tab-row--star': isTopSkill(selectedCategory.key, skill, selectedCategory.skills) }"
+            >
+              <span class="fm-tab-row__name">{{ skill }}</span>
+              <span
+                class="fm-tab-row__rating"
+                :class="`fm-tab-row__rating--${ratingTier(skillRating(skill, selectedCategory.key, index))}`"
+              >
+                {{ skillRating(skill, selectedCategory.key, index) }}
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Radar game -->
+    <aside
+      v-if="!isRefonte"
+      class="fm-skills__radar shrink-0 w-full xl:flex-1 xl:min-w-[560px] border-t xl:border-t-0 xl:border-l border-white/8"
+    >
+      <div
+        ref="containerRef"
+        class="fm-skills__radar-inner relative h-[420px] xl:h-full min-h-[400px]"
+      >
         <canvas ref="canvasRef" class="absolute inset-0 w-full h-full" />
 
         <div class="skills-radar__hud absolute top-4 left-4 z-10 pointer-events-none">
@@ -983,5 +1259,349 @@ onUnmounted(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.2;
+}
+
+/* Variante refonte — papier chaud, radar compact + accordéon */
+.fm-skills--refonte {
+  background: var(--rf-paper, #f7f2ea);
+  color: var(--rf-ink-soft, #4a433c);
+  font-family: var(--rf-sans, ui-sans-serif, system-ui, sans-serif);
+  min-height: 0;
+}
+
+.fm-skills__compact-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.35rem 1rem;
+  padding: 0.85rem 1rem 0.65rem;
+  border-bottom: 1px solid var(--rf-line, rgba(26, 22, 18, 0.12));
+}
+
+.fm-skills__compact-stats {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--rf-ink-soft, #4a433c);
+}
+
+.fm-skills__compact-stats strong {
+  font-family: var(--rf-serif, Fraunces, Georgia, serif);
+  font-weight: 700;
+  color: var(--rf-ink, #1a1612);
+}
+
+.fm-skills__compact-hint {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--rf-muted, #7a7268);
+}
+
+.fm-skills__refonte-body {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 960px) {
+  .fm-skills__refonte-body {
+    grid-template-columns: 1.15fr 0.85fr;
+    min-height: 460px;
+  }
+}
+
+.fm-skills__radar--hero {
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 45%, rgba(184, 67, 47, 0.07), transparent 60%),
+    var(--rf-bg-deep, #e0d8c8);
+  border-bottom: 1px solid var(--rf-line, rgba(26, 22, 18, 0.12));
+}
+
+@media (min-width: 960px) {
+  .fm-skills__radar--hero {
+    border-bottom: 0;
+    border-right: 1px solid var(--rf-line, rgba(26, 22, 18, 0.12));
+  }
+}
+
+.fm-skills__radar--hero .fm-skills__radar-inner {
+  padding: 0.5rem;
+}
+
+.fm-skills__tabs-wrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+}
+
+.fm-skills__tablist {
+  display: flex;
+  gap: 0.35rem;
+  padding: 0.65rem 0.75rem;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  border-bottom: 1px solid var(--rf-line, rgba(26, 22, 18, 0.12));
+  -webkit-overflow-scrolling: touch;
+}
+
+.fm-skills__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid var(--rf-line, rgba(26, 22, 18, 0.12));
+  border-radius: 999px;
+  background: rgba(26, 22, 18, 0.03);
+  color: var(--rf-ink-soft, #4a433c);
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s var(--rf-ease, ease),
+    border-color 0.2s var(--rf-ease, ease),
+    color 0.2s var(--rf-ease, ease),
+    box-shadow 0.2s var(--rf-ease, ease);
+}
+
+.fm-skills__tab:hover {
+  background: rgba(26, 22, 18, 0.06);
+  border-color: color-mix(in srgb, var(--cat-color) 35%, var(--rf-line, rgba(26, 22, 18, 0.12)));
+}
+
+.fm-skills__tab--active {
+  background: color-mix(in srgb, var(--cat-color) 12%, var(--rf-paper, #f7f2ea));
+  border-color: color-mix(in srgb, var(--cat-color) 55%, var(--rf-line, rgba(26, 22, 18, 0.12)));
+  color: var(--rf-ink, #1a1612);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--cat-color) 18%, transparent);
+}
+
+.fm-skills__tab-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.fm-skills__tab-label {
+  white-space: nowrap;
+}
+
+.fm-skills__tab-avg {
+  font-family: ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--rf-gold, #b8954a);
+}
+
+.fm-skills__tabpanel {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.85rem 1rem 1rem;
+}
+
+.fm-tabpanel__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.65rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 2px solid color-mix(in srgb, var(--cat-color) 55%, var(--rf-line, rgba(26, 22, 18, 0.12)));
+}
+
+.fm-tabpanel__title {
+  margin: 0;
+  font-family: var(--rf-serif, Fraunces, Georgia, serif);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--rf-ink, #1a1612);
+}
+
+.fm-tabpanel__meta {
+  margin: 0.15rem 0 0;
+  font-size: 0.72rem;
+  color: var(--rf-muted, #7a7268);
+}
+
+.fm-tabpanel__avg {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  font-family: ui-monospace, monospace;
+  color: var(--rf-gold, #b8954a);
+}
+
+.fm-tabpanel__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.25rem;
+}
+
+@media (min-width: 640px) {
+  .fm-tabpanel__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 0.75rem;
+  }
+}
+
+.fm-tab-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0.45rem;
+  border-radius: 0.45rem;
+  background: rgba(26, 22, 18, 0.03);
+}
+
+.fm-tab-row--star {
+  background: color-mix(in srgb, var(--cat-color) 10%, rgba(26, 22, 18, 0.03));
+  box-shadow: inset 2px 0 0 var(--cat-color);
+}
+
+.fm-tab-row__name {
+  font-size: 0.78rem;
+  color: var(--rf-ink-soft, #4a433c);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fm-tab-row__rating {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  font-weight: 800;
+  font-family: ui-monospace, monospace;
+}
+
+.fm-tab-row__rating--low { color: rgba(122, 114, 104, 0.75); }
+.fm-tab-row__rating--mid { color: var(--rf-ink-soft, #4a433c); }
+.fm-tab-row__rating--high { color: var(--rf-sage, #4a6b5d); }
+.fm-tab-row__rating--elite { color: var(--rf-gold, #b8954a); }
+
+.fm-skills--refonte .fm-skills__board {
+  background:
+    radial-gradient(ellipse 55% 45% at 15% 0%, rgba(184, 67, 47, 0.05), transparent 55%),
+    var(--rf-paper, #f7f2ea);
+}
+
+.fm-skills--refonte .fm-skills__header {
+  border-bottom: 1px solid var(--rf-line, rgba(26, 22, 18, 0.12));
+}
+
+.fm-skills--refonte .fm-skills__eyebrow {
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  color: var(--rf-muted, #7a7268);
+}
+
+.fm-skills--refonte .fm-skills__title {
+  font-family: var(--rf-serif, Fraunces, Georgia, serif);
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 700;
+  color: var(--rf-ink, #1a1612);
+}
+
+.fm-skills--refonte .fm-skills__subtitle {
+  font-size: 0.75rem;
+  color: var(--rf-muted, #7a7268);
+}
+
+.fm-skills--refonte .fm-block__head {
+  border-bottom-color: var(--rf-line, rgba(26, 22, 18, 0.12));
+}
+
+.fm-skills--refonte .fm-block__title {
+  color: var(--rf-ink-soft, #4a433c);
+}
+
+.fm-skills--refonte .fm-block--lit .fm-block__title {
+  color: var(--rf-ink, #1a1612);
+  text-shadow: none;
+}
+
+.fm-skills--refonte .fm-block__avg {
+  color: var(--rf-gold, #b8954a);
+}
+
+.fm-skills--refonte .fm-row--star .fm-row__accent {
+  background: rgba(74, 107, 93, 0.55);
+}
+
+.fm-skills--refonte .fm-row--lit .fm-row__name {
+  color: var(--rf-ink, #1a1612);
+}
+
+.fm-skills--refonte .fm-row__name {
+  color: var(--rf-ink-soft, #4a433c);
+}
+
+.fm-skills--refonte .fm-row__rating--low {
+  color: rgba(122, 114, 104, 0.75);
+}
+
+.fm-skills--refonte .fm-row__rating--mid {
+  color: var(--rf-ink-soft, #4a433c);
+}
+
+.fm-skills--refonte .fm-row__rating--high {
+  color: var(--rf-sage, #4a6b5d);
+}
+
+.fm-skills--refonte .fm-row__rating--elite {
+  color: var(--rf-gold, #b8954a);
+  text-shadow: none;
+}
+
+.fm-skills--refonte .fm-skills__hint {
+  color: var(--rf-muted, #7a7268);
+}
+
+.fm-skills--refonte .fm-skills__radar {
+  background: transparent;
+}
+
+.fm-skills--refonte .skills-radar__hud-label {
+  color: var(--rf-muted, #7a7268);
+}
+
+.fm-skills--refonte .skills-radar__hud-value {
+  font-size: 2rem;
+  background: linear-gradient(135deg, #b8432f, #4a6b5d, #b8954a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.fm-skills--refonte .skills-radar__hud-sub {
+  color: var(--rf-muted, #7a7268);
+}
+
+.fm-skills--refonte .skills-radar__legend {
+  background: rgba(247, 242, 234, 0.92);
+  border-color: var(--rf-line, rgba(26, 22, 18, 0.12));
+  box-shadow: var(--rf-shadow, 0 24px 80px rgba(26, 22, 18, 0.12));
+}
+
+.fm-skills--refonte .skills-radar__legend-title {
+  color: var(--rf-muted, #7a7268);
+}
+
+.fm-skills--refonte .skills-radar__legend-item--active .skills-radar__legend-label {
+  color: var(--rf-accent, #b8432f);
+}
+
+.fm-skills--refonte .skills-radar__legend-swatch {
+  border-color: var(--rf-paper, #f7f2ea);
+}
+
+.fm-skills--refonte .skills-radar__legend-label {
+  color: var(--rf-ink-soft, #4a433c);
 }
 </style>
