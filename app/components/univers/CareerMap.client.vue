@@ -6,11 +6,17 @@ import { MAP_DEFAULT_CENTER, MAP_DEFAULT_ZOOM } from '~/utils/experience-map'
 import { getCareerPinPalette } from '~/utils/career-pin-colors'
 import { CAREER_METRO_STATIONS } from '~/data/career-metro-overlay'
 
-const props = defineProps<{
-  pins: MapPin[]
-  selectedPinId?: string | null
-  hideLegend?: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    pins: MapPin[]
+    selectedPinId?: string | null
+    hideLegend?: boolean
+    variant?: 'game' | 'refonte'
+  }>(),
+  { variant: 'game' }
+)
+
+const isRefonte = computed(() => props.variant === 'refonte')
 
 const emit = defineEmits<{
   select: [pin: MapPin]
@@ -51,6 +57,12 @@ function escapeHtml(text: string) {
 function getPinStyle(level: number, isActive: boolean) {
   const palette = getCareerPinPalette(level)
   if (isActive) {
+    if (isRefonte.value) {
+      return {
+        dot: 'linear-gradient(135deg, #c85a48, #b8432f)',
+        ring: 'rgba(184, 67, 47, 0.45)'
+      }
+    }
     return {
       dot: 'linear-gradient(135deg, #67e8f9, #22d3ee)',
       ring: 'rgba(34, 211, 238, 0.55)'
@@ -209,8 +221,8 @@ function focusSelectedPin(pin: MapPin) {
 
   map.fitBounds(bounds, {
     maxZoom: 14,
-    paddingTopLeft: L.point(DETAIL_PANEL_PADDING_LEFT, 72),
-    paddingBottomRight: L.point(72, 72),
+    paddingTopLeft: L.point(isRefonte.value ? 48 : DETAIL_PANEL_PADDING_LEFT, 56),
+    paddingBottomRight: L.point(48, 48),
     animate: true
   })
 }
@@ -267,11 +279,16 @@ function initMap() {
 
     L.control.zoom({ position: 'topright' }).addTo(map)
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      subdomains: 'abcd',
-      maxZoom: 20,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>'
-    }).addTo(map)
+    L.tileLayer(
+      isRefonte.value
+        ? 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+        : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+      {
+        subdomains: 'abcd',
+        maxZoom: 20,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>'
+      }
+    ).addTo(map)
 
     mapInstance.value = map
     updateMetroLayers()
@@ -384,17 +401,24 @@ defineExpose({
 </script>
 
 <template>
-  <div class="career-map flex flex-col w-full h-full min-h-[480px] rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-black/40">
+  <div
+    class="career-map flex flex-col w-full h-full min-h-[480px] rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-black/40"
+    :class="{ 'career-map--refonte': isRefonte }"
+  >
     <div ref="mapContainer" class="career-map__canvas flex-1 w-full min-h-[480px]" />
     <div class="career-map__vignette pointer-events-none" aria-hidden="true" />
     <div class="career-map__glow pointer-events-none" aria-hidden="true" />
 
     <div
       v-if="!mapLoaded && !mapError"
-      class="absolute inset-0 z-[2] flex items-center justify-center bg-[#0d1117]"
+      class="absolute inset-0 z-[2] flex items-center justify-center"
+      :class="isRefonte ? 'bg-[#f7f2ea]' : 'bg-[#0d1117]'"
     >
-      <div class="flex flex-col items-center gap-3 text-white/50">
-        <div class="w-8 h-8 border-2 border-white/20 border-t-cyan-400 rounded-full animate-spin" />
+      <div class="flex flex-col items-center gap-3" :class="isRefonte ? 'text-[#7a7268]' : 'text-white/50'">
+        <div
+          class="w-8 h-8 border-2 rounded-full animate-spin"
+          :class="isRefonte ? 'border-[rgba(26,22,18,0.12)] border-t-[#b8432f]' : 'border-white/20 border-t-cyan-400'"
+        />
         <span class="text-xs tracking-wide">Chargement de la carte…</span>
       </div>
     </div>
@@ -416,8 +440,10 @@ defineExpose({
 
     <div v-if="!hideLegend" class="absolute top-3 left-4 z-[400] flex flex-col gap-2 pointer-events-none">
       <div class="career-map__legend">
-        <p class="text-xs font-semibold text-white/90 tracking-wide">Carte du parcours</p>
-        <p class="text-[10px] text-white/45 mt-0.5">Cliquez un point pour voir le détail</p>
+        <p class="career-map__legend-title">Carte du parcours</p>
+        <p class="career-map__legend-sub">
+          {{ isRefonte ? 'Synchronisée avec le scroll' : 'Cliquez un point pour voir le détail' }}
+        </p>
       </div>
     </div>
 
@@ -443,8 +469,8 @@ defineExpose({
         </ul>
       </div>
 
-      <p class="career-map__attribution text-[10px] text-white/70 bg-black/50 px-2.5 py-1 rounded-full backdrop-blur-md border border-white/10 shrink-0">
-        Carte CARTO Dark · Paris & Île-de-France
+      <p class="career-map__attribution">
+        {{ isRefonte ? 'Paris & Île-de-France' : 'Carte CARTO Dark · Paris & Île-de-France' }}
       </p>
     </div>
   </div>
@@ -481,6 +507,30 @@ defineExpose({
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+.career-map__legend-title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.career-map__legend-sub {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: 2px;
+}
+
+.career-map__attribution {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(0, 0, 0, 0.5);
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
 }
 
 .career-map__color-legend {
@@ -717,5 +767,92 @@ defineExpose({
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+/* Variante refonte — carte claire, papier chaud */
+.career-map--refonte {
+  min-height: 380px;
+  background: var(--rf-paper, #f7f2ea);
+  border-color: var(--rf-line, rgba(26, 22, 18, 0.12));
+  box-shadow: var(--rf-shadow, 0 24px 80px rgba(26, 22, 18, 0.12));
+}
+
+.career-map--refonte .career-map__canvas,
+.career-map--refonte .career-map__canvas.leaflet-container {
+  min-height: 380px;
+  background: #ebe4d6;
+}
+
+.career-map--refonte .career-map__vignette {
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(247, 242, 234, 0.35) 100%);
+}
+
+.career-map--refonte .career-map__glow {
+  background: linear-gradient(
+    180deg,
+    rgba(247, 242, 234, 0.45) 0%,
+    transparent 16%,
+    transparent 84%,
+    rgba(247, 242, 234, 0.35) 100%
+  );
+}
+
+.career-map--refonte .career-map__legend {
+  background: rgba(247, 242, 234, 0.92);
+  border-color: var(--rf-line, rgba(26, 22, 18, 0.12));
+  box-shadow: var(--rf-shadow, 0 24px 80px rgba(26, 22, 18, 0.12));
+}
+
+.career-map--refonte .career-map__legend-title {
+  font-family: var(--rf-serif, Fraunces, Georgia, serif);
+  color: var(--rf-ink, #1a1612);
+}
+
+.career-map--refonte .career-map__legend-sub {
+  color: var(--rf-muted, #7a7268);
+}
+
+.career-map--refonte .career-map__color-legend {
+  background: rgba(247, 242, 234, 0.92);
+  border-color: var(--rf-line, rgba(26, 22, 18, 0.12));
+}
+
+.career-map--refonte .career-map__color-legend-title {
+  color: var(--rf-muted, #7a7268);
+}
+
+.career-map--refonte .career-map__color-legend-item--active .career-map__color-label {
+  color: var(--rf-accent, #b8432f);
+}
+
+.career-map--refonte .career-map__color-label {
+  color: var(--rf-ink-soft, #4a433c);
+}
+
+.career-map--refonte .career-map__attribution {
+  color: var(--rf-muted, #7a7268);
+  background: rgba(247, 242, 234, 0.92);
+  border-color: var(--rf-line, rgba(26, 22, 18, 0.12));
+}
+
+.career-map--refonte .career-map__canvas .leaflet-control-zoom {
+  box-shadow: var(--rf-shadow, 0 8px 24px rgba(26, 22, 18, 0.12)) !important;
+}
+
+.career-map--refonte .career-map__canvas .leaflet-control-zoom a {
+  background: rgba(247, 242, 234, 0.95) !important;
+  color: var(--rf-ink, #1a1612) !important;
+  border-bottom-color: var(--rf-line, rgba(26, 22, 18, 0.12)) !important;
+}
+
+.career-map--refonte .career-map__canvas .leaflet-control-zoom a:hover {
+  background: rgba(184, 67, 47, 0.12) !important;
+  color: var(--rf-accent, #b8432f) !important;
+}
+
+.career-map--refonte .metro-station--active .metro-station__workplace {
+  border-color: rgba(184, 67, 47, 0.45);
+  background: rgba(247, 242, 234, 0.95);
+  color: var(--rf-ink, #1a1612);
 }
 </style>

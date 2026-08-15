@@ -1,19 +1,33 @@
 <script setup lang="ts">
+import CareerMap from '@/components/univers/CareerMap.client.vue'
 import { useRefonteScroll } from '@/composables/refonte/useRefonteScroll'
+import { buildMapPins, type MapPin } from '~/utils/experience-map'
 
 const { sections } = useContent()
-const { scroll, ready } = useRefonteScroll()
+const { scroll, ready, scrollTo } = useRefonteScroll()
 
+const mapRef = ref<{ invalidate: () => void } | null>(null)
 const activeIndex = ref(0)
+const selectedPinId = ref<string | null>(null)
+const isScrollingToPin = ref(false)
 const itemEls = ref<(HTMLElement | null)[]>([])
 
-const experiences = computed(() => sections.value.experiences)
+const pins = computed(() => buildMapPins(sections.value.experiences))
+const experiences = computed(() => pins.value.map((pin) => pin.experience))
+
+const activeExperience = computed(() => experiences.value[activeIndex.value] ?? null)
 
 function setItemRef(el: Element | null, index: number) {
   itemEls.value[index] = el instanceof HTMLElement ? el : null
 }
 
+function syncMapToIndex(index: number) {
+  selectedPinId.value = pins.value[index]?.id ?? null
+}
+
 function updateActiveFromViewport() {
+  if (isScrollingToPin.value) return
+
   const items = itemEls.value.filter(Boolean) as HTMLElement[]
   if (!items.length) return
 
@@ -32,7 +46,32 @@ function updateActiveFromViewport() {
     }
   })
 
-  activeIndex.value = closestIdx
+  if (closestIdx !== activeIndex.value) {
+    activeIndex.value = closestIdx
+    syncMapToIndex(closestIdx)
+  }
+}
+
+function scrollToExperience(index: number) {
+  const el = itemEls.value[index]
+  if (!el) return
+  scrollTo(el)
+}
+
+function focusExperience(index: number) {
+  isScrollingToPin.value = true
+  activeIndex.value = index
+  syncMapToIndex(index)
+  scrollToExperience(index)
+  window.setTimeout(() => {
+    isScrollingToPin.value = false
+    updateActiveFromViewport()
+  }, 950)
+}
+
+function onPinSelect(pin: MapPin) {
+  const index = pins.value.findIndex((item) => item.id === pin.id)
+  if (index >= 0) focusExperience(index)
 }
 
 let lenisHandler: ((args: { scroll: number }) => void) | null = null
@@ -40,6 +79,7 @@ let lenisHandler: ((args: { scroll: number }) => void) | null = null
 function bindScrollTracking() {
   unbindScrollTracking()
   updateActiveFromViewport()
+  syncMapToIndex(activeIndex.value)
 
   const lenis = scroll.value?.lenisInstance
   if (lenis && !lenisHandler) {
@@ -65,14 +105,26 @@ function unbindScrollTracking() {
 watch(
   ready,
   (isReady) => {
-    if (isReady) nextTick(() => bindScrollTracking())
+    if (isReady) {
+      nextTick(() => {
+        bindScrollTracking()
+        mapRef.value?.invalidate()
+      })
+    }
   },
   { immediate: true }
 )
 
 watch(
-  () => experiences.value.length,
-  () => nextTick(() => updateActiveFromViewport())
+  () => pins.value.length,
+  () => {
+    nextTick(() => {
+      activeIndex.value = 0
+      syncMapToIndex(0)
+      updateActiveFromViewport()
+      mapRef.value?.invalidate()
+    })
+  }
 )
 
 onUnmounted(() => unbindScrollTracking())
@@ -81,11 +133,34 @@ onUnmounted(() => unbindScrollTracking())
 <template>
   <section class="refonte-xp" data-scroll-section>
     <div class="refonte-container refonte-xp__layout">
-      <div class="refonte-xp__sticky">
-        <p class="refonte-label">Parcours</p>
-        <h2 class="refonte-display refonte-xp__title">Expériences qui forgent le craft</h2>
-        <p class="refonte-xp__hint">Scroll pour parcourir les missions</p>
-      </div>
+      <aside class="refonte-xp__aside">
+        <div class="refonte-xp__intro">
+          <p class="refonte-label">Parcours</p>
+          <h2 class="refonte-display refonte-xp__title">Expériences qui forgent le craft</h2>
+          <p class="refonte-xp__hint">
+            Faites défiler les missions — la carte se positionne sur chaque lieu.
+          </p>
+        </div>
+
+        <div class="refonte-xp__map refonte-card">
+          <ClientOnly>
+            <CareerMap
+              ref="mapRef"
+              variant="refonte"
+              class="refonte-xp__map-inner"
+              :pins="pins"
+              :selected-pin-id="selectedPinId"
+              @select="onPinSelect"
+            />
+          </ClientOnly>
+        </div>
+
+        <div v-if="activeExperience" class="refonte-xp__map-meta refonte-card">
+          <p class="refonte-label">{{ activeExperience.period }}</p>
+          <p class="refonte-xp__map-meta-title">{{ activeExperience.role }}</p>
+          <p class="refonte-xp__map-meta-company">{{ activeExperience.company }} · {{ activeExperience.location }}</p>
+        </div>
+      </aside>
 
       <div class="refonte-xp__list">
         <article
@@ -94,6 +169,9 @@ onUnmounted(() => unbindScrollTracking())
           :ref="(el) => setItemRef(el, index)"
           class="refonte-xp__item refonte-card"
           :class="{ 'is-active': index === activeIndex }"
+          tabindex="0"
+          @click="focusExperience(index)"
+          @keydown.enter="focusExperience(index)"
         >
           <header>
             <span class="refonte-label">{{ xp.period }}</span>
@@ -125,14 +203,14 @@ onUnmounted(() => unbindScrollTracking())
 
 @media (min-width: 960px) {
   .refonte-xp__layout {
-    grid-template-columns: 0.8fr 1.2fr;
-    gap: 3rem;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    gap: 2.5rem;
+    align-items: start;
   }
 
-  .refonte-xp__sticky {
+  .refonte-xp__aside {
     position: sticky;
-    top: calc(var(--rf-nav-h) + 2rem);
-    align-self: start;
+    top: calc(var(--rf-nav-h) + 1.5rem);
   }
 }
 
@@ -143,6 +221,49 @@ onUnmounted(() => unbindScrollTracking())
 
 .refonte-xp__hint {
   font-size: 0.82rem;
+  color: var(--rf-muted);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.refonte-xp__aside {
+  display: grid;
+  gap: 1rem;
+}
+
+.refonte-xp__map {
+  overflow: hidden;
+  padding: 0;
+  min-height: 380px;
+}
+
+.refonte-xp__map :deep(.refonte-xp__map-inner),
+.refonte-xp__map :deep(.career-map) {
+  min-height: 380px;
+  height: 100%;
+  border: none;
+  border-radius: inherit;
+  box-shadow: none;
+}
+
+.refonte-xp__map :deep(.career-map__canvas) {
+  min-height: 380px;
+}
+
+.refonte-xp__map-meta {
+  padding: 0.85rem 1rem;
+  border-left: 3px solid var(--rf-accent);
+}
+
+.refonte-xp__map-meta-title {
+  margin: 0.2rem 0 0;
+  font-weight: 700;
+  color: var(--rf-ink);
+}
+
+.refonte-xp__map-meta-company {
+  margin: 0.15rem 0 0;
+  font-size: 0.78rem;
   color: var(--rf-muted);
 }
 
@@ -155,13 +276,22 @@ onUnmounted(() => unbindScrollTracking())
   padding: 1.35rem;
   opacity: 0.55;
   transform: scale(0.98);
-  transition: opacity 0.35s var(--rf-ease), transform 0.35s var(--rf-ease), border-color 0.35s var(--rf-ease);
+  cursor: pointer;
+  transition:
+    opacity 0.35s var(--rf-ease),
+    transform 0.35s var(--rf-ease),
+    border-color 0.35s var(--rf-ease);
 }
 
 .refonte-xp__item.is-active {
   opacity: 1;
   transform: scale(1);
   border-color: rgba(184, 67, 47, 0.35);
+}
+
+.refonte-xp__item:focus-visible {
+  outline: 2px solid var(--rf-accent);
+  outline-offset: 2px;
 }
 
 .refonte-xp__item header h3 {

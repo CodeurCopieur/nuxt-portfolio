@@ -122,15 +122,25 @@ const categoryDefs = computed(() => {
 
 const competences = computed(() => sections.value.competences)
 
-const visibleCategories = computed(() =>
-  categoryDefs.value
+function withAccessibiliteFirst<T extends { key: string }>(cats: T[]): T[] {
+  const index = cats.findIndex((cat) => cat.key === 'accessibilite')
+  if (index <= 0) return cats
+  const next = [...cats]
+  const [access] = next.splice(index, 1)
+  return [access!, ...next]
+}
+
+const visibleCategories = computed(() => {
+  const cats = categoryDefs.value
     .map((cat) => ({
       ...cat,
       skills: competences.value[cat.key] ?? [],
       count: (competences.value[cat.key] ?? []).length
     }))
     .filter((cat) => cat.skills.length > 0)
-)
+
+  return isRefonte.value ? withAccessibiliteFirst(cats) : cats
+})
 
 const totalSkills = computed(() =>
   visibleCategories.value.reduce((sum, cat) => sum + cat.count, 0)
@@ -163,9 +173,11 @@ const REFONTE_CATEGORY_COLORS: Record<string, string> = {
   accessibilite: '#c85a48'
 }
 
-const activeKey = computed(() => focusedKey.value ?? hoveredKey.value)
+const activeKey = computed(() => hoveredKey.value ?? focusedKey.value)
 
 const selectedTabKey = ref<string | null>(null)
+const TABS_PER_PAGE = 3
+const tabPageIndex = ref(0)
 
 const selectedCategory = computed(() => {
   const key = selectedTabKey.value
@@ -182,23 +194,16 @@ watch(
   (cats) => {
     if (!cats.length) {
       selectedTabKey.value = null
+      tabPageIndex.value = 0
       return
     }
     if (!selectedTabKey.value || !cats.some((cat) => cat.key === selectedTabKey.value)) {
       selectedTabKey.value = cats[0]!.key
     }
+    tabPageIndex.value = Math.min(tabPageIndex.value, Math.max(0, Math.ceil(cats.length / TABS_PER_PAGE) - 1))
   },
   { immediate: true }
 )
-
-watch(hoveredKey, (key) => {
-  if (!isRefonte.value || !key) return
-  selectedTabKey.value = key
-})
-
-watch(focusedKey, (key) => {
-  if (isRefonte.value && key) selectedTabKey.value = key
-})
 
 function selectTab(key: string) {
   selectedTabKey.value = key
@@ -207,8 +212,57 @@ function selectTab(key: string) {
 }
 
 function previewTab(key: string) {
-  selectedTabKey.value = key
   hoveredKey.value = key
+  selectedTabKey.value = key
+}
+
+const tabPageCount = computed(() =>
+  Math.max(1, Math.ceil(visibleCategories.value.length / TABS_PER_PAGE))
+)
+
+const pagedTabCategories = computed(() => {
+  const start = tabPageIndex.value * TABS_PER_PAGE
+  return visibleCategories.value.slice(start, start + TABS_PER_PAGE)
+})
+
+const canScrollTabsLeft = computed(() => tabPageIndex.value > 0)
+const canScrollTabsRight = computed(() => tabPageIndex.value < tabPageCount.value - 1)
+
+function tabPageForKey(key: string) {
+  const index = visibleCategories.value.findIndex((cat) => cat.key === key)
+  if (index < 0) return tabPageIndex.value
+  return Math.floor(index / TABS_PER_PAGE)
+}
+
+function scrollTabStrip(direction: -1 | 1) {
+  tabPageIndex.value = Math.max(0, Math.min(tabPageCount.value - 1, tabPageIndex.value + direction))
+}
+
+function scrollActiveTabIntoView(key: string) {
+  tabPageIndex.value = tabPageForKey(key)
+}
+
+function categoryTabIndex(key: string) {
+  const index = visibleCategories.value.findIndex((cat) => cat.key === key)
+  return index < 0 ? 0 : index
+}
+
+function syncFromRadar(key: string | null) {
+  if (key) {
+    hoveredKey.value = key
+    selectedTabKey.value = key
+    scrollActiveTabIntoView(key)
+  } else if (!focusedKey.value) {
+    hoveredKey.value = null
+  }
+}
+
+function onSkillsMouseLeave() {
+  if (isRefonte.value) {
+    hoveredKey.value = focusedKey.value
+    return
+  }
+  if (!focusedKey.value) hoveredKey.value = null
 }
 
 interface RadarPoint {
@@ -709,7 +763,7 @@ function pickRadar(e: MouseEvent) {
 
 function moveRadar(e: MouseEvent) {
   const canvas = canvasRef.value
-  if (!canvas || focusedKey.value) return
+  if (!canvas) return
   const rect = canvas.getBoundingClientRect()
   const x = e.clientX - rect.left
   const y = e.clientY - rect.top
@@ -718,6 +772,13 @@ function moveRadar(e: MouseEvent) {
   for (const p of radarPoints) {
     if (Math.hypot(x - p.tipX, y - p.tipY) < 20) found = p.key
   }
+
+  if (isRefonte.value) {
+    if (found !== hoveredKey.value) syncFromRadar(found)
+    return
+  }
+
+  if (focusedKey.value) return
   hoveredKey.value = found
 }
 
@@ -744,7 +805,11 @@ onMounted(() => {
   containerRef.value?.addEventListener('click', pickRadar)
   containerRef.value?.addEventListener('mousemove', moveRadar)
   containerRef.value?.addEventListener('mouseleave', () => {
-    if (isRefonte.value || focusedKey.value) return
+    if (isRefonte.value) {
+      hoveredKey.value = focusedKey.value
+      return
+    }
+    if (focusedKey.value) return
     hoveredKey.value = null
   })
 })
@@ -762,7 +827,7 @@ onUnmounted(() => {
     :class="[
       isRefonte ? 'fm-skills--refonte min-h-0' : 'min-h-[520px] xl:flex-row',
     ]"
-    @mouseleave="!focusedKey && (hoveredKey = null)"
+    @mouseleave="onSkillsMouseLeave"
   >
     <!-- Colonnes style FM (game uniquement) -->
     <div
@@ -865,31 +930,57 @@ onUnmounted(() => {
       </aside>
 
       <div v-if="selectedCategory" class="fm-skills__tabs-wrap">
-        <div class="fm-skills__tablist" role="tablist" aria-label="Domaines de compétences">
+        <div class="fm-skills__tabnav">
           <button
-            v-for="(cat, i) in visibleCategories"
-            :id="`fm-tab-${cat.key}`"
-            :key="cat.key"
             type="button"
-            role="tab"
-            class="fm-skills__tab"
-            :class="{ 'fm-skills__tab--active': selectedTabKey === cat.key }"
-            :aria-selected="selectedTabKey === cat.key"
-            :aria-controls="`fm-panel-${cat.key}`"
-            :style="{ '--cat-color': colorFor(cat.key) }"
-            @click="selectTab(cat.key)"
-            @mouseenter="previewTab(cat.key)"
+            class="fm-skills__tabnav-btn"
+            aria-label="Afficher les domaines précédents"
+            :disabled="!canScrollTabsLeft"
+            @click="scrollTabStrip(-1)"
           >
-            <span
-              class="fm-skills__tab-swatch"
-              :style="{
-                background: pinPaletteForCategory(i).swatch,
-                boxShadow: `0 0 0 2px ${pinPaletteForCategory(i).ring}`
-              }"
-              aria-hidden="true"
-            />
-            <span class="fm-skills__tab-label">{{ cat.label }}</span>
-            <span class="fm-skills__tab-avg">{{ categoryAvg(cat.key, cat.skills) }}</span>
+            <span aria-hidden="true">‹</span>
+          </button>
+
+          <div
+            class="fm-skills__tablist"
+            role="tablist"
+            aria-label="Domaines de compétences"
+          >
+            <button
+              v-for="cat in pagedTabCategories"
+              :id="`fm-tab-${cat.key}`"
+              :key="cat.key"
+              type="button"
+              role="tab"
+              class="fm-skills__tab"
+              :class="{ 'fm-skills__tab--active': activeKey === cat.key }"
+              :aria-selected="activeKey === cat.key"
+              :aria-controls="`fm-panel-${cat.key}`"
+              :style="{ '--cat-color': colorFor(cat.key) }"
+              @click="selectTab(cat.key)"
+              @mouseenter="previewTab(cat.key)"
+            >
+              <span
+                class="fm-skills__tab-swatch"
+                :style="{
+                  background: pinPaletteForCategory(categoryTabIndex(cat.key)).swatch,
+                  boxShadow: `0 0 0 2px ${pinPaletteForCategory(categoryTabIndex(cat.key)).ring}`
+                }"
+                aria-hidden="true"
+              />
+              <span class="fm-skills__tab-label">{{ cat.label }}</span>
+              <span class="fm-skills__tab-avg">{{ categoryAvg(cat.key, cat.skills) }}</span>
+            </button>
+          </div>
+
+          <button
+            type="button"
+            class="fm-skills__tabnav-btn"
+            aria-label="Afficher les domaines suivants"
+            :disabled="!canScrollTabsRight"
+            @click="scrollTabStrip(1)"
+          >
+            <span aria-hidden="true">›</span>
           </button>
         </div>
 
@@ -1334,22 +1425,74 @@ onUnmounted(() => {
   min-width: 0;
 }
 
-.fm-skills__tablist {
+.fm-skills__tabnav {
   display: flex;
-  gap: 0.35rem;
-  padding: 0.65rem 0.75rem;
-  overflow-x: auto;
-  scrollbar-width: thin;
+  align-items: stretch;
   border-bottom: 1px solid var(--rf-line, rgba(26, 22, 18, 0.12));
-  -webkit-overflow-scrolling: touch;
+}
+
+.fm-skills__tabnav-btn {
+  flex-shrink: 0;
+  width: 2.35rem;
+  border: 0;
+  background: var(--rf-paper, #f7f2ea);
+  color: var(--rf-ink, #1a1612);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.2s var(--rf-ease, ease),
+    color 0.2s var(--rf-ease, ease),
+    opacity 0.2s var(--rf-ease, ease);
+}
+
+.fm-skills__tabnav-btn:first-child {
+  border-right: 1px solid var(--rf-line, rgba(26, 22, 18, 0.12));
+}
+
+.fm-skills__tabnav-btn:last-child {
+  border-left: 1px solid var(--rf-line, rgba(26, 22, 18, 0.12));
+}
+
+.fm-skills__tabnav-btn:hover:not(:disabled) {
+  background: rgba(26, 22, 18, 0.05);
+  color: var(--rf-accent, #b8432f);
+}
+
+.fm-skills__tabnav-btn:focus-visible {
+  outline: 2px solid var(--rf-accent, #b8432f);
+  outline-offset: -2px;
+  z-index: 1;
+}
+
+.fm-skills__tabnav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.fm-skills__tablist {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.35rem;
+  flex: 1;
+  min-width: 0;
+  padding: 0.65rem 0.5rem;
+  overflow: hidden;
+}
+
+.fm-skills__tablist::-webkit-scrollbar {
+  display: none;
 }
 
 .fm-skills__tab {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  justify-content: center;
+  gap: 0.35rem;
   flex-shrink: 0;
-  padding: 0.45rem 0.65rem;
+  width: 100%;
+  min-width: 0;
+  padding: 0.45rem 0.5rem;
   border: 1px solid var(--rf-line, rgba(26, 22, 18, 0.12));
   border-radius: 999px;
   background: rgba(26, 22, 18, 0.03);
@@ -1386,6 +1529,9 @@ onUnmounted(() => {
 
 .fm-skills__tab-label {
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .fm-skills__tab-avg {
