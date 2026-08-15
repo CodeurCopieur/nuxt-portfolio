@@ -1,0 +1,138 @@
+/* Refonte — tokens Widdy */
+:root {
+  --rf-bg: #ebe4d6;
+  --rf-bg-deep: #e0d8c8;
+  --rf-paper: #f7f2ea;
+  --rf-ink: #1a1612;
+  --rf-ink-soft: #4a433c;
+  --rf-muted: #7a7268;
+  --rf-accent: #b8432f;
+  --rf-accent-deep: #8f2f1f;
+  --rf-sage: #4a6b5d;
+  --rf-gold: #b8954a;
+  --rf-line: rgba(26, 22, 18, 0.12);
+  --rf-shadow: 0 24px 80px rgba(26, 22, 18, 0.12);
+  --rf-serif: 'Fraunces', 'Georgia', serif;
+  --rf-sans: 'Instrument Sans', 'Segoe UI', system-ui, sans-serif;
+  --rf-radius: 1.25rem;
+  --rf-nav-h: 4.5rem;
+  --rf-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.refonte-root {
+  background: var(--rf-bg);
+  color: var(--rf-ink);
+  font-family: var(--rf-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+.refonte-root ::selection {
+  background: rgba(184, 67, 47, 0.22);
+  color: var(--rf-ink);
+}
+
+.refonte-grain {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.refonte-display {
+  font-family: var(--rf-serif);
+  font-variation-settings: 'SOFT' 40, 'WONK' 0.8;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+}
+
+.refonte-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--rf-muted);
+}
+
+.refonte-link {
+  position: relative;
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.25s var(--rf-ease);
+}
+
+.refonte-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -0.15rem;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s var(--rf-ease);
+}
+
+.refonte-link:hover::after,
+.refonte-link.is-active::after {
+  transform: scaleX(1);
+}
+
+.refonte-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.9rem 1.35rem;
+  border-radius: 999px;
+  border: 1px solid var(--rf-ink);
+  background: var(--rf-ink);
+  color: var(--rf-paper);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: transform 0.25s var(--rf-ease), background 0.25s var(--rf-ease), color 0.25s var(--rf-ease);
+}
+
+.refonte-btn:hover {
+  transform: translateY(-2px);
+  background: var(--rf-accent);
+  border-color: var(--rf-accent);
+}
+
+.refonte-btn--ghost {
+  background: transparent;
+  color: var(--rf-ink);
+}
+
+.refonte-btn--ghost:hover {
+  background: var(--rf-ink);
+  color: var(--rf-paper);
+}
+
+.refonte-card {
+  background: var(--rf-paper);
+  border: 1px solid var(--rf-line);
+  border-radius: var(--rf-radius);
+  box-shadow: var(--rf-shadow);
+}
+
+.refonte-container {
+  width: min(100% - 2.5rem, 76rem);
+  margin-inline: auto;
+}
+
+[data-scroll-section] {
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .refonte-root [data-scroll-section] {
+    transform: none !important;
+  }
+}

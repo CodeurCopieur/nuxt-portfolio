@@ -25,7 +25,7 @@ export default defineNuxtConfig({
   tailwindcss: { viewer: false },
   vite: {
     optimizeDeps: {
-      include: ['leaflet']
+      include: ['leaflet', 'locomotive-scroll', 'scrollmagic', '@barba/core']
     }
   },
   experimental: { payloadExtraction: true },
