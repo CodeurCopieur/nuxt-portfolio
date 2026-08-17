@@ -8,11 +8,39 @@ const statementRef = ref<HTMLElement | null>(null)
 
 const companies = computed(() => [...new Set(sections.value.experiences.map((exp) => exp.company))])
 
+/** « de Le Point » → « du Point » ; « de Les X » → « des X ». */
+function withDe(name: string) {
+  if (/^Le\s+/i.test(name)) return `du ${name.replace(/^Le\s+/i, '')}`
+  if (/^Les\s+/i.test(name)) return `des ${name.replace(/^Les\s+/i, '')}`
+  if (/^La\s+/i.test(name)) return `de la ${name.replace(/^La\s+/i, '')}`
+  if (/^L['’]/i.test(name)) return `de ${name}`
+  return `de ${name}`
+}
+
+function withA(name: string) {
+  if (/^Le\s+/i.test(name)) return `au ${name.replace(/^Le\s+/i, '')}`
+  if (/^Les\s+/i.test(name)) return `aux ${name.replace(/^Les\s+/i, '')}`
+  if (/^La\s+/i.test(name)) return `à la ${name.replace(/^La\s+/i, '')}`
+  if (/^L['’]/i.test(name)) return `à ${name}`
+  return `à ${name}`
+}
+
 const statement = computed(() => {
   const list = companies.value
-  const path = list.length > 1
-    ? `De ${list[0]} à ${list[list.length - 1]}, en passant par ${list.slice(1, -1).join(', ') || list[0]}`
-    : list[0] ?? ''
+  if (list.length === 0) {
+    return `${meta.value.years_experience} ans à concevoir des interfaces qui tiennent la charge, sans jamais sacrifier le détail.`
+  }
+  if (list.length === 1) {
+    return `${list[0]} — ${meta.value.years_experience} ans à concevoir des interfaces qui tiennent la charge, sans jamais sacrifier le détail.`
+  }
+
+  const first = list[0]!
+  const last = list[list.length - 1]!
+  const middle = list.slice(1, -1)
+  const path = middle.length
+    ? `${withDe(first).replace(/^d/, 'D')} ${withA(last)}, en passant par ${middle.join(', ')}`
+    : `${withDe(first).replace(/^d/, 'D')} ${withA(last)}`
+
   return `${path} — ${meta.value.years_experience} ans à concevoir des interfaces qui tiennent la charge, sans jamais sacrifier le détail.`
 })
 

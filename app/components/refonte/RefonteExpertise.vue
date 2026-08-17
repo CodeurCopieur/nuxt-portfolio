@@ -472,7 +472,6 @@ onUnmounted(() => unbind())
   position: relative;
 }
 
-/* Collé pile sous la nav — pas de padding fantôme */
 .rf-expertise__pin {
   position: sticky;
   top: var(--rf-nav-h);
@@ -480,6 +479,8 @@ onUnmounted(() => unbind())
   min-height: calc(100dvh - var(--rf-nav-h));
   box-sizing: border-box;
   overflow: hidden;
+  /* Même offset que Expériences au pin / démarrage de chorégraphie */
+  padding-top: var(--rf-section-pin-pad);
 }
 
 .rf-expertise__frame {
@@ -487,7 +488,7 @@ onUnmounted(() => unbind())
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
   gap: 0;
-  padding-block: 0.65rem 0.75rem;
+  padding-block: 0 0.75rem;
   box-sizing: border-box;
 }
 
@@ -499,9 +500,10 @@ onUnmounted(() => unbind())
 }
 
 .rf-expertise__title {
-  margin: 0.25rem 0 0;
-  font-size: clamp(1.85rem, 4.5vw, 3rem);
-  line-height: 1;
+  margin: 0.35rem 0 0;
+  font-size: var(--rf-section-title-size);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
 }
 
 .rf-expertise__act {
@@ -722,12 +724,13 @@ onUnmounted(() => unbind())
     height: auto;
     min-height: auto;
     overflow: visible;
+    padding-top: var(--rf-section-pin-pad);
   }
 
   .rf-expertise__frame {
     height: auto;
     grid-template-rows: auto auto auto;
-    padding-block: 0.35rem 0.5rem;
+    padding-block: 0 0.5rem;
   }
 
   .rf-expertise__stage {

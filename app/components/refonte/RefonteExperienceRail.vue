@@ -524,7 +524,7 @@ watch(total, () => nextTick(() => {
   top: var(--rf-nav-h);
   min-height: calc(100dvh - var(--rf-nav-h));
   display: grid;
-  gap: clamp(1rem, 2.5vw, 1.75rem);
+  gap: var(--rf-section-pin-pad);
   padding-bottom: clamp(1.5rem, 4vw, 2.5rem);
   overflow: hidden;
 }
@@ -555,7 +555,7 @@ watch(total, () => nextTick(() => {
 }
 
 .refonte-xp__title {
-  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-size: var(--rf-section-title-size);
   margin: 0.35rem 0 0.5rem;
   letter-spacing: -0.03em;
 }

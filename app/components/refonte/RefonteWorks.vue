@@ -368,6 +368,8 @@ onUnmounted(() => unbind())
   min-height: calc(100dvh - var(--rf-nav-h));
   box-sizing: border-box;
   overflow: hidden;
+  /* Respire sous la nav au moment où la chorégraphie démarre */
+  padding-top: var(--rf-section-pin-pad);
 }
 
 .rf-works__frame {
@@ -377,7 +379,7 @@ onUnmounted(() => unbind())
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   gap: 0;
-  padding-block: 0.65rem 0.75rem;
+  padding-block: 0 0.75rem;
   box-sizing: border-box;
 }
 
@@ -395,12 +397,13 @@ onUnmounted(() => unbind())
 }
 
 .rf-works__title {
-  margin: 0.25rem 0 0;
+  margin: 0.35rem 0 0;
   font-size: calc(
-    (1 - var(--rf-compact, 0)) * clamp(2.1rem, 5.5vw, 3.5rem)
+    (1 - var(--rf-compact, 0)) * var(--rf-section-title-size)
     + var(--rf-compact, 0) * clamp(1.65rem, 3.5vw, 2.35rem)
   );
   line-height: 1.02;
+  letter-spacing: -0.03em;
 }
 
 .rf-works__title-serif {
@@ -689,11 +692,12 @@ onUnmounted(() => unbind())
     height: auto;
     min-height: auto;
     overflow: visible;
+    padding-top: var(--rf-section-pin-pad);
   }
 
   .rf-works__frame {
     height: auto;
-    padding-block: 0.35rem 0.5rem;
+    padding-block: 0 0.5rem;
   }
 
   .rf-works__stage {
