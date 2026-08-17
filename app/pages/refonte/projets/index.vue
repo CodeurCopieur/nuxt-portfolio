@@ -9,7 +9,7 @@ useHead({
 </script>
 
 <template>
-  <RefonteSection chapter="Work">
+  <RefonteSection chapter="Projets">
     <RefonteProjectsArchive />
   </RefonteSection>
 </template>

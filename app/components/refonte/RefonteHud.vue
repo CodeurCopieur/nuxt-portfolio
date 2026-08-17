@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRefonteScroll } from '@/composables/refonte/useRefonteScroll'
 
-const { activeChapter, cursor } = useRefonteScroll()
+const { cursor } = useRefonteScroll()
 
 const clock = ref('--:--')
 let clockTimer: ReturnType<typeof setInterval> | null = null
@@ -35,7 +35,6 @@ const cursorLabel = computed(() => `${pad(cursor.value.x)} X ${pad(cursor.value.
     </div>
 
     <div class="refonte-hud__row">
-      <span class="refonte-hud__chapter">{{ activeChapter }}</span>
       <span class="refonte-hud__coords">{{ cursorLabel }}</span>
     </div>
   </aside>
@@ -66,14 +65,6 @@ const cursorLabel = computed(() => `${pad(cursor.value.x)} X ${pad(cursor.value.
 
 .refonte-hud__row--meta {
   color: var(--rf-text-muted);
-}
-
-.refonte-hud__chapter {
-  color: var(--rf-text);
-  font-family: var(--rf-sans);
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
 }
 
 .refonte-hud__coords {

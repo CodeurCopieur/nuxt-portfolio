@@ -114,10 +114,52 @@ export function ratingTier(value: number): SkillRatingTier {
   return 'low'
 }
 
+/**
+ * Équivalence note française /20 → lettre US (conversion académique courante).
+ * 16–20 ≈ A, 14–15 ≈ B+, 12–13 ≈ B, 10–11 ≈ C…
+ */
+export function ratingToLetter(value: number): string {
+  const v = Math.min(20, Math.max(0, Number(value) || 0))
+  if (v >= 18) return 'A+'
+  if (v >= 16) return 'A'
+  if (v >= 15) return 'A-'
+  if (v >= 14) return 'B+'
+  if (v >= 13) return 'B'
+  if (v >= 12) return 'B-'
+  if (v >= 11) return 'C+'
+  if (v >= 10) return 'C'
+  if (v >= 9) return 'C-'
+  if (v >= 8) return 'D'
+  return 'F'
+}
+
+/** GPA US sur 4.0, aligné sur la même grille. */
+export function ratingToGpa(value: number): number {
+  const letter = ratingToLetter(value)
+  const table: Record<string, number> = {
+    'A+': 4.0,
+    A: 4.0,
+    'A-': 3.7,
+    'B+': 3.3,
+    B: 3.0,
+    'B-': 2.7,
+    'C+': 2.3,
+    C: 2.0,
+    'C-': 1.7,
+    D: 1.0,
+    F: 0
+  }
+  return table[letter] ?? 0
+}
+
 export function categoryAvg(catKey: string, skills: string[]) {
   if (!skills.length) return 0
   const sum = skills.reduce((acc, skill, i) => acc + skillRating(skill, catKey, i), 0)
   return Math.round(sum / skills.length)
+}
+
+export function categoryLetter(catKey: string, skills: string[]) {
+  return ratingToLetter(categoryAvg(catKey, skills))
 }
 
 export function colorForSkillCategory(key: string) {

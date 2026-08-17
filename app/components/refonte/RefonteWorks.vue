@@ -19,8 +19,8 @@ let targetP = 0
 const projects = computed(() => sortProjectsByYear(sections.value.projets).slice(0, 6))
 const total = computed(() => projects.value.length)
 
-/** Course adaptée au nombre de projets (assez de scroll par focus). */
-const SCROLL_TRAVEL = computed(() => 800 + Math.max(total.value, 1) * 560)
+/** Course adaptée au nombre de projets (assez de dwell par focus). */
+const SCROLL_TRAVEL = computed(() => 720 + Math.max(total.value, 1) * 640)
 
 function pad(n: number) {
   return String(n + 1).padStart(2, '0')
@@ -66,20 +66,43 @@ const manifestoScale = computed(() => {
 /** Progression 0→1 dans la zone focus multi-projets. */
 const focusRail = computed(() => span(p.value, FOCUS_START, FOCUS_END))
 
-const focusIndex = computed(() => {
+/** Index scroll brut (peut osciller près des seuils). */
+const focusIndexRaw = computed(() => {
   const n = total.value
   if (n <= 0) return 0
   if (focusRail.value >= 0.999) return n - 1
   return Math.min(n - 1, Math.floor(focusRail.value * n))
 })
 
-/** 0→1 à l'intérieur du projet actif. */
-const focusFrac = computed(() => {
-  const n = total.value
-  if (n <= 1) return focusRail.value
-  const scaled = focusRail.value * n
-  if (focusRail.value >= 0.999) return 1
-  return scaled - Math.floor(scaled)
+/** Index stabilisé : évite les bascules saccadées au bord d’un segment. */
+const focusIndex = ref(0)
+watch(
+  focusIndexRaw,
+  (next) => {
+    const n = total.value
+    if (n <= 0) {
+      focusIndex.value = 0
+      return
+    }
+    const clamped = Math.min(Math.max(next, 0), n - 1)
+    if (clamped === focusIndex.value) return
+
+    const scaled = focusRail.value * n
+    const center = focusIndex.value + 0.5
+    // Ne change que si on a clairement dépassé le milieu du segment courant.
+    if (clamped > focusIndex.value && scaled >= focusIndex.value + 0.55) {
+      focusIndex.value = clamped
+    } else if (clamped < focusIndex.value && scaled <= focusIndex.value + 0.45) {
+      focusIndex.value = clamped
+    } else if (Math.abs(clamped - focusIndex.value) > 1) {
+      focusIndex.value = clamped
+    }
+  },
+  { immediate: true }
+)
+
+watch(total, (n) => {
+  if (focusIndex.value > Math.max(n - 1, 0)) focusIndex.value = Math.max(n - 1, 0)
 })
 
 const activeProject = computed(() => projects.value[focusIndex.value] ?? null)
@@ -93,25 +116,6 @@ const focusShellOpacity = computed(() => {
   return Math.round(enter * exit * 40) / 40
 })
 
-/** Entrée / sortie douce à chaque changement de projet. */
-const focusCardOpacity = computed(() => {
-  const f = focusFrac.value
-  const n = total.value
-  const isLast = focusIndex.value >= n - 1
-  const enter = easeOut(Math.min(f / 0.22, 1))
-  const exit = isLast ? 1 : 1 - easeInOut(span(f, 0.78, 1))
-  return Math.round(enter * exit * 40) / 40
-})
-
-const focusShift = computed(() => {
-  const f = focusFrac.value
-  const enter = (1 - easeOut(Math.min(f / 0.25, 1))) * 36
-  const exit = focusIndex.value >= total.value - 1 ? 0 : easeInOut(span(f, 0.8, 1)) * -24
-  return Math.round(enter + exit)
-})
-
-const focusDetailT = computed(() => easeOut(span(focusFrac.value, 0.12, 0.4)))
-
 const listOpacity = computed(() => {
   if (!isDesktop.value) return 1
   return Math.round(easeOut(span(p.value, LIST_START, LIST_START + 0.1)) * 40) / 40
@@ -122,11 +126,11 @@ const listVisible = computed(() => listOpacity.value > 0.02 || !isDesktop.value)
 const headCompact = computed(() => easeInOut(span(p.value, 0.1, 0.2)))
 
 const actLabel = computed(() => {
-  if (p.value < FOCUS_START) return '01 — Manifeste'
+  if (p.value < FOCUS_START) return '01 — Projets'
   if (p.value < LIST_START) {
     return `02 — Focus ${pad(focusIndex.value)}/${pad(Math.max(total.value - 1, 0))}`
   }
-  return '03 — Index'
+  return '03 — Liste'
 })
 
 function rowStyle(index: number) {
@@ -296,10 +300,6 @@ onUnmounted(() => unbind())
                   v-if="activeProject && inFocusAct"
                   :key="activeProject.slug"
                   class="rf-works__focus"
-                  :style="{
-                    opacity: focusCardOpacity,
-                    transform: `translateY(${focusShift}px)`
-                  }"
                 >
                   <p class="rf-works__focus-num">{{ pad(focusIndex) }}</p>
                   <h3 class="rf-works__focus-title">{{ activeProject.title }}</h3>
@@ -307,7 +307,7 @@ onUnmounted(() => unbind())
                     {{ activeProject.org }} · {{ activeProject.year }}
                   </p>
                   <p class="rf-works__focus-summary">{{ activeProject.summary }}</p>
-                  <div class="rf-works__focus-stack" :style="{ opacity: focusDetailT }">
+                  <div class="rf-works__focus-stack">
                     <span
                       v-for="tech in activeProject.stack.slice(0, 5)"
                       :key="tech"
@@ -316,7 +316,6 @@ onUnmounted(() => unbind())
                   <RefonteLink
                     :to="`/refonte/projets/${activeProject.slug}`"
                     class="rf-works__focus-cta"
-                    :style="{ opacity: focusDetailT }"
                   >
                     Voir le projet →
                   </RefonteLink>
@@ -521,22 +520,24 @@ onUnmounted(() => unbind())
   display: grid;
   align-content: center;
   gap: 0.55rem;
-  will-change: opacity, transform;
 }
 
-.rf-works-focus-enter-active,
+.rf-works-focus-enter-active {
+  transition: opacity 0.45s var(--rf-ease), transform 0.45s var(--rf-ease);
+}
+
 .rf-works-focus-leave-active {
-  transition: opacity 0.35s var(--rf-ease), transform 0.35s var(--rf-ease);
+  transition: opacity 0.28s var(--rf-ease), transform 0.28s var(--rf-ease);
 }
 
 .rf-works-focus-enter-from {
   opacity: 0;
-  transform: translateY(28px);
+  transform: translateY(18px);
 }
 
 .rf-works-focus-leave-to {
   opacity: 0;
-  transform: translateY(-20px);
+  transform: translateY(-10px);
 }
 
 .rf-works__focus-num {
@@ -626,13 +627,18 @@ onUnmounted(() => unbind())
 
 .rf-works__link {
   display: grid;
-  grid-template-columns: var(--rf-works-num) minmax(0, 1fr) auto;
+  grid-template-columns: var(--rf-works-num) minmax(0, 1fr) 1.75rem;
   column-gap: var(--rf-works-gap);
   align-items: center;
   padding-block: clamp(1.05rem, 2.5vw, 1.55rem);
+  padding-inline: clamp(0.65rem, 2.2vw, 1.35rem) 0.35rem;
   text-decoration: none;
   color: inherit;
   transition: background 0.3s var(--rf-ease);
+}
+
+.rf-works__link.refonte-link::after {
+  display: none;
 }
 
 .rf-works__link:hover,
@@ -645,8 +651,7 @@ onUnmounted(() => unbind())
   font-style: italic;
   font-size: 1.2rem;
   color: var(--rf-text-muted);
-  align-self: start;
-  padding-top: 0.15rem;
+  align-self: center;
   line-height: 1;
 }
 
@@ -684,15 +689,19 @@ onUnmounted(() => unbind())
 }
 
 .rf-works__arrow {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
   font-size: 1.2rem;
+  line-height: 1;
   color: var(--rf-text-muted);
-  transform: translateX(0) rotate(-45deg);
+  transform: rotate(-45deg);
   transition: transform 0.35s var(--rf-ease), color 0.35s var(--rf-ease);
   justify-self: end;
 }
 
 .rf-works__link:hover .rf-works__arrow {
-  transform: translateX(6px) rotate(0deg);
+  transform: rotate(0deg);
   color: var(--rf-accent);
 }
 

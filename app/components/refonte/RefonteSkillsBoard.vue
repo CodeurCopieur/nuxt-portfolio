@@ -3,8 +3,10 @@ import { useContent } from '@/composables/useContent'
 import { COMPETENCE_CATEGORIES, sortCompetenceCategories } from '~/data/competence-categories'
 import {
   categoryAvg,
+  categoryLetter,
   colorForSkillCategory,
   ratingTier,
+  ratingToLetter,
   skillRating
 } from '~/utils/skill-ratings'
 
@@ -64,6 +66,8 @@ const globalAvg = computed(() => {
   return Math.round(sum / cats.length)
 })
 
+const globalLetter = computed(() => ratingToLetter(globalAvg.value))
+
 const activeCategory = computed(() => {
   const cats = categories.value
   if (!cats.length) return null
@@ -75,11 +79,15 @@ const activeCategory = computed(() => {
 const activeSkills = computed(() => {
   const cat = activeCategory.value
   if (!cat) return []
-  return cat.skills.map((skill, index) => ({
-    skill,
-    rating: skillRating(skill, cat.key, index),
-    tier: ratingTier(skillRating(skill, cat.key, index))
-  }))
+  return cat.skills.map((skill, index) => {
+    const rating = skillRating(skill, cat.key, index)
+    return {
+      skill,
+      rating,
+      letter: ratingToLetter(rating),
+      tier: ratingTier(rating)
+    }
+  })
 })
 
 watch(
@@ -116,9 +124,8 @@ function barWidth(rating: number) {
         </p>
       </div>
       <div class="rf-skills__global">
-        <span class="rf-skills__global-label">PWR</span>
-        <span class="rf-skills__global-value">{{ globalAvg }}</span>
-        <span class="rf-skills__global-max">/20</span>
+        <span class="rf-skills__global-label">GPA</span>
+        <span class="rf-skills__global-value rf-grade">{{ globalLetter }}</span>
       </div>
     </header>
 
@@ -136,7 +143,7 @@ function barWidth(rating: number) {
         :style="{ '--cat-color': colorForSkillCategory(cat.key) }"
         @click="selectCategory(cat.key)"
       >
-        <span class="rf-skills__domain-pwr">{{ categoryAvg(cat.key, cat.skills) }}</span>
+        <span class="rf-skills__domain-pwr rf-grade">{{ categoryLetter(cat.key, cat.skills) }}</span>
         <span class="rf-skills__domain-label">{{ cat.label }}</span>
       </button>
     </div>
@@ -156,10 +163,9 @@ function barWidth(rating: number) {
           </p>
         </div>
         <div class="rf-skills__panel-score">
-          <span class="rf-skills__panel-score-val">
-            {{ categoryAvg(activeCategory.key, activeCategory.skills) }}
+          <span class="rf-skills__panel-score-val rf-grade">
+            {{ categoryLetter(activeCategory.key, activeCategory.skills) }}
           </span>
-          <span class="rf-skills__panel-score-max">/20</span>
         </div>
       </header>
 
@@ -174,7 +180,7 @@ function barWidth(rating: number) {
           <div class="rf-skills__meter-track" aria-hidden="true">
             <div class="rf-skills__meter-fill" :style="{ width: barWidth(item.rating) }" />
           </div>
-          <span class="rf-skills__meter-val">{{ item.rating }}</span>
+          <span class="rf-skills__meter-val rf-grade">{{ item.letter }}</span>
         </li>
       </ul>
     </article>
@@ -236,8 +242,25 @@ function barWidth(rating: number) {
 }
 
 .rf-skills__global-value {
-  font-size: 3rem;
-  font-style: italic;
+  font-size: 3.6rem;
+}
+
+.rf-skills__domain-pwr {
+  font-size: 1.45rem;
+}
+
+.rf-skills__panel-score-val {
+  font-size: 2.75rem;
+  display: inline-block;
+}
+
+.rf-skills__meter-val {
+  font-size: 1.35rem;
+  text-align: right;
+  display: inline-block;
+}
+
+.rf-skills__meter--elite .rf-skills__meter-val {
   color: var(--rf-accent);
 }
 
@@ -283,18 +306,6 @@ function barWidth(rating: number) {
 
 .rf-skills__domain.is-active {
   border-color: var(--cat-color, var(--rf-accent));
-}
-
-.rf-skills__domain-pwr {
-  font-family: var(--rf-sans);
-  font-weight: 700;
-  font-size: 1rem;
-  line-height: 1;
-  color: var(--cat-color, var(--rf-text-muted));
-}
-
-.rf-skills__domain.is-active .rf-skills__domain-pwr {
-  color: var(--rf-accent);
 }
 
 .rf-skills__domain-label {
@@ -343,14 +354,7 @@ function barWidth(rating: number) {
   display: flex;
   align-items: baseline;
   gap: 0.1rem;
-  font-family: var(--rf-sans);
-  font-weight: 700;
   line-height: 1;
-}
-
-.rf-skills__panel-score-val {
-  font-size: 1.75rem;
-  color: var(--cat-color, var(--rf-accent));
 }
 
 .rf-skills__panel-score-max {
@@ -368,14 +372,14 @@ function barWidth(rating: number) {
 
 .rf-skills__meter {
   display: grid;
-  grid-template-columns: minmax(7rem, 1.1fr) minmax(0, 2fr) 2rem;
+  grid-template-columns: minmax(7rem, 1.1fr) minmax(0, 2fr) 2.75rem;
   align-items: center;
   gap: 0.75rem;
 }
 
 @media (max-width: 559px) {
   .rf-skills__meter {
-    grid-template-columns: 1fr 2.5rem;
+    grid-template-columns: 1fr 2.75rem;
     grid-template-rows: auto auto;
   }
 
@@ -407,18 +411,5 @@ function barWidth(rating: number) {
 
 .rf-skills__meter--elite .rf-skills__meter-fill {
   background: var(--rf-accent);
-}
-
-.rf-skills__meter-val {
-  font-family: ui-monospace, monospace;
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-align: right;
-  color: var(--rf-text-muted);
-  font-variant-numeric: tabular-nums;
-}
-
-.rf-skills__meter--elite .rf-skills__meter-val {
-  color: var(--rf-accent);
 }
 </style>

@@ -2,6 +2,7 @@
 import { useContent } from '@/composables/useContent'
 import { COMPETENCE_CATEGORIES, sortCompetenceCategories } from '~/data/competence-categories'
 import { getCareerPinPalette, type CareerPinPalette } from '~/utils/career-pin-colors'
+import { ratingToLetter } from '~/utils/skill-ratings'
 
 const props = withDefaults(
   defineProps<{ variant?: 'game' | 'refonte' }>(),
@@ -677,7 +678,7 @@ function drawRadar(ctx: CanvasRenderingContext2D, cx: number, cy: number, radius
     ctx.fillStyle = lit ? theme.badgeTextLit : theme.badgeText
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
-    ctx.fillText(String(p.avgRating), badgeX, badgeY + 0.5)
+    ctx.fillText(ratingToLetter(p.avgRating), badgeX, badgeY + 0.5)
   })
 }
 
@@ -860,7 +861,7 @@ onUnmounted(() => {
         >
           <header class="fm-block__head">
             <h3 class="fm-block__title">{{ cat.label }}</h3>
-            <span class="fm-block__avg">{{ categoryAvg(cat.key, cat.skills) }}</span>
+            <span class="fm-block__avg">{{ ratingToLetter(categoryAvg(cat.key, cat.skills)) }}</span>
           </header>
 
           <ul class="fm-block__list">
@@ -880,7 +881,7 @@ onUnmounted(() => {
                 class="fm-row__rating"
                 :class="`fm-row__rating--${ratingTier(skillRating(skill, cat.key, index))}`"
               >
-                {{ skillRating(skill, cat.key, index) }}
+                {{ ratingToLetter(skillRating(skill, cat.key, index)) }}
               </span>
             </li>
           </ul>
@@ -915,14 +916,14 @@ onUnmounted(() => {
           <div class="skills-radar__hud absolute top-4 left-4 z-10 pointer-events-none">
             <p class="skills-radar__hud-label">Profil radar</p>
             <p class="skills-radar__hud-value">
-              {{ activeKey ? categoryAvg(activeKey, visibleCategories.find(c => c.key === activeKey)?.skills ?? []) : Math.round(visibleCategories.reduce((s, c) => s + categoryAvg(c.key, c.skills), 0) / Math.max(visibleCategories.length, 1)) }}
+              {{ ratingToLetter(activeKey ? categoryAvg(activeKey, visibleCategories.find(c => c.key === activeKey)?.skills ?? []) : Math.round(visibleCategories.reduce((s, c) => s + categoryAvg(c.key, c.skills), 0) / Math.max(visibleCategories.length, 1))) }}
             </p>
             <p class="skills-radar__hud-sub">
               <template v-if="activeKey">
-                {{ visibleCategories.find((c) => c.key === activeKey)?.label }} · moyenne /20
+                {{ visibleCategories.find((c) => c.key === activeKey)?.label }} · grade US
               </template>
               <template v-else>
-                Moyenne globale · échelle /20
+                Moyenne globale · lettres US
               </template>
             </p>
           </div>
@@ -969,7 +970,7 @@ onUnmounted(() => {
                 aria-hidden="true"
               />
               <span class="fm-skills__tab-label">{{ cat.label }}</span>
-              <span class="fm-skills__tab-avg">{{ categoryAvg(cat.key, cat.skills) }}</span>
+              <span class="fm-skills__tab-avg">{{ ratingToLetter(categoryAvg(cat.key, cat.skills)) }}</span>
             </button>
           </div>
 
@@ -998,7 +999,7 @@ onUnmounted(() => {
                 {{ selectedCategory.skills.length }} technologie{{ selectedCategory.skills.length > 1 ? 's' : '' }}
               </p>
             </div>
-            <span class="fm-tabpanel__avg">{{ categoryAvg(selectedCategory.key, selectedCategory.skills) }}/20</span>
+            <span class="fm-tabpanel__avg">{{ ratingToLetter(categoryAvg(selectedCategory.key, selectedCategory.skills)) }}</span>
           </header>
 
           <ul class="fm-tabpanel__list">
@@ -1013,7 +1014,7 @@ onUnmounted(() => {
                 class="fm-tab-row__rating"
                 :class="`fm-tab-row__rating--${ratingTier(skillRating(skill, selectedCategory.key, index))}`"
               >
-                {{ skillRating(skill, selectedCategory.key, index) }}
+                {{ ratingToLetter(skillRating(skill, selectedCategory.key, index)) }}
               </span>
             </li>
           </ul>
@@ -1035,14 +1036,14 @@ onUnmounted(() => {
         <div class="skills-radar__hud absolute top-4 left-4 z-10 pointer-events-none">
           <p class="skills-radar__hud-label">Profil radar</p>
           <p class="skills-radar__hud-value">
-            {{ activeKey ? categoryAvg(activeKey, visibleCategories.find(c => c.key === activeKey)?.skills ?? []) : Math.round(visibleCategories.reduce((s, c) => s + categoryAvg(c.key, c.skills), 0) / Math.max(visibleCategories.length, 1)) }}
+            {{ ratingToLetter(activeKey ? categoryAvg(activeKey, visibleCategories.find(c => c.key === activeKey)?.skills ?? []) : Math.round(visibleCategories.reduce((s, c) => s + categoryAvg(c.key, c.skills), 0) / Math.max(visibleCategories.length, 1))) }}
           </p>
           <p class="skills-radar__hud-sub">
             <template v-if="activeKey">
-              {{ visibleCategories.find((c) => c.key === activeKey)?.label }} · moyenne /20
+              {{ visibleCategories.find((c) => c.key === activeKey)?.label }} · grade US
             </template>
             <template v-else>
-              Moyenne globale · échelle /20
+              Moyenne globale · lettres US
             </template>
           </p>
         </div>

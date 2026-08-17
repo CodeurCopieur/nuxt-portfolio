@@ -170,7 +170,7 @@ watch(isDesktop, () => nextTick(() => remeasure()))
 </script>
 
 <template>
-  <RefonteSection chapter="Parcours" :scroll-section="false" class="refonte-xp">
+  <RefonteSection chapter="Expériences" :scroll-section="false" class="refonte-xp">
     <div
       ref="scrollerRef"
       class="refonte-xp__scroller"
@@ -190,7 +190,7 @@ watch(isDesktop, () => nextTick(() => remeasure()))
 
         <div class="refonte-container refonte-xp__head">
           <div class="refonte-xp__head-copy">
-            <p class="rf-movement__num">005 // Parcours</p>
+            <p class="rf-movement__num">005 — Expériences</p>
             <h2 class="refonte-display refonte-xp__title">Expériences</h2>
             <p class="refonte-xp__lead">
               <template v-if="isDesktop && !isComplete">
@@ -437,6 +437,7 @@ watch(isDesktop, () => nextTick(() => remeasure()))
   display: grid;
   grid-template-columns: minmax(12rem, 0.9fr) minmax(0, 1.4fr);
   gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: center;
   min-height: clamp(380px, 48vh, 480px);
   padding-block: clamp(1rem, 2.5vw, 1.5rem);
   border-top: 1px solid var(--rf-line);
@@ -445,7 +446,7 @@ watch(isDesktop, () => nextTick(() => remeasure()))
 
 .refonte-xp__mission-lead {
   display: grid;
-  align-content: start;
+  align-content: center;
   gap: 0.35rem;
   padding-right: clamp(0.5rem, 2vw, 1.25rem);
   border-right: 1px solid var(--rf-line);
@@ -530,7 +531,7 @@ watch(isDesktop, () => nextTick(() => remeasure()))
 .refonte-xp__mission-body {
   display: grid;
   gap: clamp(1.15rem, 2.5vw, 1.65rem);
-  align-content: start;
+  align-content: center;
   min-width: 0;
 }
 

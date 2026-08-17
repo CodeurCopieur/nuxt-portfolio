@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { categoryAvg } from '~/utils/skill-ratings'
+import { categoryAvg, categoryLetter } from '~/utils/skill-ratings'
 import { useRefonteScroll } from '@/composables/refonte/useRefonteScroll'
 
 const { sections } = useContent()
@@ -53,7 +53,8 @@ const categories = computed(() => {
       label: labelFor(key),
       radarLabel: RADAR_LABELS[key] ?? labelFor(key),
       skills: sections.value.competences[key] ?? [],
-      avg: categoryAvg(key, sections.value.competences[key] ?? [])
+      avg: categoryAvg(key, sections.value.competences[key] ?? []),
+      letter: categoryLetter(key, sections.value.competences[key] ?? [])
     }))
     .filter((cat) => cat.skills.length > 0)
 })
@@ -171,8 +172,8 @@ const radarAxes = computed(() => {
       y: radarCy + sin * r,
       labelX: radarCx + cos * (radarMaxR + 44),
       labelY: radarCy + sin * (radarMaxR + 44),
-      scoreX: radarCx + cos * (r + 20),
-      scoreY: radarCy + sin * (r + 20),
+                  scoreX: radarCx + cos * (r + 28),
+                  scoreY: radarCy + sin * (r + 28),
       gridX: (level: number) => radarCx + cos * radarMaxR * level,
       gridY: (level: number) => radarCy + sin * radarMaxR * level
     }
@@ -365,7 +366,7 @@ onUnmounted(() => unbind())
                     dominant-baseline="middle"
                     :opacity="scoreOpacity"
                   >
-                    {{ axis.avg }}
+                    {{ axis.letter }}
                   </text>
                   <text
                     :x="axis.labelX"
@@ -397,7 +398,7 @@ onUnmounted(() => unbind())
                 <div class="rf-expertise__group-head">
                   <span class="rf-expertise__group-num">{{ pad(ci) }}</span>
                   <h3 class="rf-expertise__group-label">{{ cat.label }}</h3>
-                  <span class="rf-expertise__group-avg">{{ cat.avg }}/20</span>
+                  <span class="rf-expertise__group-avg rf-grade">{{ cat.letter }}</span>
                 </div>
                 <div class="rf-expertise__group-pills">
                   <span
@@ -556,9 +557,14 @@ onUnmounted(() => unbind())
 
 .rf-expertise__radar-score {
   fill: var(--rf-accent);
-  font-size: 15px;
-  font-family: var(--rf-serif);
-  font-style: italic;
+  font-size: 28px;
+  font-family: var(--rf-comic);
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  paint-order: stroke fill;
+  stroke: rgba(11, 10, 8, 0.9);
+  stroke-width: 3.5px;
 }
 
 .rf-expertise__radar-label {
@@ -616,11 +622,7 @@ onUnmounted(() => unbind())
 .rf-expertise__group-avg {
   margin-left: auto;
   flex-shrink: 0;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--rf-accent);
-  font-variant-numeric: tabular-nums;
+  font-size: clamp(1.6rem, 3.2vw, 2.1rem);
 }
 
 .rf-expertise__group-pills {

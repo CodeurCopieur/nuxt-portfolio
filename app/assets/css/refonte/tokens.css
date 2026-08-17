@@ -48,6 +48,7 @@
   /* Typo & layout */
   --rf-serif: 'Instrument Serif', Georgia, serif;
   --rf-sans: 'Instrument Sans', 'Segoe UI', system-ui, sans-serif;
+  --rf-comic: 'Bangers', 'Comic Sans MS', Impact, sans-serif;
   --rf-radius: 0.65rem;
   --rf-radius-sm: 0.4rem;
   --rf-nav-h: 4.25rem;
@@ -247,7 +248,22 @@ html:has(.refonte-root) ::-webkit-scrollbar {
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
+  color: var(--rf-text-muted);
+}
+
+/* Note / grade style comics */
+.rf-grade {
+  font-family: var(--rf-comic);
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1;
   color: var(--rf-accent);
+  text-transform: uppercase;
+  transform: rotate(-8deg);
+  text-shadow:
+    2px 2px 0 rgba(0, 0, 0, 0.55),
+    -1px -1px 0 rgba(20, 19, 16, 0.35);
 }
 
 [data-scroll-section] {

@@ -4,7 +4,7 @@ import { useRefonteScroll } from '@/composables/refonte/useRefonteScroll'
 
 const route = useRoute()
 const { navigateTo } = useRefonteTransition()
-const { scrollProgress } = useRefonteScroll()
+const { scrollProgress, activeChapter, refresh } = useRefonteScroll()
 const menuOpen = ref(false)
 
 const links = [
@@ -15,6 +15,21 @@ const links = [
 ]
 
 const scrollPct = computed(() => String(Math.round(scrollProgress.value * 100)).padStart(2, '0'))
+
+const chapterLabel = computed(() => {
+  const byRoute: Record<string, string> = {
+    '/refonte/prestations': 'Prestations',
+    '/refonte/contact': 'Contact',
+    '/refonte/plan-du-site': 'Plan du site'
+  }
+
+  if (route.path.startsWith('/refonte/projets')) return 'Projets'
+  if (route.path.startsWith('/refonte/mentions') || route.path.startsWith('/refonte/cgu') || route.path.startsWith('/refonte/confidentialite')) {
+    return 'Légal'
+  }
+
+  return byRoute[route.path] ?? activeChapter.value
+})
 
 function isActive(path: string) {
   if (path === '/refonte') return route.path === '/refonte'
@@ -37,6 +52,7 @@ function onKeydown(event: KeyboardEvent) {
 
 watch(() => route.path, () => {
   menuOpen.value = false
+  nextTick(() => refresh())
 })
 
 watch(menuOpen, (open) => {
@@ -61,20 +77,23 @@ onUnmounted(() => {
         Widdy<span class="refonte-nav__logo-dot">·</span>Louis
       </a>
 
-      <button
-        type="button"
-        class="refonte-nav__trigger"
-        :class="{ 'is-open': menuOpen }"
-        :aria-expanded="menuOpen"
-        aria-controls="refonte-nav-overlay"
-        @click="toggleMenu"
-      >
-        <span class="refonte-nav__trigger-pct">{{ scrollPct }}%</span>
-        <span class="refonte-nav__trigger-label">{{ menuOpen ? 'Fermer' : 'Menu' }}</span>
-        <span class="refonte-nav__trigger-icon" aria-hidden="true">
-          <i /><i /><i />
-        </span>
-      </button>
+      <div class="refonte-nav__actions">
+        <p class="refonte-nav__chapter" aria-live="polite">{{ chapterLabel }}</p>
+        <button
+          type="button"
+          class="refonte-nav__trigger"
+          :class="{ 'is-open': menuOpen }"
+          :aria-expanded="menuOpen"
+          aria-controls="refonte-nav-overlay"
+          @click="toggleMenu"
+        >
+          <span class="refonte-nav__trigger-pct">{{ scrollPct }}%</span>
+          <span class="refonte-nav__trigger-label">{{ menuOpen ? 'Fermer' : 'Menu' }}</span>
+          <span class="refonte-nav__trigger-icon" aria-hidden="true">
+            <i /><i /><i />
+          </span>
+        </button>
+      </div>
     </div>
 
     <Transition name="rf-overlay">
@@ -151,6 +170,35 @@ onUnmounted(() => {
   margin: 0 0.05em;
 }
 
+.refonte-nav__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.refonte-nav__chapter {
+  margin: 0;
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rf-accent);
+  text-align: right;
+}
+
+@media (max-width: 479px) {
+  .refonte-nav__chapter {
+    max-width: 6.5rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.04em;
+  }
+}
+
 .refonte-nav__trigger {
   display: inline-flex;
   align-items: center;
@@ -163,6 +211,7 @@ onUnmounted(() => {
   font-family: inherit;
   cursor: pointer;
   transition: border-color 0.3s var(--rf-ease);
+  flex-shrink: 0;
 }
 
 .refonte-nav__trigger:hover {

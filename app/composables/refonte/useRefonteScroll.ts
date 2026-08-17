@@ -41,7 +41,7 @@ const INERT: RefonteScrollApi = {
   controller: ref(null),
   ready: ref(false),
   scrollProgress: ref(0),
-  activeChapter: ref('Intro'),
+  activeChapter: ref('Accueil'),
   cursor: ref({ x: 0, y: 0 }),
   addScene: () => {},
   bindScrollScrub: () => () => {},
@@ -56,22 +56,45 @@ export function provideRefonteScroll(): RefonteScrollApi {
   const controller = ref<Controller | null>(null)
   const ready = ref(false)
   const scrollProgress = ref(0)
-  const activeChapter = ref('Intro')
+  const activeChapter = ref('Accueil')
   const cursor = ref({ x: 0, y: 0 })
 
   const pendingScenes: RefonteSceneOptions[] = []
   const mountedScenes: Scene[] = []
   const scrubCleanups: Array<() => void> = []
   let SceneCtor: typeof Scene | null = null
-  let chapterObserver: IntersectionObserver | null = null
   let scrollTriggerModule: typeof import('gsap/ScrollTrigger') | null = null
   let lenisProxyReady = false
   let onMouseMove: ((e: MouseEvent) => void) | null = null
   let onResizeChapters: (() => void) | null = null
+  let chapterNodes: HTMLElement[] = []
 
   function updateScrollProgress(pos: number) {
     const max = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)
     scrollProgress.value = Math.min(Math.max(pos / max, 0), 1)
+  }
+
+  /** Scrollspy : section dont le haut a passé ~32% du viewport (fiable avec pin). */
+  function updateActiveChapter() {
+    if (!chapterNodes.length) {
+      chapterNodes = Array.from(document.querySelectorAll<HTMLElement>('[data-rf-chapter]'))
+    }
+    if (!chapterNodes.length) return
+
+    const marker = window.innerHeight * 0.32
+    let current = chapterNodes[0]
+
+    for (const el of chapterNodes) {
+      if (el.getBoundingClientRect().top <= marker) current = el
+    }
+
+    const name = current?.dataset.rfChapter?.trim()
+    if (name && name !== activeChapter.value) activeChapter.value = name
+  }
+
+  function bindChapters() {
+    chapterNodes = Array.from(document.querySelectorAll<HTMLElement>('[data-rf-chapter]'))
+    updateActiveChapter()
   }
 
   function mountScene(opts: RefonteSceneOptions) {
@@ -94,27 +117,6 @@ export function provideRefonteScroll(): RefonteScrollApi {
 
     scene.addTo(controller.value)
     mountedScenes.push(scene)
-  }
-
-  function bindChapterObserver() {
-    chapterObserver?.disconnect()
-
-    const chapters = Array.from(document.querySelectorAll<HTMLElement>('[data-rf-chapter]'))
-    if (!chapters.length) return
-
-    chapterObserver = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
-
-        const top = visible[0]?.target as HTMLElement | undefined
-        if (top?.dataset.rfChapter) activeChapter.value = top.dataset.rfChapter
-      },
-      { threshold: [0.2, 0.35, 0.5, 0.65], rootMargin: '-20% 0px -45% 0px' }
-    )
-
-    chapters.forEach((el) => chapterObserver!.observe(el))
   }
 
   async function initScrollTrigger() {
@@ -202,7 +204,8 @@ export function provideRefonteScroll(): RefonteScrollApi {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       ready.value = true
       pendingScenes.splice(0).forEach(mountScene)
-      nextTick(() => bindChapterObserver())
+      nextTick(() => bindChapters())
+      window.addEventListener('scroll', updateActiveChapter, { passive: true })
       return
     }
 
@@ -222,6 +225,7 @@ export function provideRefonteScroll(): RefonteScrollApi {
       controller.value?.scrollPos(pos)
       controller.value?.update(true)
       updateScrollProgress(pos)
+      updateActiveChapter()
       scrollTriggerModule?.ScrollTrigger.update()
     })
 
@@ -230,8 +234,8 @@ export function provideRefonteScroll(): RefonteScrollApi {
     ready.value = true
 
     nextTick(() => {
-      bindChapterObserver()
-      onResizeChapters = () => bindChapterObserver()
+      bindChapters()
+      onResizeChapters = () => bindChapters()
       window.addEventListener('resize', onResizeChapters, { passive: true })
     })
 
@@ -258,7 +262,7 @@ export function provideRefonteScroll(): RefonteScrollApi {
       scroll.value?.resize()
       controller.value?.update(true)
       scrollTriggerModule?.ScrollTrigger.refresh()
-      bindChapterObserver()
+      bindChapters()
     },
     scrollTo: (target) => {
       if (scroll.value) {
@@ -280,6 +284,7 @@ export function provideRefonteScroll(): RefonteScrollApi {
         document.documentElement.scrollTop = 0
         document.body.scrollTop = 0
         scrollProgress.value = 0
+        activeChapter.value = 'Accueil'
         controller.value?.scrollPos(0)
         controller.value?.update(true)
       } catch {
@@ -291,8 +296,8 @@ export function provideRefonteScroll(): RefonteScrollApi {
       mountedScenes.forEach((scene) => scene.destroy(true))
       mountedScenes.length = 0
       scrubCleanups.splice(0).forEach((fn) => fn())
-      chapterObserver?.disconnect()
-      chapterObserver = null
+      chapterNodes = []
+      window.removeEventListener('scroll', updateActiveChapter)
       if (onMouseMove) window.removeEventListener('mousemove', onMouseMove)
       if (onResizeChapters) window.removeEventListener('resize', onResizeChapters)
       scrollTriggerModule?.ScrollTrigger.getAll().forEach((st) => st.kill())
