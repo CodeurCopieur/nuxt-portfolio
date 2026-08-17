@@ -159,8 +159,8 @@ async function submit() {
   font-style: italic;
   font-size: clamp(5rem, 16vw, 13rem);
   line-height: 1;
-  color: var(--rf-text);
-  opacity: 0.05;
+  color: var(--rf-accent);
+  opacity: 0.12;
   pointer-events: none;
 }
 

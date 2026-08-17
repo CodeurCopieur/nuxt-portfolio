@@ -536,7 +536,7 @@ watch(total, () => nextTick(() => {
 .refonte-xp__progress {
   position: relative;
   height: 4px;
-  background: rgba(243, 237, 228, 0.12);
+  background: rgba(255, 255, 255, 0.12);
   overflow: hidden;
 }
 
@@ -873,7 +873,7 @@ watch(total, () => nextTick(() => {
   min-width: 0;
   width: 100%;
   cursor: pointer;
-  border-color: rgba(31, 29, 26, 0.2);
+  border-color: rgba(11, 26, 58, 0.18);
   display: grid;
   gap: 0.35rem;
   padding: clamp(0.85rem, 1.8vw, 1.2rem);
@@ -882,7 +882,7 @@ watch(total, () => nextTick(() => {
 
 .refonte-xp__card.is-active {
   border-color: var(--rf-accent);
-  box-shadow: 3px 3px 0 rgba(31, 29, 26, 0.45);
+  box-shadow: 3px 3px 0 rgba(11, 26, 58, 0.35);
   transform: translateY(-2px);
 }
 

@@ -114,8 +114,8 @@ function selectTech(tech: string | null) {
   font-family: var(--rf-serif);
   font-style: italic;
   font-size: clamp(4rem, 12vw, 9rem);
-  color: var(--rf-text);
-  opacity: 0.06;
+  color: var(--rf-accent);
+  opacity: 0.14;
   pointer-events: none;
   line-height: 1;
 }

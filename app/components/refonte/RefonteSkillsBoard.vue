@@ -27,12 +27,12 @@ const categoryDefs = computed(() => {
       label: key.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase()),
       hint: 'Compétences…',
       description: '',
-      accent: ['rose', 'cyan', 'lime', 'amber'][index % 4]!,
+      accent: ['blue', 'gold', 'sky', 'amber'][index % 4]!,
       gradient: [
-        'from-rose-500 to-red-600',
-        'from-cyan-500 to-blue-600',
-        'from-lime-500 to-green-600',
-        'from-amber-500 to-yellow-600'
+        'from-blue-700 to-indigo-900',
+        'from-yellow-500 to-amber-600',
+        'from-sky-500 to-blue-700',
+        'from-amber-400 to-yellow-600'
       ][index % 4]!
     }))
 

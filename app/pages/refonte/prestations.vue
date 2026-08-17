@@ -182,6 +182,52 @@ const extras = [
   { label: 'Audit a11y ou perf', value: 'à partir de 450 €' }
 ]
 
+/** Conditions commerciales communes (acompte ≠ arrhes). */
+const DEPOSIT_RATE = 0.4
+
+const paymentTerms = [
+  {
+    title: 'Devis visé',
+    text: 'Le devis est accepté par signature ou « bon pour accord ». Ce visa formalise la commande.'
+  },
+  {
+    title: 'Acompte à la commande',
+    text: 'Un acompte de 40 % du montant HT est versé à la signature. Il est déduit de la facture finale.'
+  },
+  {
+    title: 'Démarrage de mission',
+    text: 'La mission commence uniquement après devis visé et réception de l’acompte.'
+  },
+  {
+    title: 'Solde à la livraison',
+    text: 'Le solde (60 %) est dû à la livraison / réception des livrables, sauf échéancier convenu au devis.'
+  }
+]
+
+function parsePriceEuro(price: string): number | null {
+  const digits = price.replace(/\s/g, '').replace(/[^\d]/g, '')
+  if (!digits) return null
+  return Number.parseInt(digits, 10)
+}
+
+function formatEuro(amount: number): string {
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: 'EUR',
+    maximumFractionDigits: 0
+  }).format(amount)
+}
+
+function depositLabel(offer: Offer): string {
+  const total = parsePriceEuro(offer.price)
+  if (total == null) {
+    return 'Acompte 40 % HT à la commande · solde à la livraison (selon devis)'
+  }
+  const deposit = Math.round(total * DEPOSIT_RATE)
+  const balance = total - deposit
+  return `Acompte ${formatEuro(deposit)} HT (40 %) · solde ${formatEuro(balance)} HT`
+}
+
 function selectCategory(id: CategoryId) {
   activeId.value = id
 }
@@ -225,8 +271,8 @@ async function goContact(event?: MouseEvent) {
       </h1>
       <p class="rf-pricing__lead" v-reveal="{ delay: 100 }">
         Trois familles d’offres — Vue / Nuxt 4, motion, intégration soignée et backends légers
-        (Supabase / Firebase). La page unique reste l’entrée la plus accessible. Montants
-        indicatifs HT, devis après brief.
+        (Supabase / Firebase). Montants indicatifs HT. Mission démarrée après devis visé
+        (« bon pour accord ») et versement de l’acompte.
       </p>
       <p class="rf-pricing__availability" v-reveal="{ delay: 140 }">
         {{ sections.a_propos.availability }}
@@ -286,6 +332,9 @@ async function goContact(event?: MouseEvent) {
                 <span v-if="offer.unit" class="rf-pricing__card-price-unit">{{ offer.unit }}</span>
               </p>
               <p class="rf-pricing__card-duration">{{ offer.duration }}</p>
+              <p class="rf-pricing__card-deposit">
+                {{ depositLabel(offer) }}
+              </p>
             </div>
 
             <ul class="rf-pricing__card-list">
@@ -330,14 +379,23 @@ async function goContact(event?: MouseEvent) {
     </section>
 
     <section class="refonte-container rf-pricing__note" v-reveal>
-      <p class="refonte-label">Méthode</p>
+      <p class="refonte-label">Conditions</p>
       <h2 class="refonte-display rf-pricing__note-title">
-        Brief → devis → itérations
+        Devis visé → acompte → mission
       </h2>
-      <p>
-        Chaque projet démarre par un échange (objectifs, contenus, délais). Le tarif final dépend
-        du volume de pages, du niveau d’animation, des intégrations et des contenus fournis.
-        Je travaille en freelance, en remote ou sur Paris.
+      <p class="rf-pricing__note-intro">
+        Chaque projet commence par un brief (objectifs, contenus, délais). Le tarif final dépend
+        du volume, du motion, des intégrations et des contenus fournis. Ensuite :
+      </p>
+      <ol class="rf-pricing__terms">
+        <li v-for="term in paymentTerms" :key="term.title">
+          <strong>{{ term.title }}</strong>
+          <span>{{ term.text }}</span>
+        </li>
+      </ol>
+      <p class="rf-pricing__terms-aside">
+        L’acompte n’est pas des arrhes : en cas d’annulation après démarrage, les sommes
+        correspondant au travail déjà réalisé restent dues. Facturation en HT (TVA selon régime).
       </p>
       <a href="/refonte/contact" class="refonte-link rf-pricing__note-cta" @click="goContact">
         Parler de votre projet →
@@ -426,7 +484,7 @@ async function goContact(event?: MouseEvent) {
 
 .rf-pricing__tab:hover:not(.is-active) {
   color: var(--rf-text-soft);
-  background: rgba(245, 242, 232, 0.03);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .rf-pricing__tab.is-active {
@@ -485,7 +543,7 @@ async function goContact(event?: MouseEvent) {
   padding: clamp(1.35rem, 3vw, 1.75rem);
   border: 1px solid var(--rf-line);
   border-radius: var(--rf-radius);
-  background: rgba(245, 242, 232, 0.03);
+  background: rgba(255, 255, 255, 0.03);
   color: var(--rf-text);
 }
 
@@ -493,7 +551,7 @@ async function goContact(event?: MouseEvent) {
   border-color: rgba(var(--rf-accent-rgb), 0.55);
   background:
     radial-gradient(ellipse 80% 50% at 50% 0%, rgba(var(--rf-accent-rgb), 0.1), transparent 60%),
-    rgba(245, 242, 232, 0.04);
+    rgba(255, 255, 255, 0.04);
   box-shadow: 0 0 0 1px rgba(var(--rf-accent-rgb), 0.12);
 }
 
@@ -546,6 +604,15 @@ async function goContact(event?: MouseEvent) {
   margin: 0.45rem 0 0;
   font-size: 0.78rem;
   color: var(--rf-text-muted);
+}
+
+.rf-pricing__card-deposit {
+  margin: 0.55rem 0 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  color: var(--rf-accent);
 }
 
 .rf-pricing__card-list {
@@ -639,8 +706,8 @@ async function goContact(event?: MouseEvent) {
 .rf-pricing__note {
   margin-top: clamp(3rem, 7vw, 4.5rem);
   display: grid;
-  gap: 0.75rem;
-  max-width: 40rem;
+  gap: 0.85rem;
+  max-width: 44rem;
 }
 
 .rf-pricing__note-title {
@@ -648,10 +715,55 @@ async function goContact(event?: MouseEvent) {
   font-size: clamp(1.5rem, 3.5vw, 2.15rem);
 }
 
-.rf-pricing__note p {
+.rf-pricing__note-intro,
+.rf-pricing__terms-aside {
   margin: 0;
   line-height: 1.65;
   color: var(--rf-text-soft);
+}
+
+.rf-pricing__terms {
+  margin: 0.35rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.85rem;
+  counter-reset: rf-term;
+}
+
+.rf-pricing__terms li {
+  display: grid;
+  gap: 0.25rem;
+  padding-left: 2.1rem;
+  position: relative;
+  counter-increment: rf-term;
+}
+
+.rf-pricing__terms li::before {
+  content: counter(rf-term, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 0.1em;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--rf-accent);
+}
+
+.rf-pricing__terms strong {
+  font-size: 0.92rem;
+  color: var(--rf-text);
+}
+
+.rf-pricing__terms span {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--rf-text-soft);
+}
+
+.rf-pricing__terms-aside {
+  font-size: 0.82rem;
+  color: var(--rf-text-muted);
 }
 
 .rf-pricing__note-cta {

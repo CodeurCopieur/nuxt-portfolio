@@ -134,7 +134,7 @@ onUnmounted(() => {
 
 .refonte-nav__progress {
   height: 2px;
-  background: rgba(245, 242, 232, 0.08);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .refonte-nav__progress-fill {

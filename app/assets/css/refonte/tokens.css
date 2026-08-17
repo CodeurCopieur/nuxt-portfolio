@@ -1,35 +1,35 @@
-/* Refonte — direction "creative dev studio" : encre + papier + lime unique */
+/* Refonte — blanc + bleu roi + jaune or */
 :root {
-  /* Fonds — encre chaude, jamais de noir pur */
-  --rf-bg: #141310;
-  --rf-bg-deep: #0b0a08;
-  --rf-bg-soft: #1c1a15;
-  --rf-paper: #f5f2e8;
-  --rf-paper-deep: #eae4d3;
+  /* Fonds — bleu roi profond */
+  --rf-bg: #0b1a3a;
+  --rf-bg-deep: #061028;
+  --rf-bg-soft: #122548;
+  --rf-paper: #ffffff;
+  --rf-paper-deep: #f2f5fb;
 
   /* Texte */
-  --rf-text: #f5f2e8;
-  --rf-text-muted: #8c8778;
-  --rf-text-soft: #d6d1c0;
-  --rf-ink: #141310;
-  --rf-ink-soft: #46433a;
-  --rf-muted-ink: #75705f;
+  --rf-text: #ffffff;
+  --rf-text-muted: #9aacc8;
+  --rf-text-soft: #d7e0ef;
+  --rf-ink: #0b1a3a;
+  --rf-ink-soft: #2a3f66;
+  --rf-muted-ink: #5c6f91;
 
-  /* Accent unique — lime acide, mat, jamais fluo agressif */
-  --rf-accent: #d6f24c;
-  --rf-accent-deep: #b8d635;
-  --rf-accent-rgb: 214, 242, 76;
-  --rf-accent-deep-rgb: 184, 214, 53;
+  /* Accent — jaune or */
+  --rf-accent: #d4af37;
+  --rf-accent-deep: #b8942a;
+  --rf-accent-rgb: 212, 175, 55;
+  --rf-accent-deep-rgb: 184, 148, 42;
 
-  /* Neutres secondaires (touches très ponctuelles, jamais dominantes) */
-  --rf-sage: #8a9a78;
-  --rf-sage-deep: #6c7d5c;
-  --rf-gold: #c2ac82;
-  --rf-gold-deep: #a38f68;
-  --rf-clay: #a68a72;
-  --rf-clay-deep: #86705c;
-  --rf-sky: var(--rf-sage);
-  --rf-sky-deep: var(--rf-sage-deep);
+  /* Neutres secondaires */
+  --rf-sage: #7a8fb5;
+  --rf-sage-deep: #5c7399;
+  --rf-gold: #e8c547;
+  --rf-gold-deep: #c9a227;
+  --rf-clay: #8fa3c4;
+  --rf-clay-deep: #6d82a8;
+  --rf-sky: #4a6fa5;
+  --rf-sky-deep: #355789;
   --rf-rose: var(--rf-clay);
   --rf-rose-deep: var(--rf-clay-deep);
 
@@ -40,10 +40,10 @@
   --rf-tone-5: var(--rf-sage-deep);
 
   /* Lignes & ombres */
-  --rf-line: rgba(245, 242, 232, 0.14);
-  --rf-line-ink: rgba(20, 19, 16, 0.12);
-  --rf-shadow: 0 18px 48px rgba(4, 4, 3, 0.4);
-  --rf-shadow-soft: 0 28px 70px rgba(4, 4, 3, 0.5);
+  --rf-line: rgba(255, 255, 255, 0.14);
+  --rf-line-ink: rgba(11, 26, 58, 0.12);
+  --rf-shadow: 0 18px 48px rgba(4, 10, 24, 0.45);
+  --rf-shadow-soft: 0 28px 70px rgba(4, 10, 24, 0.55);
 
   /* Typo & layout */
   --rf-serif: 'Instrument Serif', Georgia, serif;
@@ -53,7 +53,7 @@
   --rf-radius-sm: 0.4rem;
   --rf-nav-h: 4.25rem;
   --rf-ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --rf-container-max: 90rem;
+  --rf-container-max: 100rem;
   /* Gutter horizontal unique — titre, listes et rails alignés */
   --rf-gutter: clamp(1rem, 4vw, 3rem);
 
@@ -63,7 +63,7 @@
   --rf-card-pad: clamp(1.5rem, 3vw, 2rem);
   --rf-block-gap: clamp(1.25rem, 3vw, 2rem);
 
-  --rf-scroll-track: rgba(245, 242, 232, 0.18);
+  --rf-scroll-track: rgba(255, 255, 255, 0.16);
   --rf-scroll-thumb: var(--rf-accent);
 
   --rf-muted: var(--rf-text-muted);
@@ -83,8 +83,8 @@ html:has(.refonte-root) ::-webkit-scrollbar {
   position: relative;
   background: var(--rf-bg);
   background-image:
-    radial-gradient(ellipse 60% 46% at 12% -4%, rgba(214, 242, 76, 0.05), transparent 55%),
-    radial-gradient(ellipse 50% 40% at 100% 30%, rgba(245, 242, 232, 0.04), transparent 55%),
+    radial-gradient(ellipse 60% 46% at 12% -4%, rgba(var(--rf-accent-rgb), 0.12), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 100% 30%, rgba(65, 105, 225, 0.18), transparent 55%),
     linear-gradient(180deg, var(--rf-bg-soft) 0%, var(--rf-bg) 40%, var(--rf-bg-deep) 100%);
   color: var(--rf-text);
   font-family: var(--rf-sans);
@@ -162,7 +162,7 @@ html:has(.refonte-root) ::-webkit-scrollbar {
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--rf-text-muted);
+  color: var(--rf-accent);
 }
 
 .refonte-link {
@@ -217,7 +217,7 @@ html:has(.refonte-root) ::-webkit-scrollbar {
 }
 
 .refonte-btn--ghost:hover {
-  background: rgba(245, 242, 232, 0.06);
+  background: rgba(255, 255, 255, 0.06);
   transform: translateY(-2px);
 }
 
@@ -231,7 +231,7 @@ html:has(.refonte-root) ::-webkit-scrollbar {
 }
 
 .refonte-card .refonte-label {
-  color: var(--rf-muted-ink);
+  color: var(--rf-gold-deep);
 }
 
 .refonte-card .refonte-display {
@@ -266,7 +266,7 @@ html:has(.refonte-root) ::-webkit-scrollbar {
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--rf-text-muted);
+  color: var(--rf-accent);
 }
 
 /* Note / grade style comics */

@@ -32,7 +32,7 @@ export default defineNuxtConfig({
           content:
             'Widdy Louis — développeur front-end freelance. Interfaces web performantes, accessibles et animées (Nuxt, Vue).'
         },
-        { name: 'theme-color', content: '#141310' },
+        { name: 'theme-color', content: '#0b1a3a' },
         { property: 'og:type', content: 'website' },
         { name: 'twitter:card', content: 'summary_large_image' }
       ],

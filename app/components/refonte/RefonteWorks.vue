@@ -472,7 +472,7 @@ onUnmounted(() => unbind())
   margin: 0;
   font-size: clamp(1rem, 2.4vw, 1.35rem);
   font-weight: 600;
-  color: var(--rf-text-soft);
+  color: var(--rf-accent);
 }
 
 .rf-works__manifesto-lead {
@@ -620,7 +620,7 @@ onUnmounted(() => unbind())
 
 .rf-works__link:hover,
 .rf-works__link:focus-visible {
-  background: rgba(245, 242, 232, 0.03);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .rf-works__num {

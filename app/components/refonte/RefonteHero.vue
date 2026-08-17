@@ -71,8 +71,8 @@ const { meta, sections } = useContent()
   font-style: italic;
   font-size: min(46vw, 32rem);
   line-height: 1;
-  color: var(--rf-text);
-  opacity: 0.045;
+  color: var(--rf-accent);
+  opacity: 0.12;
   pointer-events: none;
   z-index: 0;
   user-select: none;
@@ -187,7 +187,12 @@ const { meta, sections } = useContent()
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--rf-text-muted);
+  color: var(--rf-accent);
+  transition: color 0.25s var(--rf-ease), opacity 0.25s var(--rf-ease);
+}
+
+.rf-hero__scroll-cue:hover {
+  color: var(--rf-gold);
 }
 
 .rf-hero__scroll-arrow {
@@ -210,7 +215,7 @@ const { meta, sections } = useContent()
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.03em;
-  color: var(--rf-text-muted);
+  color: var(--rf-accent);
 }
 
 @media (prefers-reduced-motion: reduce) {

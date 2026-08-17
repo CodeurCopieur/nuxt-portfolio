@@ -584,13 +584,13 @@ onUnmounted(() => unbind())
 }
 
 .rf-expertise__radar-grid {
-  stroke: rgba(245, 242, 232, 0.14);
+  stroke: rgba(255, 255, 255, 0.14);
   stroke-width: 1.35;
-  fill: rgba(214, 242, 76, 0.04);
+  fill: rgba(var(--rf-accent-rgb), 0.06);
 }
 
 .rf-expertise__radar-axis {
-  stroke: rgba(245, 242, 232, 0.16);
+  stroke: rgba(255, 255, 255, 0.16);
   stroke-width: 1.1;
 }
 
@@ -613,7 +613,7 @@ onUnmounted(() => unbind())
   font-weight: 400;
   letter-spacing: 0.04em;
   paint-order: stroke fill;
-  stroke: rgba(11, 10, 8, 0.9);
+  stroke: rgba(11, 26, 58, 0.9);
   stroke-width: 3.5px;
 }
 
