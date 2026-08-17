@@ -190,6 +190,11 @@ export function provideRefonteScroll(): RefonteScrollApi {
   async function init() {
     if (!import.meta.client) return
 
+    // Yield après le premier frame pour ne pas bloquer le Speed Index
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+    })
+
     SceneCtor = (await import('scrollmagic')).Scene
     controller.value = new (await import('scrollmagic')).Controller()
 
@@ -310,7 +315,15 @@ export function provideRefonteScroll(): RefonteScrollApi {
   }
 
   onMounted(() => {
-    init()
+    // Laisser le 1er paint (hero) avant d'hydrater Lenis / ScrollMagic / GSAP
+    const start = () => {
+      void init()
+    }
+    if (typeof window.requestIdleCallback === 'function') {
+      window.requestIdleCallback(() => start(), { timeout: 1200 })
+    } else {
+      window.setTimeout(start, 150)
+    }
   })
 
   onUnmounted(() => api.destroy())

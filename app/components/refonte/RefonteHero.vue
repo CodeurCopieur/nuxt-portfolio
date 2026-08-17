@@ -134,8 +134,9 @@ const { meta, sections } = useContent()
   line-height: 1.05;
   font-size: clamp(2.75rem, 9vw, 6.75rem);
   color: var(--rf-text);
-  animation: rf-line-in 900ms var(--rf-ease) both;
-  animation-delay: calc(var(--i, 0) * 110ms + 120ms);
+  /* Visible immédiatement (Speed Index) — micro-mouvement après paint */
+  animation: rf-line-in 480ms var(--rf-ease) both;
+  animation-delay: calc(var(--i, 0) * 40ms);
 }
 
 .rf-hero__line--serif {
@@ -158,10 +159,12 @@ const { meta, sections } = useContent()
 
 @keyframes rf-line-in {
   from {
-    transform: translateY(112%);
+    transform: translateY(0.18em);
+    opacity: 0.55;
   }
   to {
     transform: translateY(0);
+    opacity: 1;
   }
 }
 
