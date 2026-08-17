@@ -13,11 +13,11 @@ const gamification = useGamificationStore()
 const isCompleted = computed(() => gamification.viewedProjects.includes(props.p.slug))
 
 const cardRef = ref<HTMLElement | null>(null)
-const { $gsap } = useNuxtApp()
 
-onMounted(() => {
+onMounted(async () => {
   if (!cardRef.value) return
-  $gsap.fromTo(cardRef.value, { opacity: 0, y: 30, scale: 0.95 }, { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'power2.out' })
+  const gsap = await useGsap()
+  gsap.fromTo(cardRef.value, { opacity: 0, y: 30, scale: 0.95 }, { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'power2.out' })
 })
 </script>
 

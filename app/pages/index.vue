@@ -1,8 +1,19 @@
 <!-- pages/index.vue -->
 <script setup lang="ts">
 const { meta, sections, recentProjects } = useContent()
-useHead({
-  title: computed(() => `${meta.value.name} — ${meta.value.role}`)
+
+const pageTitle = computed(() => `${meta.value.name} — ${meta.value.role}`)
+const pageDescription = computed(
+  () =>
+    `${meta.value.name} — ${meta.value.role}. Portfolio front-end : projets Nuxt/Vue, expériences et compétences.`
+)
+
+useSeoMeta({
+  title: pageTitle,
+  description: pageDescription,
+  ogTitle: pageTitle,
+  ogDescription: pageDescription,
+  twitterCard: 'summary_large_image'
 })
 
 // Fonction pour calculer la durée d'expérience réelle

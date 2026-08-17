@@ -6,15 +6,14 @@ definePageMeta({ layout: 'refonte' })
 const { meta, sections } = useContent()
 const { navigateTo } = useRefonteTransition()
 
-useHead({
+useSeoMeta({
   title: computed(() => `Prestations — ${meta.value?.name ?? 'Portfolio'}`),
-  meta: [
-    {
-      name: 'description',
-      content:
-        'Tarifs indicatifs : page unique, site multipage (avec ou sans backend), et projets sur-mesure (Nuxt 4, Vue, motion, Supabase).'
-    }
-  ]
+  description:
+    'Tarifs indicatifs : page unique, site multipage (avec ou sans backend), et projets sur-mesure (Nuxt, Vue, motion, Supabase).',
+  ogTitle: computed(() => `Prestations — ${meta.value?.name ?? 'Portfolio'}`),
+  ogDescription:
+    'Tarifs indicatifs : page unique, site multipage (avec ou sans backend), et projets sur-mesure.',
+  twitterCard: 'summary_large_image'
 })
 
 type Offer = {

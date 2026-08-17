@@ -47,7 +47,9 @@ async function submit() {
       EMAILJS_PUBLIC_KEY
     )
     
-    console.log('Email envoyé avec succès:', result)
+    if (import.meta.dev) {
+      console.log('Email envoyé avec succès:', result)
+    }
     success.value = true
     
     // Réinitialiser le formulaire

@@ -16,7 +16,6 @@ const props = defineProps<{
 }>()
 
 const charRef = ref<HTMLElement | null>(null)
-const { $gsap } = useNuxtApp()
 
 const titles = [
   'Apprenti intégrateur',
@@ -35,9 +34,10 @@ const auraOpacity = computed(() => 0.15 + props.stats.level * 0.08)
 
 watch(
   () => props.stats.level,
-  () => {
+  async () => {
     if (!charRef.value) return
-    $gsap.fromTo(
+    const gsap = await useGsap()
+    gsap.fromTo(
       charRef.value,
       { scale: 0.9 },
       { scale: 1, duration: 0.5, ease: 'back.out(2)' }

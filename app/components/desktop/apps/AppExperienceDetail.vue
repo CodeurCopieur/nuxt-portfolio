@@ -9,7 +9,6 @@ const props = defineProps<{
 
 const { sections } = useContent()
 const desktop = useDesktopStore()
-const { $gsap } = useNuxtApp()
 
 const rootRef = ref<HTMLElement | null>(null)
 const headerRef = ref<HTMLElement | null>(null)
@@ -42,7 +41,8 @@ watch(
     await nextTick()
     if (!rootRef.value || !headerRef.value || !bodyRef.value) return
 
-    const tl = $gsap.timeline()
+    const gsap = await useGsap()
+    const tl = gsap.timeline()
     tl.fromTo(rootRef.value, { opacity: 0 }, { opacity: 1, duration: 0.2 })
     tl.fromTo(
       headerRef.value,

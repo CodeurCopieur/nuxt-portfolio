@@ -1,104 +1,100 @@
 <!-- components/ProjectSlider.vue -->
 <script setup lang="ts">
+import { Swiper } from 'swiper'
+import { Navigation, Pagination, Autoplay } from 'swiper/modules'
+import 'swiper/css'
+import 'swiper/css/navigation'
+import 'swiper/css/pagination'
+
 const { sections } = useContent()
 const projets = computed(() => sections.value.projets)
 
 // Référence pour Swiper
-const swiperRef = ref<any>(null)
+const swiperRef = ref<InstanceType<typeof Swiper> | null>(null)
 
-// GSAP
-const { $gsap } = useNuxtApp()
+onMounted(async () => {
+  if (typeof window === 'undefined') return
 
-// Configuration Swiper
-const swiperOptions = {
-  slidesPerView: 1.1,
-  spaceBetween: 30,
-  touchRatio: 0.5,
-  loop: true,
-  autoplay: {
-    delay: 5000,
-    disableOnInteraction: false,
-    stopOnLastSlide: false,
-  },
-  pagination: {
-    el: '.swiper-pagination.custom-swiper-pagination',
-    type: 'bullets' as const,
-    dynamicBullets: true,
-    clickable: true
-  },
-  navigation: {
-    nextEl: '.swiper-button-next',
-    prevEl: '.swiper-button-prev',
-  },
-  breakpoints: {
-    768: {
-      slidesPerView: 2.1,
-      spaceBetween: 30,
-      resistanceRatio : 0.2,
+  const gsap = await useGsap()
+
+  const swiperOptions = {
+    slidesPerView: 1.1,
+    spaceBetween: 30,
+    touchRatio: 0.5,
+    loop: true,
+    autoplay: {
+      delay: 5000,
+      disableOnInteraction: false,
+      stopOnLastSlide: false,
     },
-    1024: {
-      slidesPerView: 3.1,
-      spaceBetween: 30,
-      resistanceRatio : 0.2,
+    pagination: {
+      el: '.swiper-pagination.custom-swiper-pagination',
+      type: 'bullets' as const,
+      dynamicBullets: true,
+      clickable: true
     },
-  },
-  on: {
-    init: function(this: any) {
-      // Animation d'entrée pour les slides
-      this.slides.forEach((slide: any, index: number) => {
-        $gsap.fromTo(slide, {
-          opacity: 0,
-          y: 30,
-          scale: 0.95
-        }, {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.6,
-          delay: index * 0.1,
-          ease: 'power2.out'
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev',
+    },
+    breakpoints: {
+      768: {
+        slidesPerView: 2.1,
+        spaceBetween: 30,
+        resistanceRatio: 0.2,
+      },
+      1024: {
+        slidesPerView: 3.1,
+        spaceBetween: 30,
+        resistanceRatio: 0.2,
+      },
+    },
+    on: {
+      init: function (this: InstanceType<typeof Swiper>) {
+        this.slides.forEach((slide: HTMLElement, index: number) => {
+          gsap.fromTo(slide, {
+            opacity: 0,
+            y: 30,
+            scale: 0.95
+          }, {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.6,
+            delay: index * 0.1,
+            ease: 'power2.out'
+          })
         })
-      })
-    },
-    slideChange: function(this: any) {
-      // Animation pour les nouvelles slides
-      this.slides[this.activeIndex].querySelectorAll('.project-card').forEach((card: any, index: number) => {
-        $gsap.fromTo(card, {
-          opacity: 0,
-          y: 20,
-          scale: 0.95
-        }, {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.5,
-          delay: index * 0.1,
-          ease: 'power2.out'
+      },
+      slideChange: function (this: InstanceType<typeof Swiper>) {
+        this.slides[this.activeIndex]?.querySelectorAll('.project-card').forEach((card, index) => {
+          gsap.fromTo(card, {
+            opacity: 0,
+            y: 20,
+            scale: 0.95
+          }, {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.5,
+            delay: index * 0.1,
+            ease: 'power2.out'
+          })
         })
-      })
+      }
     }
   }
-}
 
-onMounted(() => {
-  // Initialiser Swiper avec un délai pour s'assurer que le DOM est prêt
-  if (typeof window !== 'undefined') {
-    const { $Swiper, $Navigation, $Pagination, $Autoplay } = useNuxtApp()
-    
-    // Délai pour s'assurer que le DOM est complètement rendu
-    setTimeout(() => {
-      const swiperElement = document.querySelector('.swiper')
-      if (swiperElement) {
-        swiperRef.value = new $Swiper('.swiper', {
-          modules: [$Navigation, $Pagination, $Autoplay],
-          ...swiperOptions
-        })
-        
-        // Vérifier que la navigation fonctionne
-        console.log('Swiper initialisé avec navigation:', swiperRef.value)
-      }
-    }, 100)
-  }
+  // Délai pour s'assurer que le DOM est complètement rendu
+  setTimeout(() => {
+    const swiperElement = document.querySelector('.swiper')
+    if (swiperElement) {
+      swiperRef.value = new Swiper('.swiper', {
+        modules: [Navigation, Pagination, Autoplay],
+        ...swiperOptions
+      })
+    }
+  }, 100)
 })
 
 onUnmounted(() => {
@@ -157,11 +153,6 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-/* Import Swiper CSS */
-@import 'swiper/css';
-@import 'swiper/css/navigation';
-@import 'swiper/css/pagination';
-
 .project-slider {
   width: 100%;
   position: relative;

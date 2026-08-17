@@ -21,21 +21,22 @@ const totalSkills = computed(() =>
 )
 
 const cloud = ref<HTMLElement | null>(null)
-const { $gsap } = useNuxtApp()
 
 const prefersReducedMotion = ref(false)
 
-onMounted(() => {
+onMounted(async () => {
   prefersReducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   if (!cloud.value || prefersReducedMotion.value) return
 
-  $gsap.fromTo(
+  const gsap = await useGsap()
+
+  gsap.fromTo(
     cloud.value.querySelectorAll('.skill-category'),
     { opacity: 0, y: 20, scale: 0.98 },
     { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.08, ease: 'power2.out' }
   )
 
-  $gsap.fromTo(
+  gsap.fromTo(
     cloud.value.querySelectorAll('.skill-tag'),
     { opacity: 0, y: 8 },
     { opacity: 1, y: 0, duration: 0.35, stagger: 0.02, delay: 0.2, ease: 'power2.out' }

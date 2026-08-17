@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
 import type { Map as LeafletMap, Marker } from 'leaflet'
 import type { MapPin } from '~/utils/experience-map'
 import { MAP_DEFAULT_CENTER, MAP_DEFAULT_ZOOM } from '~/utils/experience-map'

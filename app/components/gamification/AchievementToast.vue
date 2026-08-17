@@ -2,7 +2,6 @@
 import { useGamificationStore } from '@/store/useGamification'
 
 const gamification = useGamificationStore()
-const { $gsap } = useNuxtApp()
 const toastRef = ref<HTMLElement | null>(null)
 
 watch(
@@ -11,7 +10,8 @@ watch(
     if (!payload) return
     await nextTick()
     if (!toastRef.value) return
-    $gsap.fromTo(
+    const gsap = await useGsap()
+    gsap.fromTo(
       toastRef.value,
       { opacity: 0, y: 20, scale: 0.9 },
       { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: 'back.out(2)' }

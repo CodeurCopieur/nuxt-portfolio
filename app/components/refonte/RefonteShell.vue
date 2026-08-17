@@ -121,7 +121,6 @@ onUnmounted(() => unbindScrollbar())
 .refonte-main {
   padding-top: var(--rf-nav-h);
   min-height: 100dvh;
-  will-change: transform;
 }
 
 .refonte-main--transitioning {

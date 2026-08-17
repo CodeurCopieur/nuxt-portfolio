@@ -284,10 +284,6 @@ html:has(.refonte-root) ::-webkit-scrollbar {
     -1px -1px 0 rgba(20, 19, 16, 0.35);
 }
 
-[data-scroll-section] {
-  will-change: transform;
-}
-
 /* Système de révélation au scroll — v-reveal */
 .rf-reveal {
   opacity: 0;
@@ -297,7 +293,6 @@ html:has(.refonte-root) ::-webkit-scrollbar {
     opacity var(--rf-reveal-duration, 720ms) var(--rf-ease) var(--rf-reveal-delay, 0ms),
     transform var(--rf-reveal-duration, 720ms) var(--rf-ease) var(--rf-reveal-delay, 0ms),
     filter var(--rf-reveal-duration, 720ms) var(--rf-ease) var(--rf-reveal-delay, 0ms);
-  will-change: opacity, transform, filter;
 }
 
 .rf-reveal--in {

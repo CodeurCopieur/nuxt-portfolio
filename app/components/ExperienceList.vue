@@ -13,11 +13,11 @@ const filtered = computed(() => {
 })
 
 const el = ref<HTMLElement | null>(null)
-const { $gsap } = useNuxtApp()
 
-onMounted(() => {
+onMounted(async () => {
   if (!el.value) return
-  $gsap.fromTo(el.value.querySelectorAll('.experience-card'), {
+  const gsap = await useGsap()
+  gsap.fromTo(el.value.querySelectorAll('.experience-card'), {
     opacity: 0,
     y: 30,
     scale: 0.95

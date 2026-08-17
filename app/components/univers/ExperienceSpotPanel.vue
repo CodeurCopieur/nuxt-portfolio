@@ -18,14 +18,14 @@ const gradient = computed(() =>
 )
 
 const panelRef = ref<HTMLElement | null>(null)
-const { $gsap } = useNuxtApp()
 
 watch(
   () => props.pin?.id,
   async () => {
     await nextTick()
     if (!panelRef.value || !props.pin) return
-    $gsap.fromTo(
+    const gsap = await useGsap()
+    gsap.fromTo(
       panelRef.value,
       { opacity: 0, y: 16 },
       { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }

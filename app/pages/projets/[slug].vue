@@ -19,14 +19,15 @@ useHead({
 // Références pour les animations
 const heroRef = ref<HTMLElement | null>(null)
 const contentRef = ref<HTMLElement | null>(null)
-const { $gsap } = useNuxtApp()
 
 // Animation d'entrée
-onMounted(() => {
+onMounted(async () => {
   if (!heroRef.value || !contentRef.value) return
-  
+
+  const gsap = await useGsap()
+
   // Animation du hero
-  $gsap.fromTo(heroRef.value.querySelector('.hero-title'), {
+  gsap.fromTo(heroRef.value.querySelector('.hero-title'), {
     opacity: 0,
     y: 30,
     scale: 0.95
@@ -37,8 +38,8 @@ onMounted(() => {
     duration: 0.8,
     ease: 'power2.out'
   })
-  
-  $gsap.fromTo(heroRef.value.querySelector('.hero-meta'), {
+
+  gsap.fromTo(heroRef.value.querySelector('.hero-meta'), {
     opacity: 0,
     y: 20
   }, {
@@ -48,9 +49,9 @@ onMounted(() => {
     delay: 0.2,
     ease: 'power2.out'
   })
-  
+
   // Animation du contenu
-  $gsap.fromTo(contentRef.value.querySelectorAll('.content-section'), {
+  gsap.fromTo(contentRef.value.querySelectorAll('.content-section'), {
     opacity: 0,
     y: 40
   }, {

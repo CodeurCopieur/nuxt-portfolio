@@ -3,13 +3,14 @@
 defineProps<{ p: any }>()
 
 const cardRef = ref<HTMLElement | null>(null)
-const { $gsap } = useNuxtApp()
 
-onMounted(() => {
+onMounted(async () => {
   if (!cardRef.value) return
-  
+
+  const gsap = await useGsap()
+
   // Animation d'entrée avec GSAP
-  $gsap.fromTo(cardRef.value, {
+  gsap.fromTo(cardRef.value, {
     opacity: 0,
     y: 30,
     scale: 0.95
@@ -34,9 +35,12 @@ onMounted(() => {
       <img 
         v-if="p.cover" 
         :src="p.cover" 
-        :alt="p.title" 
+        :alt="p.title"
+        width="640"
+        height="360"
         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
-        loading="lazy" 
+        loading="lazy"
+        decoding="async"
       />
       <div v-else class="w-full h-full bg-gradient-to-br from-sky-100 to-indigo-100 dark:from-sky-900/30 dark:to-indigo-900/30 flex items-center justify-center">
         <svg class="w-16 h-16 text-sky-400 dark:text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

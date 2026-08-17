@@ -2,13 +2,14 @@
 const { meta, sections } = useContent()
 
 const heroRef = ref<HTMLElement | null>(null)
-const { $gsap } = useNuxtApp()
 
-onMounted(() => {
+onMounted(async () => {
   if (!heroRef.value) return
-  
+
+  const gsap = await useGsap()
+
   // Animation d'entrée moderne
-  $gsap.fromTo(heroRef.value.querySelector('.hero-title'), {
+  gsap.fromTo(heroRef.value.querySelector('.hero-title'), {
     opacity: 0,
     y: 30,
     scale: 0.95
@@ -19,8 +20,8 @@ onMounted(() => {
     duration: 0.8,
     ease: 'power3.out'
   })
-  
-  $gsap.fromTo(heroRef.value.querySelector('.hero-subtitle'), {
+
+  gsap.fromTo(heroRef.value.querySelector('.hero-subtitle'), {
     opacity: 0,
     y: 20
   }, {
@@ -30,8 +31,8 @@ onMounted(() => {
     delay: 0.2,
     ease: 'power2.out'
   })
-  
-  $gsap.fromTo(heroRef.value.querySelector('.hero-bio'), {
+
+  gsap.fromTo(heroRef.value.querySelector('.hero-bio'), {
     opacity: 0,
     y: 20
   }, {
@@ -41,8 +42,8 @@ onMounted(() => {
     delay: 0.4,
     ease: 'power2.out'
   })
-  
-  $gsap.fromTo(heroRef.value.querySelector('.hero-highlights'), {
+
+  gsap.fromTo(heroRef.value.querySelector('.hero-highlights'), {
     opacity: 0,
     y: 20
   }, {
