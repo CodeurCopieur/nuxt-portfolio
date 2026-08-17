@@ -118,7 +118,7 @@ Le contenu du portfolio est géré via le fichier `app/data/content.json` qui co
   "meta": {
     "name": "Widdy Louis",
     "role": "Développeur Front-End & Intégrateur Web",
-    "email": "louiswiddy49@gmail.com",
+    "email": "contact.louisfreelance@ik.me",
     "links": {
       "linkedin": "https://www.linkedin.com/in/widdy-louis/",
       "github": "https://github.com/CodeurCopieur"
@@ -202,7 +202,7 @@ Ce projet est privé et destiné à un usage personnel.
 ## 👨‍💻 Auteur
 
 **Widdy Louis** - Développeur Front-End & Intégrateur Web
-- 📧 Email : louiswiddy49@gmail.com
+- 📧 Email : contact.louisfreelance@ik.me
 - 💼 LinkedIn : [Widdy Louis](https://www.linkedin.com/in/widdy-louis/)
 - 🐙 GitLab : [CodeurCopieur](https://gitlab.com/codwerk)
 

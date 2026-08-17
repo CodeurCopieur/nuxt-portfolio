@@ -4,9 +4,11 @@ import Container from '@/components/Ui/Container.vue'
 import PageTransition from '@/components/PageTransition.vue'
 import ScrollAnimations from '@/components/ScrollAnimations.vue'
 import CustomCursor from '@/components/CustomCursor.vue'
+import { PUBLIC_CONTACT_EMAIL } from '@/constants/contact'
 
 const route = useRoute()
 const isScrolled = ref(false)
+const contactEmail = PUBLIC_CONTACT_EMAIL
 
 onMounted(() => {
   document.documentElement.style.overflow = ''
@@ -138,8 +140,8 @@ onMounted(() => {
             <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Contact</h3>
             <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
               <p>📍 Paris / Remote</p>
-              <a href="mailto:contact.louisfreelance@ik.me" class="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
-                📧 contact.louisfreelance@ik.me
+              <a :href="`mailto:${contactEmail}`" class="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
+                📧 {{ contactEmail }}
               </a>
               <p>📱 06 22 85 31 21</p>
             </div>

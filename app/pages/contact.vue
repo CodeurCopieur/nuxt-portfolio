@@ -1,12 +1,14 @@
 <!-- pages/contact.vue -->
 <script setup lang="ts">
+import { PUBLIC_CONTACT_EMAIL } from '@/constants/contact'
+
 const { meta } = useContent()
 
 useHead({
   title: computed(() => `Contact — ${meta.value.name}`)
 })
 
-const CONTACT_EMAIL = 'contact.louisfreelance@ik.me'
+const CONTACT_EMAIL = PUBLIC_CONTACT_EMAIL
 
 const form = reactive({ name: '', email: '', message: '' })
 const loading = ref(false)

@@ -1,4 +1,5 @@
 import type { PortfolioContent } from '~/types/portfolio'
+import { PUBLIC_CONTACT_EMAIL } from '../../app/constants/contact'
 import {
   mergeCompetenceCategories,
   parseCustomCategories,
@@ -84,7 +85,7 @@ export async function fetchPortfolioContent(): Promise<PortfolioContent | null> 
         role: meta.role,
         years_experience: meta.years_experience,
         location: meta.location,
-        email: meta.email,
+        email: PUBLIC_CONTACT_EMAIL,
         phone: meta.phone,
         links: { linkedin: meta.linkedin, github: meta.github },
         tagline: meta.tagline

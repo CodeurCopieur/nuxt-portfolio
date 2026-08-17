@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { useRefonteTransition } from '@/composables/refonte/useRefonteTransition'
 import { useRefonteScroll } from '@/composables/refonte/useRefonteScroll'
+import { PUBLIC_CONTACT_EMAIL } from '@/constants/contact'
 
 const route = useRoute()
 const { navigateTo } = useRefonteTransition()
 const { scrollProgress, activeChapter, refresh } = useRefonteScroll()
 const menuOpen = ref(false)
+const contactEmail = PUBLIC_CONTACT_EMAIL
 
 const links = [
   { to: '/refonte', label: 'Accueil', num: '01' },
@@ -114,8 +116,8 @@ onUnmounted(() => {
         </nav>
 
         <div class="refonte-nav__overlay-foot">
-          <a href="mailto:contact.louisfreelance@ik.me" class="refonte-nav__overlay-mail">
-            contact.louisfreelance@ik.me
+          <a :href="`mailto:${contactEmail}`" class="refonte-nav__overlay-mail">
+            {{ contactEmail }}
           </a>
           <p class="refonte-nav__overlay-note">Front-end · Motion · Paris / Remote</p>
         </div>
