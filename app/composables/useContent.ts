@@ -22,13 +22,15 @@ export function getRecentProjects(projets: PortfolioProject[]): PortfolioProject
 }
 
 export function useContent() {
+  const fallback = withSortedExperiences(fallbackData as PortfolioContent)
+
   const { data } = useFetch<PortfolioContent>('/api/content', {
     key: 'portfolio-content',
-    default: () => withSortedExperiences(fallbackData as PortfolioContent)
+    default: () => fallback
   })
 
-  const meta = computed(() => data.value!.meta)
-  const sections = computed(() => data.value!.sections)
+  const meta = computed(() => data.value?.meta ?? fallback.meta)
+  const sections = computed(() => data.value?.sections ?? fallback.sections)
   const recentProjects = computed(() => getRecentProjects(sections.value.projets))
 
   return { meta, sections, recentProjects, data }

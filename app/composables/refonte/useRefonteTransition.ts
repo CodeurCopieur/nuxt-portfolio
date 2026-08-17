@@ -5,7 +5,14 @@ const ROUTE_ORDER = ['/refonte', '/refonte/projets', '/refonte/contact']
 let leaveFn: TransitionFn | null = null
 let enterFn: TransitionFn | null = null
 let initialized = false
-const swipeDirection = ref(1)
+
+export interface RefonteTransitionApi {
+  navigateTo: (to: string) => Promise<void>
+  isTransitioning: Ref<boolean>
+  swipeDirection: Ref<number>
+}
+
+export const REFONTE_TRANSITION_KEY: InjectionKey<RefonteTransitionApi> = Symbol('refonte-transition')
 
 async function getBarba() {
   const { default: barba } = await import('@barba/core')
@@ -29,7 +36,6 @@ function resolveDirection(from: string, to: string) {
   return toIdx > fromIdx ? 1 : -1
 }
 
-/** Barba orchestre les transitions ; Nuxt gère le routing (pas de PJAX). */
 export async function initRefonteBarba() {
   if (!import.meta.client || initialized) return
   initialized = true
@@ -48,7 +54,7 @@ export async function initRefonteBarba() {
   })
 }
 
-export function setRefonteTransitionHandlers(handlers: {
+function setRefonteTransitionHandlers(handlers: {
   leave: TransitionFn
   enter: TransitionFn
 }) {
@@ -58,32 +64,50 @@ export function setRefonteTransitionHandlers(handlers: {
 
 export async function runRefonteTransition(
   navigate: () => Promise<void> | void,
-  opts?: { from?: string; to?: string }
+  opts?: { from?: string; to?: string; direction?: Ref<number>; onBeforeEnter?: () => void; onAfterEnter?: () => void }
 ) {
   if (!import.meta.client) {
     await navigate()
     return
   }
 
-  if (opts?.from && opts?.to) {
-    swipeDirection.value = resolveDirection(opts.from, opts.to)
+  if (opts?.from && opts?.to && opts.direction) {
+    opts.direction.value = resolveDirection(opts.from, opts.to)
   }
 
-  await initRefonteBarba()
+  try {
+    await initRefonteBarba()
 
-  await leaveFn?.()
-  await navigate()
-  await nextTick()
-  await enterFn?.()
+    if (leaveFn) await leaveFn()
+    await navigate()
+    await nextTick()
+    opts?.onBeforeEnter?.()
+    await nextTick()
+    if (enterFn) await enterFn()
+    opts?.onAfterEnter?.()
+  } catch (error) {
+    console.error('[refonte-transition]', error)
+    useState('refonte-transitioning', () => false).value = false
+    const el = document.querySelector('.refonte-main') as HTMLElement | null
+    if (el) {
+      el.style.visibility = ''
+      el.style.transform = ''
+      el.style.opacity = ''
+    }
+  }
 }
 
-export function useRefonteTransition() {
+/** Enregistre les handlers une seule fois — à appeler depuis RefonteShell. */
+export function provideRefonteTransition(
+  pageRef: Ref<HTMLElement | null>,
+  opts?: { onBeforeEnter?: () => void; onAfterEnter?: () => void }
+): RefonteTransitionApi {
   const router = useRouter()
-  const pageRef = inject<Ref<HTMLElement | null>>('refonte-page')
   const isTransitioning = useState('refonte-transitioning', () => false)
+  const swipeDirection = ref(1)
 
   async function animateLeave() {
-    const el = pageRef?.value
+    const el = pageRef.value
     if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     const { gsap } = await import('gsap')
@@ -98,7 +122,7 @@ export function useRefonteTransition() {
   }
 
   async function animateEnter() {
-    const el = pageRef?.value
+    const el = pageRef.value
     if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     const { gsap } = await import('gsap')
@@ -114,27 +138,64 @@ export function useRefonteTransition() {
     gsap.set(el, { clearProps: 'transform,opacity' })
   }
 
+  setRefonteTransitionHandlers({
+    leave: async () => {
+      isTransitioning.value = true
+      await animateLeave()
+    },
+    enter: async () => {
+      try {
+        await animateEnter()
+      } finally {
+        isTransitioning.value = false
+        if (pageRef.value) pageRef.value.style.visibility = ''
+      }
+    }
+  })
+
   onMounted(async () => {
     await initRefonteBarba()
-    setRefonteTransitionHandlers({
-      leave: async () => {
-        isTransitioning.value = true
-        await animateLeave()
-      },
-      enter: async () => {
-        await animateEnter()
-        isTransitioning.value = false
-      }
-    })
+  })
+
+  onUnmounted(() => {
+    leaveFn = null
+    enterFn = null
   })
 
   async function navigateTo(to: string) {
     const from = router.currentRoute.value.path
     if (from === to) return
-    await runRefonteTransition(async () => {
-      await router.push(to)
-    }, { from, to })
+
+    await runRefonteTransition(
+      async () => { await router.push(to) },
+      {
+        from,
+        to,
+        direction: swipeDirection,
+        onBeforeEnter: () => opts?.onBeforeEnter?.(),
+        onAfterEnter: () => opts?.onAfterEnter?.()
+      }
+    )
   }
 
-  return { navigateTo, isTransitioning, swipeDirection }
+  const api: RefonteTransitionApi = {
+    navigateTo,
+    isTransitioning,
+    swipeDirection
+  }
+
+  provide(REFONTE_TRANSITION_KEY, api)
+  return api
+}
+
+export function useRefonteTransition(): RefonteTransitionApi {
+  const injected = inject(REFONTE_TRANSITION_KEY, null)
+  if (injected) return injected
+
+  const router = useRouter()
+  return {
+    navigateTo: async (to: string) => { await router.push(to) },
+    isTransitioning: ref(false),
+    swipeDirection: ref(1)
+  }
 }

@@ -1,27 +1,91 @@
-/* Refonte — tokens Widdy */
+/* Refonte — direction "creative dev studio" : encre + papier + lime unique */
 :root {
-  --rf-bg: #ebe4d6;
-  --rf-bg-deep: #e0d8c8;
-  --rf-paper: #f7f2ea;
-  --rf-ink: #1a1612;
-  --rf-ink-soft: #4a433c;
-  --rf-muted: #7a7268;
-  --rf-accent: #b8432f;
-  --rf-accent-deep: #8f2f1f;
-  --rf-sage: #4a6b5d;
-  --rf-gold: #b8954a;
-  --rf-line: rgba(26, 22, 18, 0.12);
-  --rf-shadow: 0 24px 80px rgba(26, 22, 18, 0.12);
-  --rf-serif: 'Fraunces', 'Georgia', serif;
+  /* Fonds — encre chaude, jamais de noir pur */
+  --rf-bg: #141310;
+  --rf-bg-deep: #0b0a08;
+  --rf-bg-soft: #1c1a15;
+  --rf-paper: #f5f2e8;
+  --rf-paper-deep: #eae4d3;
+
+  /* Texte */
+  --rf-text: #f5f2e8;
+  --rf-text-muted: #8c8778;
+  --rf-text-soft: #d6d1c0;
+  --rf-ink: #141310;
+  --rf-ink-soft: #46433a;
+  --rf-muted-ink: #75705f;
+
+  /* Accent unique — lime acide, mat, jamais fluo agressif */
+  --rf-accent: #d6f24c;
+  --rf-accent-deep: #b8d635;
+  --rf-accent-rgb: 214, 242, 76;
+  --rf-accent-deep-rgb: 184, 214, 53;
+
+  /* Neutres secondaires (touches très ponctuelles, jamais dominantes) */
+  --rf-sage: #8a9a78;
+  --rf-sage-deep: #6c7d5c;
+  --rf-gold: #c2ac82;
+  --rf-gold-deep: #a38f68;
+  --rf-clay: #a68a72;
+  --rf-clay-deep: #86705c;
+  --rf-sky: var(--rf-sage);
+  --rf-sky-deep: var(--rf-sage-deep);
+  --rf-rose: var(--rf-clay);
+  --rf-rose-deep: var(--rf-clay-deep);
+
+  --rf-tone-1: var(--rf-accent);
+  --rf-tone-2: var(--rf-ink-soft);
+  --rf-tone-3: var(--rf-accent-deep);
+  --rf-tone-4: var(--rf-muted-ink);
+  --rf-tone-5: var(--rf-sage-deep);
+
+  /* Lignes & ombres */
+  --rf-line: rgba(245, 242, 232, 0.14);
+  --rf-line-ink: rgba(20, 19, 16, 0.12);
+  --rf-shadow: 0 18px 48px rgba(4, 4, 3, 0.4);
+  --rf-shadow-soft: 0 28px 70px rgba(4, 4, 3, 0.5);
+
+  /* Typo & layout */
+  --rf-serif: 'Instrument Serif', Georgia, serif;
   --rf-sans: 'Instrument Sans', 'Segoe UI', system-ui, sans-serif;
-  --rf-radius: 1.25rem;
-  --rf-nav-h: 4.5rem;
+  --rf-radius: 0.65rem;
+  --rf-radius-sm: 0.4rem;
+  --rf-nav-h: 4.25rem;
   --rf-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --rf-container-max: 90rem;
+  /* Gutter horizontal unique — titre, listes et rails alignés */
+  --rf-gutter: clamp(1rem, 4vw, 3rem);
+
+  --rf-section-y: clamp(5rem, 12vw, 9rem);
+  --rf-section-gap: clamp(2rem, 5vw, 3.5rem);
+  --rf-chapter-gap: clamp(4rem, 10vw, 7rem);
+  --rf-card-pad: clamp(1.5rem, 3vw, 2rem);
+  --rf-block-gap: clamp(1.25rem, 3vw, 2rem);
+
+  --rf-scroll-track: rgba(245, 242, 232, 0.18);
+  --rf-scroll-thumb: var(--rf-accent);
+
+  --rf-muted: var(--rf-text-muted);
+  --rf-sage-paper: var(--rf-sage-deep);
+  --rf-gold-paper: var(--rf-gold-deep);
+}
+
+html:has(.refonte-root) {
+  scrollbar-width: none;
+}
+
+html:has(.refonte-root) ::-webkit-scrollbar {
+  display: none;
 }
 
 .refonte-root {
+  position: relative;
   background: var(--rf-bg);
-  color: var(--rf-ink);
+  background-image:
+    radial-gradient(ellipse 60% 46% at 12% -4%, rgba(214, 242, 76, 0.05), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 100% 30%, rgba(245, 242, 232, 0.04), transparent 55%),
+    linear-gradient(180deg, var(--rf-bg-soft) 0%, var(--rf-bg) 40%, var(--rf-bg-deep) 100%);
+  color: var(--rf-text);
   font-family: var(--rf-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -29,32 +93,57 @@
 }
 
 .refonte-root ::selection {
-  background: rgba(184, 67, 47, 0.22);
+  background: rgba(var(--rf-accent-rgb), 0.35);
   color: var(--rf-ink);
 }
 
-.refonte-grain {
-  pointer-events: none;
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  opacity: 0.045;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+.refonte-section {
+  padding-block: var(--rf-section-y);
+}
+
+.refonte-section--chapter {
+  padding-block: clamp(6rem, 14vw, 10rem);
+}
+
+.refonte-section--flush {
+  padding-block: 0;
+}
+
+.refonte-section__head {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: var(--rf-section-gap);
+}
+
+.refonte-section__lead {
+  max-width: 52ch;
+  font-size: 1.02rem;
+  line-height: 1.65;
+  color: var(--rf-text-soft);
 }
 
 .refonte-display {
-  font-family: var(--rf-serif);
-  font-variation-settings: 'SOFT' 40, 'WONK' 0.8;
+  font-family: var(--rf-sans);
+  font-weight: 700;
   letter-spacing: -0.03em;
-  line-height: 0.95;
+  line-height: 1.08;
+  text-transform: none;
+  color: var(--rf-text);
+}
+
+.refonte-serif {
+  font-family: var(--rf-serif);
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: -0.01em;
 }
 
 .refonte-label {
   font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--rf-muted);
+  color: var(--rf-text-muted);
 }
 
 .refonte-link {
@@ -68,7 +157,7 @@
   content: '';
   position: absolute;
   left: 0;
-  bottom: -0.15rem;
+  bottom: -0.12rem;
   width: 100%;
   height: 1px;
   background: currentColor;
@@ -85,54 +174,114 @@
 .refonte-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.65rem;
-  padding: 0.9rem 1.35rem;
+  gap: 0.55rem;
+  padding: 0.85rem 1.35rem;
   border-radius: 999px;
-  border: 1px solid var(--rf-ink);
-  background: var(--rf-ink);
-  color: var(--rf-paper);
+  border: none;
+  background: var(--rf-accent);
+  color: var(--rf-ink);
   font-size: 0.82rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
   text-decoration: none;
-  transition: transform 0.25s var(--rf-ease), background 0.25s var(--rf-ease), color 0.25s var(--rf-ease);
+  transition: transform 0.2s var(--rf-ease), background 0.2s var(--rf-ease);
 }
 
 .refonte-btn:hover {
   transform: translateY(-2px);
-  background: var(--rf-accent);
-  border-color: var(--rf-accent);
+  background: var(--rf-accent-deep);
 }
-
 .refonte-btn--ghost {
   background: transparent;
-  color: var(--rf-ink);
+  color: var(--rf-text);
+  border: 1px solid var(--rf-line);
 }
 
 .refonte-btn--ghost:hover {
-  background: var(--rf-ink);
-  color: var(--rf-paper);
+  background: rgba(245, 242, 232, 0.06);
+  transform: translateY(-2px);
 }
 
 .refonte-card {
   background: var(--rf-paper);
-  border: 1px solid var(--rf-line);
+  color: var(--rf-ink);
+  border: 1px solid var(--rf-line-ink);
   border-radius: var(--rf-radius);
   box-shadow: var(--rf-shadow);
+  padding: var(--rf-card-pad);
+}
+
+.refonte-card .refonte-label {
+  color: var(--rf-muted-ink);
+}
+
+.refonte-card .refonte-display {
+  color: var(--rf-ink);
+}
+
+.refonte-animate-in {
+  animation: rf-section-in 0.85s var(--rf-ease) both;
+}
+
+@keyframes rf-section-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .refonte-animate-in {
+    animation: none;
+  }
 }
 
 .refonte-container {
-  width: min(100% - 2.5rem, 76rem);
+  width: min(100% - (var(--rf-gutter) * 2), var(--rf-container-max));
   margin-inline: auto;
+}
+
+.rf-movement__num {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--rf-accent);
 }
 
 [data-scroll-section] {
   will-change: transform;
 }
 
+/* Système de révélation au scroll — v-reveal */
+.rf-reveal {
+  opacity: 0;
+  transform: translate(var(--rf-reveal-x, 0px), var(--rf-reveal-y, 26px));
+  filter: blur(7px);
+  transition:
+    opacity var(--rf-reveal-duration, 720ms) var(--rf-ease) var(--rf-reveal-delay, 0ms),
+    transform var(--rf-reveal-duration, 720ms) var(--rf-ease) var(--rf-reveal-delay, 0ms),
+    filter var(--rf-reveal-duration, 720ms) var(--rf-ease) var(--rf-reveal-delay, 0ms);
+  will-change: opacity, transform, filter;
+}
+
+.rf-reveal--in {
+  opacity: 1;
+  transform: translate(0, 0);
+  filter: blur(0px);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .refonte-root [data-scroll-section] {
     transform: none !important;
   }
+
+  .rf-reveal {
+    transition: none !important;
+    filter: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
+

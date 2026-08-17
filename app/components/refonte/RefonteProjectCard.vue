@@ -1,90 +1,146 @@
 <script setup lang="ts">
 import type { PortfolioProject } from '~/types/portfolio'
 
-defineProps<{ project: PortfolioProject; index?: number }>()
+const props = defineProps<{ project: PortfolioProject; index?: number }>()
+
+function pad(n: number) {
+  return String(n + 1).padStart(3, '0')
+}
 </script>
 
 <template>
-  <article class="refonte-project-card refonte-card">
-    <div class="refonte-project-card__top">
-      <span class="refonte-label">{{ project.year }}</span>
-      <span class="refonte-project-card__org">{{ project.org }}</span>
-    </div>
-    <h3 class="refonte-display refonte-project-card__title">{{ project.title }}</h3>
-    <p class="refonte-project-card__summary">{{ project.summary }}</p>
-    <ul class="refonte-project-card__stack">
-      <li v-for="tech in project.stack.slice(0, 5)" :key="tech">{{ tech }}</li>
-    </ul>
-    <RefonteLink :to="`/refonte/projets/${project.slug}`" class="refonte-project-card__link">
-      Voir l'étude →
-    </RefonteLink>
-  </article>
+  <RefonteLink
+    :to="`/refonte/projets/${project.slug}`"
+    class="rf-prow"
+    v-reveal="{ index: (index ?? 0) % 5, stagger: 55 }"
+  >
+    <span class="rf-prow__num">{{ pad(index ?? 0) }}</span>
+
+    <span class="rf-prow__main">
+      <span class="rf-prow__title">{{ project.title }}</span>
+      <span class="rf-prow__summary">{{ project.summary }}</span>
+    </span>
+
+    <span class="rf-prow__side">
+      <span class="rf-prow__org">{{ project.org }} · {{ project.year }}</span>
+      <span v-if="project.stack.length" class="rf-prow__stack">
+        <span v-for="tech in project.stack.slice(0, 4)" :key="tech">{{ tech }}</span>
+      </span>
+    </span>
+
+    <span class="rf-prow__arrow" aria-hidden="true">→</span>
+  </RefonteLink>
 </template>
 
 <style scoped>
-.refonte-project-card {
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-  min-height: 100%;
-  transition: transform 0.35s var(--rf-ease), box-shadow 0.35s var(--rf-ease);
+.rf-prow {
+  display: grid;
+  grid-template-columns: 3.5rem 1fr auto 2rem;
+  gap: 1.5rem;
+  align-items: center;
+  padding-block: clamp(1.5rem, 3.5vw, 2.25rem);
+  border-bottom: 1px solid var(--rf-line);
+  text-decoration: none;
+  color: inherit;
+  transition: padding-left 0.35s var(--rf-ease);
 }
 
-.refonte-project-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 28px 90px rgba(26, 22, 18, 0.16);
+.rf-prow.refonte-link::after {
+  display: none;
 }
 
-.refonte-project-card__top {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  align-items: baseline;
+.rf-prow:hover,
+.rf-prow:focus-visible {
+  padding-left: 0.75rem;
 }
 
-.refonte-project-card__org {
-  font-size: 0.78rem;
-  color: var(--rf-muted);
+.rf-prow__num {
+  font-family: var(--rf-serif);
+  font-style: italic;
+  font-size: 1.25rem;
+  color: var(--rf-text-muted);
 }
 
-.refonte-project-card__title {
-  font-size: clamp(1.5rem, 3vw, 2rem);
-}
-
-.refonte-project-card__summary {
-  flex: 1;
-  color: var(--rf-ink-soft);
-  line-height: 1.6;
-  font-size: 0.92rem;
-}
-
-.refonte-project-card__stack {
-  display: flex;
-  flex-wrap: wrap;
+.rf-prow__main {
+  display: grid;
   gap: 0.4rem;
-  list-style: none;
-  padding: 0;
-  margin: 0;
+  min-width: 0;
 }
 
-.refonte-project-card__stack li {
-  font-size: 0.68rem;
+.rf-prow__title {
+  font-size: clamp(1.25rem, 2.8vw, 1.75rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--rf-text);
+  transition: color 0.3s var(--rf-ease);
+}
+
+.rf-prow:hover .rf-prow__title {
+  color: var(--rf-accent);
+}
+
+.rf-prow__summary {
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--rf-text-soft);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 60ch;
+}
+
+.rf-prow__side {
+  display: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.45rem;
+  text-align: right;
+}
+
+@media (min-width: 720px) {
+  .rf-prow__side {
+    display: flex;
+  }
+}
+
+.rf-prow__org {
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  padding: 0.3rem 0.55rem;
-  border-radius: 999px;
-  background: rgba(26, 22, 18, 0.06);
+  color: var(--rf-text-muted);
 }
 
-.refonte-project-card__link {
-  margin-top: 0.5rem;
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+.rf-prow__stack {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  max-width: 16rem;
+}
+
+.rf-prow__stack span {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
+  padding: 0.22rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--rf-line);
+  color: var(--rf-text-muted);
+}
+
+.rf-prow__arrow {
+  font-size: 1.25rem;
+  color: var(--rf-text-muted);
+  transform: rotate(-45deg);
+  transition: transform 0.35s var(--rf-ease), color 0.35s var(--rf-ease);
+}
+
+.rf-prow:hover .rf-prow__arrow {
+  transform: translateX(4px) rotate(0deg);
   color: var(--rf-accent);
-  text-decoration: none;
 }
 </style>

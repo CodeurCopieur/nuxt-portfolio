@@ -2,16 +2,16 @@
 import { useRefonteTransition } from '@/composables/refonte/useRefonteTransition'
 
 const props = defineProps<{ to: string }>()
+const { navigateTo } = useRefonteTransition()
 
 async function onClick(event: MouseEvent) {
   event.preventDefault()
-  const { navigateTo } = useRefonteTransition()
   await navigateTo(props.to)
 }
 </script>
 
 <template>
-  <a :href="to" @click="onClick">
+  <a :href="to" class="refonte-link" @click="onClick">
     <slot />
   </a>
 </template>

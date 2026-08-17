@@ -8,7 +8,7 @@ useHead({
   meta: [
     {
       name: 'description',
-      content: computed(() => `${meta.value.tagline} — Refonte portfolio éditoriale.`)
+      content: computed(() => `${meta.value?.tagline ?? ''} — Portfolio front-end & motion.`.trim())
     }
   ]
 })
@@ -17,9 +17,9 @@ useHead({
 <template>
   <div>
     <RefonteHero />
-    <RefonteMarquee />
-    <RefonteProjectsShowcase />
-    <RefonteSkillsTapestry />
+    <RefonteIntro />
+    <RefonteWorks />
+    <RefonteExpertise />
     <RefonteExperienceRail />
   </div>
 </template>

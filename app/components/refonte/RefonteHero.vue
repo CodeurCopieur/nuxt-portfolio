@@ -1,153 +1,216 @@
 <script setup lang="ts">
 const { meta, sections } = useContent()
-const heroRef = ref<HTMLElement | null>(null)
-
-onMounted(async () => {
-  if (!heroRef.value || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-  const { gsap } = await import('gsap')
-  const targets = heroRef.value.querySelectorAll('[data-hero-item]')
-  gsap.from(targets, {
-    y: 48,
-    opacity: 0,
-    duration: 1,
-    stagger: 0.12,
-    ease: 'power3.out',
-    delay: 0.15
-  })
-})
 </script>
 
 <template>
-  <section ref="heroRef" class="refonte-hero" data-scroll-section>
-    <div class="refonte-container refonte-hero__grid">
-      <div class="refonte-hero__copy">
-        <p class="refonte-label" data-hero-item>Portfolio front-end · {{ meta.location }}</p>
-        <h1 class="refonte-display refonte-hero__title" data-hero-item>
-          {{ meta.name.split(' ')[0] }}<br>
-          <em>{{ meta.name.split(' ').slice(1).join(' ') || 'Louis' }}</em>
-        </h1>
-        <p class="refonte-hero__role" data-hero-item>{{ meta.role }}</p>
-        <p class="refonte-hero__tagline" data-hero-item>{{ meta.tagline }}</p>
-        <div class="refonte-hero__stats" data-hero-item>
-          <div>
-            <strong>{{ meta.years_experience }}+</strong>
-            <span>ans d'expérience</span>
-          </div>
-          <div>
-            <strong>{{ sections.experiences.length }}</strong>
-            <span>missions clés</span>
-          </div>
-          <div>
-            <strong>{{ sections.projets.length }}</strong>
-            <span>projets portfolio</span>
-          </div>
-        </div>
-      </div>
+  <section class="rf-hero" data-scroll-section data-rf-chapter="Accueil">
+    <span class="rf-hero__ghost" aria-hidden="true">01</span>
 
-      <aside class="refonte-hero__panel refonte-card" data-hero-item>
-        <p class="refonte-label">Manifeste</p>
-        <p class="refonte-hero__bio">{{ sections.a_propos.bio }}</p>
-        <ul class="refonte-hero__highlights">
-          <li v-for="item in sections.a_propos.highlights" :key="item">{{ item }}</li>
-        </ul>
-        <p class="refonte-hero__availability">{{ sections.a_propos.availability }}</p>
-      </aside>
+    <div class="refonte-container rf-hero__top">
+      <span class="refonte-label">{{ meta.role }}</span>
+      <span class="rf-hero__status">
+        <span class="rf-hero__status-dot" />
+        Disponible en freelance
+      </span>
+    </div>
+
+    <div class="refonte-container rf-hero__body">
+      <h1 class="rf-hero__title">
+        <span class="rf-hero__mask"><span class="rf-hero__line" style="--i: 0">Je conçois des</span></span>
+        <span class="rf-hero__mask"><span class="rf-hero__line" style="--i: 1">interfaces</span></span>
+        <span class="rf-hero__mask">
+          <span class="rf-hero__line rf-hero__line--serif refonte-serif" style="--i: 2">qui tiennent la charge</span>
+        </span>
+      </h1>
+
+      <div class="rf-hero__mask rf-hero__tagline-mask">
+        <p class="rf-hero__line rf-hero__tagline" style="--i: 3">{{ meta.tagline }}</p>
+      </div>
+    </div>
+
+    <div class="refonte-container rf-hero__foot">
+      <a href="#rf-intro" class="rf-hero__scroll-cue">
+        <span class="rf-hero__scroll-arrow" aria-hidden="true">↓</span>
+        <span>Scroll pour explorer</span>
+      </a>
+
+      <ul class="rf-hero__stats">
+        <li>{{ meta.years_experience }}+ ans</li>
+        <li>{{ sections.projets.length }} projets</li>
+        <li>{{ meta.location }}</li>
+      </ul>
     </div>
   </section>
 </template>
 
 <style scoped>
-.refonte-hero {
-  padding: clamp(3rem, 8vw, 6rem) 0 clamp(4rem, 10vw, 7rem);
-}
-
-.refonte-hero__grid {
+.rf-hero {
+  position: relative;
+  min-height: calc(100dvh - var(--rf-nav-h));
   display: grid;
-  gap: 2.5rem;
-  align-items: start;
+  grid-template-rows: auto 1fr auto;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+  padding-block: clamp(1.75rem, 5vw, 2.75rem) clamp(1.5rem, 4vw, 2rem);
+  overflow: hidden;
 }
 
-@media (min-width: 960px) {
-  .refonte-hero__grid {
-    grid-template-columns: 1.15fr 0.85fr;
-  }
-}
-
-.refonte-hero__title {
-  font-size: clamp(3rem, 9vw, 6.5rem);
-  margin: 0.5rem 0 1rem;
-}
-
-.refonte-hero__title em {
+.rf-hero__ghost {
+  position: absolute;
+  top: 42%;
+  right: max(-1rem, calc((100vw - var(--rf-container-max)) / -2 - 1rem));
+  transform: translateY(-50%);
+  font-family: var(--rf-serif);
   font-style: italic;
+  font-size: min(46vw, 32rem);
+  line-height: 1;
+  color: var(--rf-text);
+  opacity: 0.045;
+  pointer-events: none;
+  z-index: 0;
+  user-select: none;
+}
+
+.rf-hero__top {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+}
+
+.rf-hero__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--rf-text-soft);
+}
+
+.rf-hero__status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--rf-accent);
+  box-shadow: 0 0 0 4px rgba(var(--rf-accent-rgb), 0.18);
+}
+
+.rf-hero__body {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: clamp(1.25rem, 3vw, 1.75rem);
+  align-content: center;
+}
+
+.rf-hero__title {
+  margin: 0;
+  display: grid;
+  gap: 0.05em;
+}
+
+.rf-hero__mask {
+  display: block;
+  overflow: hidden;
+}
+
+.rf-hero__line {
+  display: block;
+  font-family: var(--rf-sans);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 0.98;
+  font-size: clamp(2.75rem, 9vw, 6.75rem);
+  color: var(--rf-text);
+  animation: rf-line-in 900ms var(--rf-ease) both;
+  animation-delay: calc(var(--i, 0) * 110ms + 120ms);
+}
+
+.rf-hero__line--serif {
+  font-family: var(--rf-serif);
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: -0.01em;
   color: var(--rf-accent);
 }
 
-.refonte-hero__role {
-  font-size: clamp(1.05rem, 2vw, 1.35rem);
-  font-weight: 600;
-  color: var(--rf-ink-soft);
-  margin-bottom: 0.75rem;
+.rf-hero__tagline-mask {
+  max-width: 46ch;
 }
 
-.refonte-hero__tagline {
-  font-size: 1.05rem;
+.rf-hero__tagline {
+  font-family: var(--rf-sans);
+  font-weight: 500;
+  font-size: clamp(0.95rem, 1.6vw, 1.1rem);
   line-height: 1.6;
-  color: var(--rf-muted);
-  max-width: 36ch;
-  margin-bottom: 2rem;
+  color: var(--rf-text-soft);
+  letter-spacing: normal;
 }
 
-.refonte-hero__stats {
+@keyframes rf-line-in {
+  from {
+    transform: translateY(112%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.rf-hero__foot {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-wrap: wrap;
-  gap: 1.5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
 }
 
-.refonte-hero__stats strong {
-  display: block;
-  font-family: var(--rf-serif);
-  font-size: 2rem;
-  line-height: 1;
-}
-
-.refonte-hero__stats span {
-  font-size: 0.78rem;
-  color: var(--rf-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.refonte-hero__panel {
-  padding: 1.75rem;
-}
-
-.refonte-hero__bio {
-  margin: 0.75rem 0 1.25rem;
-  line-height: 1.65;
-  color: var(--rf-ink-soft);
-}
-
-.refonte-hero__highlights {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 1.25rem;
-  display: grid;
-  gap: 0.55rem;
-}
-
-.refonte-hero__highlights li {
-  padding-left: 1rem;
-  border-left: 2px solid var(--rf-accent);
-  font-size: 0.88rem;
-  color: var(--rf-ink-soft);
-}
-
-.refonte-hero__availability {
-  font-size: 0.82rem;
+.rf-hero__scroll-cue {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--rf-sage);
+  color: var(--rf-text-muted);
+}
+
+.rf-hero__scroll-arrow {
+  display: inline-flex;
+  animation: rf-scroll-bounce 1.8s ease-in-out infinite;
+}
+
+@keyframes rf-scroll-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(5px); }
+}
+
+.rf-hero__stats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.25rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--rf-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rf-hero__line {
+    animation: none;
+    transform: none;
+  }
+
+  .rf-hero__scroll-arrow {
+    animation: none;
+  }
 }
 </style>
