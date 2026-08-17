@@ -214,8 +214,22 @@ onMounted(() => {
         </div>
 
         <!-- Copyright -->
-        <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700 text-center text-sm text-gray-500 dark:text-gray-400">
+        <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-sm text-gray-500 dark:text-gray-400">
           <p>&copy; {{ new Date().getFullYear() }} Widdy Louis — Tous droits réservés.</p>
+          <nav class="flex flex-wrap gap-x-4 gap-y-2" aria-label="Informations légales">
+            <NuxtLink to="/refonte/mentions-legales" class="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
+              Mentions légales
+            </NuxtLink>
+            <NuxtLink to="/refonte/cgu" class="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
+              CGU
+            </NuxtLink>
+            <NuxtLink to="/refonte/confidentialite" class="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
+              Confidentialité
+            </NuxtLink>
+            <NuxtLink to="/refonte/plan-du-site" class="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
+              Plan du site
+            </NuxtLink>
+          </nav>
         </div>
       </Container>
     </footer>

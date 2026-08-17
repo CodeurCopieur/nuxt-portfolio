@@ -15,6 +15,7 @@ const mainSections = computed(() => [
     links: [
       { label: 'Accueil', to: '/refonte' },
       { label: 'Projets', to: '/refonte/projets' },
+      { label: 'Prestations', to: '/refonte/prestations' },
       { label: 'Contact', to: '/refonte/contact' }
     ]
   },

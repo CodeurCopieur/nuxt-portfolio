@@ -549,7 +549,6 @@ onUnmounted(() => unbind())
 
 .rf-works__focus-title {
   margin: 0;
-  max-width: 18ch;
   font-size: clamp(2rem, 5.5vw, 3.75rem);
   font-weight: 700;
   letter-spacing: -0.03em;
@@ -568,7 +567,6 @@ onUnmounted(() => unbind())
 
 .rf-works__focus-summary {
   margin: 0.35rem 0 0;
-  max-width: 48ch;
   font-size: 0.95rem;
   line-height: 1.6;
   color: var(--rf-text-soft);
@@ -592,6 +590,8 @@ onUnmounted(() => unbind())
 
 .rf-works__focus-cta {
   margin-top: 0.85rem;
+  justify-self: start;
+  width: fit-content;
   font-size: 0.85rem;
   font-weight: 700;
   color: var(--rf-accent);
@@ -599,7 +599,7 @@ onUnmounted(() => unbind())
 }
 
 .rf-works__focus-cta:hover {
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 /* ACTE 03 — Index */

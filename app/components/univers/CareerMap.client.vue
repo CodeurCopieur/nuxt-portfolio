@@ -769,90 +769,120 @@ defineExpose({
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
 }
 
-/* Variante refonte — carte claire, papier chaud */
+/* Variante refonte — carte BD / parcours */
 .career-map--refonte {
-  min-height: 380px;
-  background: var(--rf-paper, #f7f2ea);
-  border-color: var(--rf-line, rgba(26, 22, 18, 0.12));
-  box-shadow: var(--rf-shadow, 0 24px 80px rgba(26, 22, 18, 0.12));
+  min-height: 400px;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(234, 179, 8, 0.1), transparent 35%),
+    var(--rf-paper, #fff9ed);
+  border-color: var(--rf-ink, #18162a);
+  border-width: 2.5px;
 }
 
 .career-map--refonte .career-map__canvas,
 .career-map--refonte .career-map__canvas.leaflet-container {
-  min-height: 380px;
-  background: #ebe4d6;
+  min-height: 400px;
+  background: #e8dfc8;
+  filter: saturate(0.88) contrast(1.05);
+}
+
+.career-map--refonte .career-map__legend {
+  border: 2px solid var(--rf-ink, #18162a);
+  box-shadow: 3px 3px 0 var(--rf-ink, #18162a);
+}
+
+.career-map--refonte .career-map__legend-title {
+  font-family: var(--rf-serif, Bangers, Impact, sans-serif);
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rf-ink, #18162a);
+}
+
+.career-map--refonte .career-map__color-legend {
+  border: 2px solid var(--rf-ink, #18162a);
+  box-shadow: 2px 2px 0 var(--rf-ink, #18162a);
+}
+
+.career-map--refonte .career-map__canvas .leaflet-control-zoom {
+  border: 2px solid var(--rf-ink, #18162a) !important;
+  box-shadow: 2px 2px 0 var(--rf-ink, #18162a) !important;
+  border-radius: var(--rf-radius, 0.35rem) !important;
+  overflow: hidden;
+}
+
+.career-map--refonte .metro-station--active .metro-station__workplace {
+  border-color: var(--rf-accent, #e11d48);
+  border-width: 2px;
+  box-shadow: 2px 2px 0 var(--rf-ink, #18162a);
 }
 
 .career-map--refonte .career-map__vignette {
-  background: radial-gradient(ellipse at center, transparent 55%, rgba(247, 242, 234, 0.35) 100%);
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(255, 249, 237, 0.35) 100%);
 }
 
 .career-map--refonte .career-map__glow {
   background: linear-gradient(
     180deg,
-    rgba(247, 242, 234, 0.45) 0%,
+    rgba(255, 249, 237, 0.45) 0%,
     transparent 16%,
     transparent 84%,
-    rgba(247, 242, 234, 0.35) 100%
+    rgba(255, 249, 237, 0.35) 100%
   );
 }
 
 .career-map--refonte .career-map__legend {
-  background: rgba(247, 242, 234, 0.92);
-  border-color: var(--rf-line, rgba(26, 22, 18, 0.12));
-  box-shadow: var(--rf-shadow, 0 24px 80px rgba(26, 22, 18, 0.12));
+  background: rgba(255, 249, 237, 0.95);
+  border-color: var(--rf-line-ink, rgba(24, 22, 42, 0.2));
+  box-shadow: var(--rf-shadow, 4px 4px 0 rgba(0, 0, 0, 0.92));
 }
 
 .career-map--refonte .career-map__legend-title {
-  font-family: var(--rf-serif, Fraunces, Georgia, serif);
-  color: var(--rf-ink, #1a1612);
+  font-family: var(--rf-serif, Bangers, Impact, sans-serif);
+  color: var(--rf-ink, #18162a);
 }
 
 .career-map--refonte .career-map__legend-sub {
-  color: var(--rf-muted, #7a7268);
+  color: var(--rf-muted-ink, #5e5978);
 }
 
 .career-map--refonte .career-map__color-legend {
-  background: rgba(247, 242, 234, 0.92);
-  border-color: var(--rf-line, rgba(26, 22, 18, 0.12));
+  background: rgba(255, 249, 237, 0.95);
+  border-color: var(--rf-line-ink, rgba(24, 22, 42, 0.2));
 }
 
 .career-map--refonte .career-map__color-legend-title {
-  color: var(--rf-muted, #7a7268);
+  color: var(--rf-muted-ink, #5e5978);
 }
 
 .career-map--refonte .career-map__color-legend-item--active .career-map__color-label {
-  color: var(--rf-accent, #b8432f);
+  color: var(--rf-accent, #e11d48);
 }
 
 .career-map--refonte .career-map__color-label {
-  color: var(--rf-ink-soft, #4a433c);
+  color: var(--rf-ink-soft, #3d3958);
 }
 
 .career-map--refonte .career-map__attribution {
-  color: var(--rf-muted, #7a7268);
-  background: rgba(247, 242, 234, 0.92);
-  border-color: var(--rf-line, rgba(26, 22, 18, 0.12));
-}
-
-.career-map--refonte .career-map__canvas .leaflet-control-zoom {
-  box-shadow: var(--rf-shadow, 0 8px 24px rgba(26, 22, 18, 0.12)) !important;
+  color: var(--rf-muted-ink, #5e5978);
+  background: rgba(255, 249, 237, 0.95);
+  border-color: var(--rf-line-ink, rgba(24, 22, 42, 0.2));
 }
 
 .career-map--refonte .career-map__canvas .leaflet-control-zoom a {
-  background: rgba(247, 242, 234, 0.95) !important;
-  color: var(--rf-ink, #1a1612) !important;
-  border-bottom-color: var(--rf-line, rgba(26, 22, 18, 0.12)) !important;
+  background: rgba(255, 249, 237, 0.95) !important;
+  color: var(--rf-ink, #18162a) !important;
+  border-bottom-color: var(--rf-line-ink, rgba(24, 22, 42, 0.2)) !important;
 }
 
 .career-map--refonte .career-map__canvas .leaflet-control-zoom a:hover {
-  background: rgba(184, 67, 47, 0.12) !important;
-  color: var(--rf-accent, #b8432f) !important;
+  background: rgba(225, 29, 72, 0.12) !important;
+  color: var(--rf-accent, #e11d48) !important;
 }
 
 .career-map--refonte .metro-station--active .metro-station__workplace {
-  border-color: rgba(184, 67, 47, 0.45);
-  background: rgba(247, 242, 234, 0.95);
-  color: var(--rf-ink, #1a1612);
+  border-color: rgba(225, 29, 72, 0.45);
+  background: rgba(255, 249, 237, 0.95);
+  color: var(--rf-ink, #18162a);
 }
 </style>

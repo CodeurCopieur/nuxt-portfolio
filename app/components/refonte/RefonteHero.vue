@@ -114,6 +114,8 @@ const { meta, sections } = useContent()
 .rf-hero__mask {
   display: block;
   overflow: hidden;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
 }
 
 .rf-hero__line {
@@ -121,7 +123,7 @@ const { meta, sections } = useContent()
   font-family: var(--rf-sans);
   font-weight: 700;
   letter-spacing: -0.03em;
-  line-height: 0.98;
+  line-height: 1.05;
   font-size: clamp(2.75rem, 9vw, 6.75rem);
   color: var(--rf-text);
   animation: rf-line-in 900ms var(--rf-ease) both;
@@ -133,11 +135,8 @@ const { meta, sections } = useContent()
   font-weight: 400;
   font-style: italic;
   letter-spacing: -0.01em;
+  line-height: 1.12;
   color: var(--rf-accent);
-}
-
-.rf-hero__tagline-mask {
-  max-width: 46ch;
 }
 
 .rf-hero__tagline {

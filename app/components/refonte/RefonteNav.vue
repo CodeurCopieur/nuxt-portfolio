@@ -10,7 +10,8 @@ const menuOpen = ref(false)
 const links = [
   { to: '/refonte', label: 'Accueil', num: '01' },
   { to: '/refonte/projets', label: 'Projets', num: '02' },
-  { to: '/refonte/contact', label: 'Contact', num: '03' }
+  { to: '/refonte/prestations', label: 'Prestations', num: '03' },
+  { to: '/refonte/contact', label: 'Contact', num: '04' }
 ]
 
 const scrollPct = computed(() => String(Math.round(scrollProgress.value * 100)).padStart(2, '0'))

@@ -1,6 +1,6 @@
 type TransitionFn = () => Promise<void>
 
-const ROUTE_ORDER = ['/refonte', '/refonte/projets', '/refonte/contact']
+const ROUTE_ORDER = ['/refonte', '/refonte/projets', '/refonte/prestations', '/refonte/contact']
 
 let leaveFn: TransitionFn | null = null
 let enterFn: TransitionFn | null = null
@@ -23,6 +23,7 @@ function resolveDirection(from: string, to: string) {
   const normalize = (path: string) => {
     if (path === '/refonte') return '/refonte'
     if (path.startsWith('/refonte/projets')) return '/refonte/projets'
+    if (path.startsWith('/refonte/prestations')) return '/refonte/prestations'
     if (path.startsWith('/refonte/contact')) return '/refonte/contact'
     return path
   }
