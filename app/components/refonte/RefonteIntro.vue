@@ -71,6 +71,16 @@ onMounted(() => {
   padding-block: clamp(4rem, 10vw, 7rem);
 }
 
+@media (max-width: 767px) {
+  .rf-intro {
+    padding-block: 2.5rem;
+  }
+
+  .rf-intro__grid {
+    gap: 1.5rem;
+  }
+}
+
 .rf-intro__grid {
   display: grid;
   gap: clamp(2rem, 5vw, 3rem);

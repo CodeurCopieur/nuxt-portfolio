@@ -693,13 +693,13 @@ onUnmounted(() => unbind())
 
   .rf-works__frame {
     height: auto;
-    padding-block: 1.5rem 2rem;
+    padding-block: 0.35rem 0.5rem;
   }
 
   .rf-works__stage {
     display: grid;
-    gap: 1.75rem;
-    margin-top: 1.5rem;
+    gap: 1.25rem;
+    margin-top: 1.15rem;
     overflow: visible;
   }
 

@@ -31,7 +31,8 @@ const RADAR_LABELS: Record<string, string> = {
 
 const scrollerRef = ref<HTMLElement | null>(null)
 const smooth = ref(0)
-const isDesktop = ref(import.meta.client ? window.innerWidth >= 768 : true)
+const isDesktop = ref(false)
+const openKey = ref<string | null>(null)
 
 const SCROLL_TRAVEL = 3000
 
@@ -47,7 +48,7 @@ const categories = computed(() => {
     ? sections.value.competences_order
     : Object.keys(sections.value.competences)
 
-  return order
+  const cats = order
     .map((key) => ({
       key,
       label: labelFor(key),
@@ -57,7 +58,41 @@ const categories = computed(() => {
       letter: categoryLetter(key, sections.value.competences[key] ?? [])
     }))
     .filter((cat) => cat.skills.length > 0)
+
+  // Accessibilité toujours en tête
+  const accessIndex = cats.findIndex((cat) => cat.key === 'accessibilite')
+  if (accessIndex <= 0) return cats
+  const next = [...cats]
+  const [access] = next.splice(accessIndex, 1)
+  return [access!, ...next]
 })
+
+watch(
+  [categories, isDesktop],
+  ([cats, desktop]) => {
+    if (desktop) {
+      openKey.value = null
+      return
+    }
+    if (!cats.length) {
+      openKey.value = null
+      return
+    }
+    if (!openKey.value || !cats.some((cat) => cat.key === openKey.value)) {
+      openKey.value = cats[0]!.key
+    }
+  },
+  { immediate: true }
+)
+
+function isGroupOpen(key: string) {
+  return isDesktop.value || openKey.value === key
+}
+
+function toggleGroup(key: string) {
+  if (isDesktop.value) return
+  openKey.value = openKey.value === key ? null : key
+}
 
 const totalSkills = computed(() => categories.value.reduce((n, c) => n + c.skills.length, 0))
 
@@ -320,9 +355,10 @@ onUnmounted(() => unbind())
             </div>
           </div>
 
-          <!-- Même zone : radar puis liste à la place -->
+          <!-- Même zone : radar (desktop) puis liste -->
           <div class="rf-expertise__stage">
             <div
+              v-if="isDesktop"
               class="rf-expertise__radar"
               aria-hidden="true"
               :style="{
@@ -393,14 +429,28 @@ onUnmounted(() => unbind())
                 v-for="(cat, ci) in categories"
                 :key="cat.key"
                 class="rf-expertise__group"
+                :class="{ 'is-open': isGroupOpen(cat.key) }"
                 :style="groupStyle(ci)"
               >
-                <div class="rf-expertise__group-head">
+                <button
+                  type="button"
+                  class="rf-expertise__group-head"
+                  :class="{ 'is-static': isDesktop }"
+                  :aria-expanded="isGroupOpen(cat.key)"
+                  :aria-controls="`rf-expertise-panel-${cat.key}`"
+                  :tabindex="isDesktop ? -1 : 0"
+                  @click="toggleGroup(cat.key)"
+                >
                   <span class="rf-expertise__group-num">{{ pad(ci) }}</span>
                   <h3 class="rf-expertise__group-label">{{ cat.label }}</h3>
                   <span class="rf-expertise__group-avg rf-grade">{{ cat.letter }}</span>
-                </div>
-                <div class="rf-expertise__group-pills">
+                  <span class="rf-expertise__group-chevron" aria-hidden="true" />
+                </button>
+                <div
+                  :id="`rf-expertise-panel-${cat.key}`"
+                  class="rf-expertise__group-pills"
+                  :hidden="!isGroupOpen(cat.key)"
+                >
                   <span
                     v-for="(skill, si) in cat.skills"
                     :key="skill"
@@ -598,9 +648,21 @@ onUnmounted(() => unbind())
 
 .rf-expertise__group-head {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 0.75rem;
   margin-bottom: 0.65rem;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: default;
+}
+
+.rf-expertise__group-head.is-static {
+  pointer-events: none;
 }
 
 .rf-expertise__group-num {
@@ -625,10 +687,18 @@ onUnmounted(() => unbind())
   font-size: clamp(1.6rem, 3.2vw, 2.1rem);
 }
 
+.rf-expertise__group-chevron {
+  display: none;
+}
+
 .rf-expertise__group-pills {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
+}
+
+.rf-expertise__group-pills[hidden] {
+  display: none !important;
 }
 
 .rf-expertise__pill {
@@ -657,36 +727,74 @@ onUnmounted(() => unbind())
   .rf-expertise__frame {
     height: auto;
     grid-template-rows: auto auto auto;
-    padding-block: 1.25rem;
+    padding-block: 0.35rem 0.5rem;
   }
 
   .rf-expertise__stage {
     position: relative;
-    min-height: 300px;
-    margin-block: 0.5rem 1rem;
+    min-height: 0;
+    margin-block: 0.85rem 0.5rem;
     display: grid;
-    gap: 1.5rem;
+    gap: 1.25rem;
+    place-items: stretch;
+    justify-items: stretch;
+    overflow: visible;
   }
 
   .rf-expertise__radar {
-    position: relative;
-    inset: auto;
-    width: min(100%, 380px);
-    height: auto;
-    max-width: none;
-    max-height: none;
-    opacity: 0.85 !important;
-    transform: none !important;
-    visibility: visible !important;
+    display: none !important;
   }
 
   .rf-expertise__groups {
     position: relative;
     inset: auto;
+    width: 100%;
+    max-width: none;
     opacity: 1 !important;
     visibility: visible !important;
     overflow: visible;
     padding: 0;
+    gap: 0;
+    justify-self: stretch;
+  }
+
+  .rf-expertise__group {
+    width: 100%;
+    border-bottom: 1px solid var(--rf-line);
+  }
+
+  .rf-expertise__group-head {
+    margin-bottom: 0;
+    padding-block: 0.95rem;
+    cursor: pointer;
+    pointer-events: auto;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .rf-expertise__group-avg {
+    margin-left: auto;
+    margin-right: 0.35rem;
+    font-size: 1.45rem;
+  }
+
+  .rf-expertise__group-chevron {
+    display: block;
+    width: 0.55rem;
+    height: 0.55rem;
+    flex-shrink: 0;
+    border-right: 1.5px solid var(--rf-text-muted);
+    border-bottom: 1.5px solid var(--rf-text-muted);
+    transform: rotate(45deg);
+    transition: transform 0.25s var(--rf-ease), border-color 0.25s var(--rf-ease);
+  }
+
+  .rf-expertise__group.is-open .rf-expertise__group-chevron {
+    transform: rotate(225deg);
+    border-color: var(--rf-accent);
+  }
+
+  .rf-expertise__group-pills {
+    padding: 0 0 1rem;
   }
 
   .rf-expertise__stat-value {
@@ -695,13 +803,20 @@ onUnmounted(() => unbind())
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rf-expertise__radar,
   .rf-expertise__groups,
   .rf-expertise__group,
   .rf-expertise__pill {
     opacity: 1 !important;
     transform: none !important;
     visibility: visible !important;
+  }
+
+  @media (min-width: 768px) {
+    .rf-expertise__radar {
+      opacity: 1 !important;
+      transform: none !important;
+      visibility: visible !important;
+    }
   }
 }
 </style>

@@ -98,6 +98,12 @@ async function goContact(event: MouseEvent) {
   color: var(--rf-text);
 }
 
+@media (max-width: 767px) {
+  .refonte-footer {
+    padding-block: 3rem 2rem;
+  }
+}
+
 .refonte-footer--legal {
   padding-block: clamp(1.25rem, 3vw, 1.75rem) clamp(1rem, 2.5vw, 1.25rem);
 }

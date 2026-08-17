@@ -54,6 +54,14 @@ const { meta, sections } = useContent()
   overflow: hidden;
 }
 
+@media (max-width: 767px) {
+  .rf-hero {
+    min-height: auto;
+    gap: 1.5rem;
+    padding-block: 1.5rem 2rem;
+  }
+}
+
 .rf-hero__ghost {
   position: absolute;
   top: 42%;

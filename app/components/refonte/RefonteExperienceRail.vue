@@ -7,7 +7,7 @@ const scrollerRef = ref<HTMLElement | null>(null)
 const trackRef = ref<HTMLElement | null>(null)
 const railViewportRef = ref<HTMLElement | null>(null)
 const activeIndex = ref(0)
-const isDesktop = ref(import.meta.client ? window.innerWidth >= 960 : true)
+const isDesktop = ref(false)
 
 const experiences = computed(() => sections.value.experiences)
 const activeExperience = computed(() => experiences.value[activeIndex.value] ?? null)
@@ -70,10 +70,21 @@ const detailStep = computed(() => {
 })
 
 const detailActLabel = computed(() => {
+  if (!isDesktop.value) return 'Détails'
   if (detailStep.value >= 3) return '03 — Stack'
   if (detailStep.value >= 2) return '02 — Missions'
   if (detailStep.value >= 1) return '01 — Contexte'
   return '00 — Intro'
+})
+
+const visibleMissions = computed(() => {
+  const list = activeExperience.value?.missions ?? []
+  return isDesktop.value ? list.slice(0, 4) : list
+})
+
+const visibleStack = computed(() => {
+  const list = activeExperience.value?.stack ?? []
+  return isDesktop.value ? list.slice(0, 8) : list
 })
 
 function blockStyle(step: number) {
@@ -109,40 +120,150 @@ function stackStyle(index: number) {
   }
 }
 
+const cardStep = ref(280)
+const maxScroll = ref(0)
+const scrollX = ref(0)
+const isDragging = ref(false)
+
+let pointerId: number | null = null
+let startX = 0
+let startY = 0
+let dragOriginX = 0
+let axisLock: 'x' | 'y' | null = null
+let suppressClick = false
+
 function updateBreakpoint() {
   isDesktop.value = window.innerWidth >= 960
+  if (!isDesktop.value) nextTick(() => measureRail())
 }
 
-function scrollMobileTo(index: number) {
+function measureRail() {
   const viewport = railViewportRef.value
-  if (!viewport) return
-  const card = viewport.querySelectorAll('.refonte-xp__card')[index] as HTMLElement | undefined
-  if (!card) return
-  const gutter = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--rf-gutter')) || 16
-  viewport.scrollTo({ left: Math.max(card.offsetLeft - gutter, 0), behavior: 'smooth' })
-  setActive(index)
+  const track = trackRef.value
+  const card = track?.querySelector('.refonte-xp__card') as HTMLElement | undefined
+  if (!viewport || !track || !card) return
+
+  const gap = Number.parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap) || 14
+  cardStep.value = card.offsetWidth + gap
+  maxScroll.value = Math.max(0, track.scrollWidth - viewport.clientWidth)
+  scrollX.value = Math.min(Math.max(0, scrollX.value), maxScroll.value)
 }
 
-function updateMobileProgress() {
-  const viewport = railViewportRef.value
-  if (!viewport || isDesktop.value || total.value <= 1) {
-    mobileProgress.value = total.value <= 1 ? 100 : 0
-    return
+function offsetForIndex(index: number) {
+  const i = Math.max(0, Math.min(total.value - 1, index))
+  return Math.min(i * cardStep.value, maxScroll.value)
+}
+
+function nearestIndex(x: number) {
+  if (total.value <= 1) return 0
+  let best = 0
+  let bestDist = Infinity
+  for (let i = 0; i < total.value; i++) {
+    const dist = Math.abs(offsetForIndex(i) - x)
+    if (dist < bestDist) {
+      bestDist = dist
+      best = i
+    }
   }
+  return best
+}
 
-  const max = viewport.scrollWidth - viewport.clientWidth
-  if (max <= 0) {
+function syncMobileProgress() {
+  if (total.value <= 1) {
     mobileProgress.value = 100
     return
   }
-
-  const ratio = viewport.scrollLeft / max
-  mobileProgress.value = Math.round(ratio * 100)
-  const idx = Math.min(total.value - 1, Math.round(ratio * (total.value - 1)))
-  if (idx !== activeIndex.value) setActive(idx)
+  mobileProgress.value = Math.round(((activeIndex.value + 1) / total.value) * 100)
 }
 
-let mobileHandler: (() => void) | null = null
+function scrollMobileTo(index: number) {
+  measureRail()
+  setActive(index)
+  scrollX.value = offsetForIndex(index)
+  syncMobileProgress()
+}
+
+function onCardActivate(index: number) {
+  if (suppressClick) {
+    suppressClick = false
+    return
+  }
+  focusIndex(index)
+}
+
+const mobileTrackStyle = computed(() => {
+  if (isDesktop.value) return undefined
+  return { transform: `translate3d(${-scrollX.value}px, 0, 0)` }
+})
+
+function onRailPointerDown(event: PointerEvent) {
+  if (isDesktop.value || event.button !== 0) return
+  measureRail()
+  pointerId = event.pointerId
+  startX = event.clientX
+  startY = event.clientY
+  dragOriginX = scrollX.value
+  axisLock = null
+  isDragging.value = true
+  ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
+}
+
+function onRailPointerMove(event: PointerEvent) {
+  if (!isDragging.value || pointerId !== event.pointerId) return
+
+  const dx = event.clientX - startX
+  const dy = event.clientY - startY
+
+  if (!axisLock) {
+    if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return
+    axisLock = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'
+    if (axisLock === 'y') {
+      isDragging.value = false
+      pointerId = null
+      try {
+        ;(event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId)
+      } catch {
+        /* ignore */
+      }
+      return
+    }
+  }
+
+  if (axisLock !== 'x') return
+  event.preventDefault()
+
+  let next = dragOriginX - dx
+  if (next < 0) next *= 0.35
+  else if (next > maxScroll.value) next = maxScroll.value + (next - maxScroll.value) * 0.35
+  scrollX.value = next
+}
+
+function endRailPointer(event: PointerEvent) {
+  if (pointerId !== null && pointerId !== event.pointerId) return
+  const wasHorizontal = axisLock === 'x'
+  const traveled = scrollX.value - dragOriginX
+  isDragging.value = false
+  pointerId = null
+  axisLock = null
+
+  if (!wasHorizontal || isDesktop.value) {
+    scrollX.value = offsetForIndex(activeIndex.value)
+    return
+  }
+
+  if (Math.abs(traveled) > 12) suppressClick = true
+
+  const threshold = Math.max(40, cardStep.value * 0.18)
+  let next = activeIndex.value
+  if (traveled > threshold) next += 1
+  else if (traveled < -threshold) next -= 1
+  else next = nearestIndex(scrollX.value)
+
+  next = Math.max(0, Math.min(total.value - 1, next))
+  setActive(next)
+  scrollX.value = offsetForIndex(next)
+  syncMobileProgress()
+}
 
 onMounted(() => {
   updateBreakpoint()
@@ -150,23 +271,46 @@ onMounted(() => {
 
   nextTick(() => {
     remeasure()
+    measureRail()
+    scrollX.value = offsetForIndex(activeIndex.value)
+    syncMobileProgress()
+
     const viewport = railViewportRef.value
-    if (viewport) {
-      mobileHandler = () => updateMobileProgress()
-      viewport.addEventListener('scroll', mobileHandler, { passive: true })
-    }
-    setTimeout(() => remeasure(), 900)
+    viewport?.addEventListener('pointermove', onRailPointerMove, { passive: false })
+
+    setTimeout(() => {
+      remeasure()
+      measureRail()
+      scrollX.value = offsetForIndex(activeIndex.value)
+    }, 900)
   })
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', updateBreakpoint)
-  if (railViewportRef.value && mobileHandler) {
-    railViewportRef.value.removeEventListener('scroll', mobileHandler)
-  }
+  railViewportRef.value?.removeEventListener('pointermove', onRailPointerMove)
 })
 
-watch(isDesktop, () => nextTick(() => remeasure()))
+watch(isDesktop, () => {
+  nextTick(() => {
+    remeasure()
+    measureRail()
+    scrollX.value = offsetForIndex(activeIndex.value)
+    syncMobileProgress()
+  })
+})
+
+watch(activeIndex, (index) => {
+  if (isDesktop.value || isDragging.value) return
+  measureRail()
+  scrollX.value = offsetForIndex(index)
+  syncMobileProgress()
+})
+
+watch(total, () => nextTick(() => {
+  measureRail()
+  scrollX.value = offsetForIndex(activeIndex.value)
+}))
 </script>
 
 <template>
@@ -230,7 +374,7 @@ watch(isDesktop, () => nextTick(() => remeasure()))
                 </p>
                 <p class="refonte-xp__mission-period">{{ activeExperience.period }}</p>
 
-                <div class="refonte-xp__mission-steps" aria-hidden="true">
+                <div v-if="isDesktop" class="refonte-xp__mission-steps" aria-hidden="true">
                   <span
                     v-for="step in 3"
                     :key="step"
@@ -240,7 +384,7 @@ watch(isDesktop, () => nextTick(() => remeasure()))
                     {{ String(step).padStart(2, '0') }}
                   </span>
                 </div>
-                <p class="refonte-xp__mission-act">{{ detailActLabel }}</p>
+                <p v-if="isDesktop" class="refonte-xp__mission-act">{{ detailActLabel }}</p>
               </aside>
 
               <div class="refonte-xp__mission-body">
@@ -266,7 +410,7 @@ watch(isDesktop, () => nextTick(() => remeasure()))
                     <h4 class="refonte-xp__beat-title">Missions</h4>
                     <ol class="refonte-xp__beat-list">
                       <li
-                        v-for="(mission, mi) in activeExperience.missions.slice(0, 4)"
+                        v-for="(mission, mi) in visibleMissions"
                         :key="mission"
                         :style="missionStyle(mi)"
                       >
@@ -287,7 +431,7 @@ watch(isDesktop, () => nextTick(() => remeasure()))
                     <h4 class="refonte-xp__beat-title">Stack</h4>
                     <div class="refonte-xp__beat-stack">
                       <span
-                        v-for="(tech, ti) in activeExperience.stack.slice(0, 8)"
+                        v-for="(tech, ti) in visibleStack"
                         :key="tech"
                         :style="stackStyle(ti)"
                       >{{ tech }}</span>
@@ -320,11 +464,15 @@ watch(isDesktop, () => nextTick(() => remeasure()))
             ref="railViewportRef"
             class="refonte-xp__track-viewport"
             :class="{ 'refonte-xp__track-viewport--desktop': isDesktop }"
+            @pointerdown="onRailPointerDown"
+            @pointerup="endRailPointer"
+            @pointercancel="endRailPointer"
           >
             <div
               ref="trackRef"
               class="refonte-xp__track"
-              :style="{ '--xp-count': Math.max(total, 1) }"
+              :class="{ 'is-dragging': isDragging }"
+              :style="[{ '--xp-count': Math.max(total, 1) }, mobileTrackStyle]"
             >
               <article
                 v-for="(xp, index) in experiences"
@@ -334,7 +482,7 @@ watch(isDesktop, () => nextTick(() => remeasure()))
                 tabindex="0"
                 role="tab"
                 :aria-selected="index === activeIndex"
-                @click="focusIndex(index)"
+                @click="onCardActivate(index)"
                 @keydown.enter="focusIndex(index)"
               >
                 <span class="refonte-xp__card-num">{{ pad(index) }}</span>
@@ -354,6 +502,17 @@ watch(isDesktop, () => nextTick(() => remeasure()))
 <style scoped>
 .refonte-xp {
   padding-block: clamp(3rem, 8vw, 5rem) 0;
+}
+
+@media (max-width: 767px) {
+  .refonte-xp {
+    padding-block: 2.25rem 1.5rem;
+  }
+
+  .refonte-xp__pin {
+    gap: 1.15rem;
+    padding-bottom: 1.25rem;
+  }
 }
 
 .refonte-xp__scroller {
@@ -641,6 +800,12 @@ watch(isDesktop, () => nextTick(() => remeasure()))
   gap: 0.5rem;
   padding-bottom: 0.75rem;
   border-bottom: 2px solid var(--rf-line);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.refonte-xp__timeline::-webkit-scrollbar {
+  display: none;
 }
 
 .refonte-xp__timeline-progress {
@@ -670,19 +835,29 @@ watch(isDesktop, () => nextTick(() => remeasure()))
 }
 
 .refonte-xp__track-viewport {
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
+  overflow: hidden;
   min-width: 0;
+  width: 100%;
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .refonte-xp__track-viewport--desktop {
   overflow: hidden;
-  scroll-snap-type: none;
+  cursor: default;
+  user-select: auto;
+  -webkit-user-select: auto;
+  touch-action: auto;
 }
 
-.refonte-xp__track-viewport::-webkit-scrollbar {
-  display: none;
+.refonte-xp__track-viewport:active {
+  cursor: grabbing;
+}
+
+.refonte-xp__track-viewport--desktop:active {
+  cursor: default;
 }
 
 /* Desktop : toutes les cartes dans le container, rien ne dépasse */
@@ -697,7 +872,6 @@ watch(isDesktop, () => nextTick(() => remeasure()))
 .refonte-xp__card {
   min-width: 0;
   width: 100%;
-  scroll-snap-align: start;
   cursor: pointer;
   border-color: rgba(31, 29, 26, 0.2);
   display: grid;
@@ -753,12 +927,21 @@ watch(isDesktop, () => nextTick(() => remeasure()))
     position: relative;
     top: auto;
     min-height: auto;
+    gap: 1.15rem;
+    padding-bottom: 1.25rem;
+    overflow: visible;
+  }
+
+  .refonte-xp__stage {
+    min-height: 0;
   }
 
   .refonte-xp__mission {
     grid-template-columns: 1fr;
     min-height: 0;
-    gap: 1.25rem;
+    gap: 1.35rem;
+    align-items: stretch;
+    padding-block: 1.15rem 1.35rem;
   }
 
   .refonte-xp__mission-lead {
@@ -766,6 +949,25 @@ watch(isDesktop, () => nextTick(() => remeasure()))
     padding-right: 0;
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--rf-line);
+    align-content: start;
+  }
+
+  .refonte-xp__mission-body {
+    align-content: start;
+    gap: 1.35rem;
+    width: 100%;
+  }
+
+  .refonte-xp__beat,
+  .refonte-xp__beat-list li,
+  .refonte-xp__beat-stack span {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .refonte-xp__timeline-dot {
+    flex: 1 0 auto;
+    min-width: 4.25rem;
   }
 
   .refonte-xp__track {
@@ -773,11 +975,19 @@ watch(isDesktop, () => nextTick(() => remeasure()))
     width: max-content;
     gap: 0.85rem;
     padding-inline: 0;
+    padding-bottom: 0.35rem;
+    will-change: transform;
+    transition: transform 0.38s var(--rf-ease);
+  }
+
+  .refonte-xp__track.is-dragging {
+    transition: none;
   }
 
   .refonte-xp__card {
-    flex: 0 0 clamp(220px, 72vw, 260px);
-    width: auto;
+    flex: 0 0 min(78vw, 260px);
+    width: min(78vw, 260px);
+    max-width: none;
   }
 }
 

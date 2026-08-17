@@ -255,9 +255,19 @@
         "Sonnet 5",
         "GPT-5.6 Terra",
         "Opus 4.8"
+      ],
+      "accessibilite": [
+        "WCAG 2.1",
+        "HTML sémantique",
+        "ARIA",
+        "Navigation clavier",
+        "NVDA / VoiceOver",
+        "WAVE",
+        "axe DevTools"
       ]
     },
     "competences_order": [
+      "accessibilite",
       "langages",
       "frameworks",
       "outils_dev",

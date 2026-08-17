@@ -110,6 +110,24 @@ html:has(.refonte-root) ::-webkit-scrollbar {
   padding-block: 0;
 }
 
+@media (max-width: 767px) {
+  :root {
+    --rf-section-y: 2.75rem;
+    --rf-section-gap: 1.35rem;
+    --rf-chapter-gap: 2.5rem;
+    --rf-block-gap: 1.15rem;
+  }
+
+  .refonte-section--chapter {
+    padding-block: 2.75rem;
+  }
+
+  /* Sur mobile, les sections sticky flush gardent un peu d’air entre elles */
+  .refonte-section--flush {
+    padding-block: 2.25rem;
+  }
+}
+
 .refonte-section__head {
   display: grid;
   gap: 0.75rem;
