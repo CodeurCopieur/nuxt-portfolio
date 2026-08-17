@@ -7,7 +7,7 @@ const { scroll, ready, refresh } = useRefonteScroll()
 
 const scrollerRef = ref<HTMLElement | null>(null)
 const smooth = ref(0)
-const isDesktop = ref(import.meta.client ? window.innerWidth >= 768 : true)
+const isDesktop = ref(false)
 
 const FOCUS_START = 0.16
 const FOCUS_END = 0.72
@@ -286,7 +286,7 @@ onUnmounted(() => unbind())
               </p>
             </div>
 
-            <!-- ACTE 02 — Focus : chaque projet un par un -->
+            <!-- ACTE 02 — Focus desktop only (liste seule en mobile) -->
             <div
               v-if="isDesktop"
               class="rf-works__focus-shell"
@@ -321,29 +321,6 @@ onUnmounted(() => unbind())
                   </RefonteLink>
                 </div>
               </Transition>
-            </div>
-
-            <!-- Mobile : tous les focus empilés -->
-            <div v-else class="rf-works__focus-mobile">
-              <div
-                v-for="(project, index) in projects"
-                :key="project.slug"
-                class="rf-works__focus"
-              >
-                <p class="rf-works__focus-num">{{ pad(index) }}</p>
-                <h3 class="rf-works__focus-title">{{ project.title }}</h3>
-                <p class="rf-works__focus-meta">{{ project.org }} · {{ project.year }}</p>
-                <p class="rf-works__focus-summary">{{ project.summary }}</p>
-                <div class="rf-works__focus-stack">
-                  <span v-for="tech in project.stack.slice(0, 5)" :key="tech">{{ tech }}</span>
-                </div>
-                <RefonteLink
-                  :to="`/refonte/projets/${project.slug}`"
-                  class="rf-works__focus-cta"
-                >
-                  Voir le projet →
-                </RefonteLink>
-              </div>
             </div>
 
             <!-- ACTE 03 — Index (même place) -->
@@ -727,7 +704,6 @@ onUnmounted(() => unbind())
   }
 
   .rf-works__manifesto,
-  .rf-works__focus-shell,
   .rf-works__focus {
     position: relative;
     inset: auto;
@@ -736,18 +712,13 @@ onUnmounted(() => unbind())
     visibility: visible !important;
   }
 
+  .rf-works__focus-shell,
+  .rf-works__focus-mobile {
+    display: none !important;
+  }
+
   .rf-works__manifesto-count {
     font-size: clamp(4rem, 22vw, 6rem);
-  }
-
-  .rf-works__focus-mobile {
-    display: grid;
-    gap: 1.75rem;
-  }
-
-  .rf-works__focus {
-    padding-top: 1rem;
-    border-top: 1px solid var(--rf-line);
   }
 
   .rf-works__list {
