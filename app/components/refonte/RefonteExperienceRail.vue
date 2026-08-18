@@ -22,12 +22,18 @@ function setActive(index: number) {
 }
 
 function focusIndex(index: number) {
-  if (isDesktop.value) {
-    goToIndex(index)
-  } else {
-    scrollMobileTo(index)
-  }
+  goToIndex(index)
 }
+
+function selectMobileTab(index: number) {
+  setActive(index)
+  nextTick(() => {
+    const tab = tabListRef.value?.querySelector(`[data-tab-index="${index}"]`) as HTMLElement | null
+    tab?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' })
+  })
+}
+
+const tabListRef = ref<HTMLElement | null>(null)
 
 const {
   segmentFrac,
@@ -45,17 +51,9 @@ const {
   onIndexChange: setActive
 })
 
-const mobileProgress = ref(0)
-const displayProgress = computed(() =>
-  isDesktop.value ? progressPercent.value : mobileProgress.value
-)
-
 /** Barre timeline alignée sur les cartes (1/N chacune), pas sur count-1. */
 const timelineProgress = computed(() => {
   if (total.value <= 0) return 0
-  if (!isDesktop.value) {
-    return ((activeIndex.value + 1) / total.value) * 100
-  }
   return Math.min(((activeIndex.value + segmentFrac.value) / total.value) * 100, 100)
 })
 
@@ -120,149 +118,8 @@ function stackStyle(index: number) {
   }
 }
 
-const cardStep = ref(280)
-const maxScroll = ref(0)
-const scrollX = ref(0)
-const isDragging = ref(false)
-
-let pointerId: number | null = null
-let startX = 0
-let startY = 0
-let dragOriginX = 0
-let axisLock: 'x' | 'y' | null = null
-let suppressClick = false
-
 function updateBreakpoint() {
   isDesktop.value = window.innerWidth >= 960
-  if (!isDesktop.value) nextTick(() => measureRail())
-}
-
-function measureRail() {
-  const viewport = railViewportRef.value
-  const track = trackRef.value
-  const card = track?.querySelector('.refonte-xp__card') as HTMLElement | undefined
-  if (!viewport || !track || !card) return
-
-  const gap = Number.parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap) || 14
-  cardStep.value = card.offsetWidth + gap
-  maxScroll.value = Math.max(0, track.scrollWidth - viewport.clientWidth)
-  scrollX.value = Math.min(Math.max(0, scrollX.value), maxScroll.value)
-}
-
-function offsetForIndex(index: number) {
-  const i = Math.max(0, Math.min(total.value - 1, index))
-  return Math.min(i * cardStep.value, maxScroll.value)
-}
-
-function nearestIndex(x: number) {
-  if (total.value <= 1) return 0
-  let best = 0
-  let bestDist = Infinity
-  for (let i = 0; i < total.value; i++) {
-    const dist = Math.abs(offsetForIndex(i) - x)
-    if (dist < bestDist) {
-      bestDist = dist
-      best = i
-    }
-  }
-  return best
-}
-
-function syncMobileProgress() {
-  if (total.value <= 1) {
-    mobileProgress.value = 100
-    return
-  }
-  mobileProgress.value = Math.round(((activeIndex.value + 1) / total.value) * 100)
-}
-
-function scrollMobileTo(index: number) {
-  measureRail()
-  setActive(index)
-  scrollX.value = offsetForIndex(index)
-  syncMobileProgress()
-}
-
-function onCardActivate(index: number) {
-  if (suppressClick) {
-    suppressClick = false
-    return
-  }
-  focusIndex(index)
-}
-
-const mobileTrackStyle = computed(() => {
-  if (isDesktop.value) return undefined
-  return { transform: `translate3d(${-scrollX.value}px, 0, 0)` }
-})
-
-function onRailPointerDown(event: PointerEvent) {
-  if (isDesktop.value || event.button !== 0) return
-  measureRail()
-  pointerId = event.pointerId
-  startX = event.clientX
-  startY = event.clientY
-  dragOriginX = scrollX.value
-  axisLock = null
-  isDragging.value = true
-  ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
-}
-
-function onRailPointerMove(event: PointerEvent) {
-  if (!isDragging.value || pointerId !== event.pointerId) return
-
-  const dx = event.clientX - startX
-  const dy = event.clientY - startY
-
-  if (!axisLock) {
-    if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return
-    axisLock = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'
-    if (axisLock === 'y') {
-      isDragging.value = false
-      pointerId = null
-      try {
-        ;(event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId)
-      } catch {
-        /* ignore */
-      }
-      return
-    }
-  }
-
-  if (axisLock !== 'x') return
-  event.preventDefault()
-
-  let next = dragOriginX - dx
-  if (next < 0) next *= 0.35
-  else if (next > maxScroll.value) next = maxScroll.value + (next - maxScroll.value) * 0.35
-  scrollX.value = next
-}
-
-function endRailPointer(event: PointerEvent) {
-  if (pointerId !== null && pointerId !== event.pointerId) return
-  const wasHorizontal = axisLock === 'x'
-  const traveled = scrollX.value - dragOriginX
-  isDragging.value = false
-  pointerId = null
-  axisLock = null
-
-  if (!wasHorizontal || isDesktop.value) {
-    scrollX.value = offsetForIndex(activeIndex.value)
-    return
-  }
-
-  if (Math.abs(traveled) > 12) suppressClick = true
-
-  const threshold = Math.max(40, cardStep.value * 0.18)
-  let next = activeIndex.value
-  if (traveled > threshold) next += 1
-  else if (traveled < -threshold) next -= 1
-  else next = nearestIndex(scrollX.value)
-
-  next = Math.max(0, Math.min(total.value - 1, next))
-  setActive(next)
-  scrollX.value = offsetForIndex(next)
-  syncMobileProgress()
 }
 
 onMounted(() => {
@@ -271,46 +128,17 @@ onMounted(() => {
 
   nextTick(() => {
     remeasure()
-    measureRail()
-    scrollX.value = offsetForIndex(activeIndex.value)
-    syncMobileProgress()
-
-    const viewport = railViewportRef.value
-    viewport?.addEventListener('pointermove', onRailPointerMove, { passive: false })
-
-    setTimeout(() => {
-      remeasure()
-      measureRail()
-      scrollX.value = offsetForIndex(activeIndex.value)
-    }, 900)
+    setTimeout(remeasure, 900)
   })
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', updateBreakpoint)
-  railViewportRef.value?.removeEventListener('pointermove', onRailPointerMove)
 })
 
 watch(isDesktop, () => {
-  nextTick(() => {
-    remeasure()
-    measureRail()
-    scrollX.value = offsetForIndex(activeIndex.value)
-    syncMobileProgress()
-  })
+  nextTick(remeasure)
 })
-
-watch(activeIndex, (index) => {
-  if (isDesktop.value || isDragging.value) return
-  measureRail()
-  scrollX.value = offsetForIndex(index)
-  syncMobileProgress()
-})
-
-watch(total, () => nextTick(() => {
-  measureRail()
-  scrollX.value = offsetForIndex(activeIndex.value)
-}))
 </script>
 
 <template>
@@ -322,14 +150,15 @@ watch(total, () => nextTick(() => {
     >
       <div class="refonte-xp__pin" :class="{ 'is-locked': isPinned }">
         <div
+          v-if="isDesktop"
           class="refonte-xp__progress"
           role="progressbar"
-          :aria-valuenow="displayProgress"
+          :aria-valuenow="progressPercent"
           aria-valuemin="0"
           aria-valuemax="100"
-          :aria-label="`Progression du parcours ${displayProgress}%`"
+          :aria-label="`Progression du parcours ${progressPercent}%`"
         >
-          <div class="refonte-xp__progress-fill" :style="{ width: `${displayProgress}%` }" />
+          <div class="refonte-xp__progress-fill" :style="{ width: `${progressPercent}%` }" />
         </div>
 
         <div class="refonte-container refonte-xp__head">
@@ -344,55 +173,190 @@ watch(total, () => nextTick(() => {
                 Parcours complet — continuez vers le bas.
               </template>
               <template v-else>
-                Glissez le rail pour parcourir les missions.
+                Sélectionnez une entreprise pour explorer la mission.
               </template>
             </p>
           </div>
-          <div class="refonte-xp__counter" aria-live="polite">
+          <div v-if="isDesktop" class="refonte-xp__counter" aria-live="polite">
             <span class="refonte-xp__counter-current">{{ pad(activeIndex) }}</span>
             <span class="refonte-xp__counter-sep">/</span>
             <span class="refonte-xp__counter-total">{{ String(total).padStart(2, '0') }}</span>
           </div>
         </div>
 
-        <div class="refonte-container refonte-xp__stage">
+        <template v-if="isDesktop">
+          <div class="refonte-container refonte-xp__stage">
+            <Transition name="xp-switch" mode="out-in">
+              <article
+                v-if="activeExperience"
+                :key="activeIndex"
+                class="refonte-xp__mission"
+              >
+                <aside class="refonte-xp__mission-lead">
+                  <p class="refonte-xp__mission-kicker">Mission</p>
+                  <p class="refonte-xp__mission-index refonte-serif">{{ pad(activeIndex) }}</p>
+                  <h3 class="refonte-xp__mission-role">{{ activeExperience.role }}</h3>
+                  <p class="refonte-xp__mission-company">
+                    {{ activeExperience.company }}
+                  </p>
+                  <p class="refonte-xp__mission-place">
+                    {{ activeExperience.location }}
+                  </p>
+                  <p class="refonte-xp__mission-period">{{ activeExperience.period }}</p>
+
+                  <div class="refonte-xp__mission-steps" aria-hidden="true">
+                    <span
+                      v-for="step in 3"
+                      :key="step"
+                      class="refonte-xp__mission-step"
+                      :class="{ 'is-active': detailStep >= step }"
+                    >
+                      {{ String(step).padStart(2, '0') }}
+                    </span>
+                  </div>
+                  <p class="refonte-xp__mission-act">{{ detailActLabel }}</p>
+                </aside>
+
+                <div class="refonte-xp__mission-body">
+                  <section
+                    class="refonte-xp__beat"
+                    :style="blockStyle(1)"
+                    :class="{ 'is-on': detailStep >= 1 }"
+                  >
+                    <p class="refonte-xp__beat-num">01</p>
+                    <div class="refonte-xp__beat-content">
+                      <h4 class="refonte-xp__beat-title">Contexte</h4>
+                      <p class="refonte-xp__beat-text">{{ activeExperience.summary }}</p>
+                    </div>
+                  </section>
+
+                  <section
+                    class="refonte-xp__beat"
+                    :style="blockStyle(2)"
+                    :class="{ 'is-on': detailStep >= 2 }"
+                  >
+                    <p class="refonte-xp__beat-num">02</p>
+                    <div class="refonte-xp__beat-content">
+                      <h4 class="refonte-xp__beat-title">Missions</h4>
+                      <ol class="refonte-xp__beat-list">
+                        <li
+                          v-for="(mission, mi) in visibleMissions"
+                          :key="mission"
+                          :style="missionStyle(mi)"
+                        >
+                          <span class="refonte-xp__beat-list-idx">{{ String(mi + 1).padStart(2, '0') }}</span>
+                          <span>{{ mission }}</span>
+                        </li>
+                      </ol>
+                    </div>
+                  </section>
+
+                  <section
+                    class="refonte-xp__beat"
+                    :style="blockStyle(3)"
+                    :class="{ 'is-on': detailStep >= 3 }"
+                  >
+                    <p class="refonte-xp__beat-num">03</p>
+                    <div class="refonte-xp__beat-content">
+                      <h4 class="refonte-xp__beat-title">Stack</h4>
+                      <div class="refonte-xp__beat-stack">
+                        <span
+                          v-for="(tech, ti) in visibleStack"
+                          :key="tech"
+                          :style="stackStyle(ti)"
+                        >{{ tech }}</span>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+              </article>
+            </Transition>
+          </div>
+
+          <div class="refonte-container refonte-xp__rail-area">
+            <div class="refonte-xp__timeline" role="tablist" aria-label="Chronologie">
+              <button
+                v-for="(xp, index) in experiences"
+                :key="`${xp.company}-dot`"
+                type="button"
+                role="tab"
+                class="refonte-xp__timeline-dot"
+                :class="{ 'is-active': index === activeIndex, 'is-past': index < activeIndex }"
+                :aria-selected="index === activeIndex"
+                @click="focusIndex(index)"
+              >
+                <span class="refonte-xp__timeline-year">{{ xp.period.split('–')[0]?.trim() }}</span>
+              </button>
+              <div class="refonte-xp__timeline-progress" :style="{ width: `${timelineProgress}%` }" />
+            </div>
+
+            <div
+              ref="railViewportRef"
+              class="refonte-xp__track-viewport refonte-xp__track-viewport--desktop"
+            >
+              <div
+                ref="trackRef"
+                class="refonte-xp__track"
+                :style="{ '--xp-count': Math.max(total, 1) }"
+              >
+                <article
+                  v-for="(xp, index) in experiences"
+                  :key="`${xp.company}-${xp.period}`"
+                  class="refonte-xp__card refonte-card"
+                  :class="{ 'is-active': index === activeIndex }"
+                  tabindex="0"
+                  role="tab"
+                  :aria-selected="index === activeIndex"
+                  @click="focusIndex(index)"
+                  @keydown.enter="focusIndex(index)"
+                >
+                  <span class="refonte-xp__card-num">{{ pad(index) }}</span>
+                  <h4 class="refonte-xp__card-company">{{ xp.company }}</h4>
+                  <p class="refonte-xp__card-role">{{ xp.role }}</p>
+                  <p class="refonte-xp__card-period">{{ xp.period }}</p>
+                  <p class="refonte-xp__card-location">{{ xp.location }}</p>
+                </article>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <div v-else class="refonte-container refonte-xp__mobile-tabs">
+          <div
+            ref="tabListRef"
+            class="refonte-xp__tabs"
+            role="tablist"
+            aria-label="Missions"
+          >
+            <button
+              v-for="(xp, index) in experiences"
+              :key="`${xp.company}-tab`"
+              type="button"
+              role="tab"
+              class="refonte-xp__tab"
+              :class="{ 'is-active': index === activeIndex }"
+              :aria-selected="index === activeIndex"
+              :data-tab-index="index"
+              @click="selectMobileTab(index)"
+            >
+              <span class="refonte-xp__tab-label">{{ xp.company }}</span>
+            </button>
+          </div>
+
           <Transition name="xp-switch" mode="out-in">
             <article
               v-if="activeExperience"
               :key="activeIndex"
-              class="refonte-xp__mission"
+              class="refonte-xp__mission refonte-xp__mission--mobile"
             >
               <aside class="refonte-xp__mission-lead">
-                <p class="refonte-xp__mission-kicker">Mission</p>
-                <p class="refonte-xp__mission-index refonte-serif">{{ pad(activeIndex) }}</p>
                 <h3 class="refonte-xp__mission-role">{{ activeExperience.role }}</h3>
-                <p class="refonte-xp__mission-company">
-                  {{ activeExperience.company }}
-                </p>
-                <p class="refonte-xp__mission-place">
-                  {{ activeExperience.location }}
-                </p>
+                <p class="refonte-xp__mission-place">{{ activeExperience.location }}</p>
                 <p class="refonte-xp__mission-period">{{ activeExperience.period }}</p>
-
-                <div v-if="isDesktop" class="refonte-xp__mission-steps" aria-hidden="true">
-                  <span
-                    v-for="step in 3"
-                    :key="step"
-                    class="refonte-xp__mission-step"
-                    :class="{ 'is-active': detailStep >= step }"
-                  >
-                    {{ String(step).padStart(2, '0') }}
-                  </span>
-                </div>
-                <p v-if="isDesktop" class="refonte-xp__mission-act">{{ detailActLabel }}</p>
               </aside>
 
               <div class="refonte-xp__mission-body">
-                <section
-                  class="refonte-xp__beat"
-                  :style="blockStyle(1)"
-                  :class="{ 'is-on': detailStep >= 1 }"
-                >
+                <section class="refonte-xp__beat">
                   <p class="refonte-xp__beat-num">01</p>
                   <div class="refonte-xp__beat-content">
                     <h4 class="refonte-xp__beat-title">Contexte</h4>
@@ -400,20 +364,12 @@ watch(total, () => nextTick(() => {
                   </div>
                 </section>
 
-                <section
-                  class="refonte-xp__beat"
-                  :style="blockStyle(2)"
-                  :class="{ 'is-on': detailStep >= 2 }"
-                >
+                <section class="refonte-xp__beat">
                   <p class="refonte-xp__beat-num">02</p>
                   <div class="refonte-xp__beat-content">
                     <h4 class="refonte-xp__beat-title">Missions</h4>
                     <ol class="refonte-xp__beat-list">
-                      <li
-                        v-for="(mission, mi) in visibleMissions"
-                        :key="mission"
-                        :style="missionStyle(mi)"
-                      >
+                      <li v-for="(mission, mi) in activeExperience.missions" :key="mission">
                         <span class="refonte-xp__beat-list-idx">{{ String(mi + 1).padStart(2, '0') }}</span>
                         <span>{{ mission }}</span>
                       </li>
@@ -421,78 +377,18 @@ watch(total, () => nextTick(() => {
                   </div>
                 </section>
 
-                <section
-                  class="refonte-xp__beat"
-                  :style="blockStyle(3)"
-                  :class="{ 'is-on': detailStep >= 3 }"
-                >
+                <section class="refonte-xp__beat">
                   <p class="refonte-xp__beat-num">03</p>
                   <div class="refonte-xp__beat-content">
                     <h4 class="refonte-xp__beat-title">Stack</h4>
                     <div class="refonte-xp__beat-stack">
-                      <span
-                        v-for="(tech, ti) in visibleStack"
-                        :key="tech"
-                        :style="stackStyle(ti)"
-                      >{{ tech }}</span>
+                      <span v-for="tech in activeExperience.stack" :key="tech">{{ tech }}</span>
                     </div>
                   </div>
                 </section>
               </div>
             </article>
           </Transition>
-        </div>
-
-        <div class="refonte-container refonte-xp__rail-area">
-          <div class="refonte-xp__timeline" role="tablist" aria-label="Chronologie">
-            <button
-              v-for="(xp, index) in experiences"
-              :key="`${xp.company}-dot`"
-              type="button"
-              role="tab"
-              class="refonte-xp__timeline-dot"
-              :class="{ 'is-active': index === activeIndex, 'is-past': index < activeIndex }"
-              :aria-selected="index === activeIndex"
-              @click="focusIndex(index)"
-            >
-              <span class="refonte-xp__timeline-year">{{ xp.period.split('–')[0]?.trim() }}</span>
-            </button>
-            <div class="refonte-xp__timeline-progress" :style="{ width: `${timelineProgress}%` }" />
-          </div>
-
-          <div
-            ref="railViewportRef"
-            class="refonte-xp__track-viewport"
-            :class="{ 'refonte-xp__track-viewport--desktop': isDesktop }"
-            @pointerdown="onRailPointerDown"
-            @pointerup="endRailPointer"
-            @pointercancel="endRailPointer"
-          >
-            <div
-              ref="trackRef"
-              class="refonte-xp__track"
-              :class="{ 'is-dragging': isDragging }"
-              :style="[{ '--xp-count': Math.max(total, 1) }, mobileTrackStyle]"
-            >
-              <article
-                v-for="(xp, index) in experiences"
-                :key="`${xp.company}-${xp.period}`"
-                class="refonte-xp__card refonte-card"
-                :class="{ 'is-active': index === activeIndex }"
-                tabindex="0"
-                role="tab"
-                :aria-selected="index === activeIndex"
-                @click="onCardActivate(index)"
-                @keydown.enter="focusIndex(index)"
-              >
-                <span class="refonte-xp__card-num">{{ pad(index) }}</span>
-                <h4 class="refonte-xp__card-company">{{ xp.company }}</h4>
-                <p class="refonte-xp__card-role">{{ xp.role }}</p>
-                <p class="refonte-xp__card-period">{{ xp.period }}</p>
-                <p class="refonte-xp__card-location">{{ xp.location }}</p>
-              </article>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -940,13 +836,80 @@ watch(total, () => nextTick(() => {
     overflow: visible;
   }
 
-  .refonte-xp__stage {
-    min-height: 0;
+  .refonte-xp__mobile-tabs {
+    display: grid;
+    gap: 0.85rem;
   }
 
-  .refonte-xp__mission {
+  .refonte-xp__tabs {
+    display: flex;
+    gap: 0.45rem;
+    overflow-x: auto;
+    padding-bottom: 0.65rem;
+    border-bottom: 1px solid var(--rf-line);
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .refonte-xp__tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .refonte-xp__tab {
+    flex: 0 0 auto;
+    padding: 0.55rem 0.9rem;
+    border: 1px solid var(--rf-line);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--rf-text);
+    cursor: pointer;
+    text-align: left;
+    transition:
+      border-color 0.25s var(--rf-ease),
+      color 0.25s var(--rf-ease),
+      background 0.25s var(--rf-ease);
+  }
+
+  .refonte-xp__tab.is-active {
+    border-color: var(--rf-accent);
+    background: rgba(var(--rf-accent-rgb), 0.12);
+    color: var(--rf-accent);
+    box-shadow: 2px 2px 0 rgba(11, 26, 58, 0.28);
+  }
+
+  .refonte-xp__tab-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    color: inherit;
+  }
+
+  .refonte-xp__mission--mobile .refonte-xp__mission-role {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+    color: var(--rf-text);
+  }
+
+  .refonte-xp__mission--mobile {
+    border-top: none;
+    border-bottom: none;
+    padding-block: 0.35rem 0.5rem;
+  }
+
+  .refonte-xp__mission--mobile .refonte-xp__mission-lead {
+    border-bottom: none;
+    padding-bottom: 0.35rem;
+  }
+
+  .refonte-xp__mission,
+  .refonte-xp__mission--mobile {
     grid-template-columns: 1fr;
     min-height: 0;
+    height: auto;
     gap: 1.35rem;
     align-items: stretch;
     padding-block: 1.15rem 1.35rem;
@@ -971,31 +934,6 @@ watch(total, () => nextTick(() => {
   .refonte-xp__beat-stack span {
     opacity: 1 !important;
     transform: none !important;
-  }
-
-  .refonte-xp__timeline-dot {
-    flex: 1 0 auto;
-    min-width: 4.25rem;
-  }
-
-  .refonte-xp__track {
-    display: flex;
-    width: max-content;
-    gap: 0.85rem;
-    padding-inline: 0;
-    padding-bottom: 0.35rem;
-    will-change: transform;
-    transition: transform 0.38s var(--rf-ease);
-  }
-
-  .refonte-xp__track.is-dragging {
-    transition: none;
-  }
-
-  .refonte-xp__card {
-    flex: 0 0 min(78vw, 260px);
-    width: min(78vw, 260px);
-    max-width: none;
   }
 }
 
