@@ -388,7 +388,7 @@ onUnmounted(() => unbind())
   align-items: flex-end;
   justify-content: space-between;
   gap: 1rem 2rem;
-  padding-bottom: calc(0.85rem + (1 - var(--rf-compact, 0)) * 0.4rem);
+  padding-bottom: calc(0.55rem + (1 - var(--rf-compact, 0)) * 0.3rem);
   border-bottom: 1px solid var(--rf-line);
 }
 
@@ -465,7 +465,7 @@ onUnmounted(() => unbind())
 
 .rf-works__manifesto-count {
   margin: 0;
-  font-size: clamp(5.5rem, 18vw, 11rem);
+  font-size: clamp(3.5rem, 12vh, 11rem);
   line-height: 0.85;
   color: var(--rf-accent);
   font-variant-numeric: tabular-nums;
@@ -610,7 +610,7 @@ onUnmounted(() => unbind())
   grid-template-columns: var(--rf-works-num) minmax(0, 1fr) 1.75rem;
   column-gap: var(--rf-works-gap);
   align-items: center;
-  padding-block: clamp(1.05rem, 2.5vw, 1.55rem);
+  padding-block: clamp(0.7rem, 1.6vh, 1.55rem);
   padding-inline: clamp(0.65rem, 2.2vw, 1.35rem) 0.35rem;
   text-decoration: none;
   color: inherit;
@@ -642,7 +642,7 @@ onUnmounted(() => unbind())
 }
 
 .rf-works__name {
-  font-size: clamp(1.2rem, 2.8vw, 1.75rem);
+  font-size: clamp(1.05rem, 2.2vh + 0.4vw, 1.75rem);
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.15;
@@ -741,6 +741,20 @@ onUnmounted(() => unbind())
   .rf-works__arrow,
   .rf-works__stack {
     display: none;
+  }
+}
+
+@media (max-height: 900px) and (min-width: 768px) {
+  .rf-works__title {
+    font-size: var(--rf-section-title-size);
+  }
+
+  .rf-works__head {
+    padding-bottom: 0.45rem;
+  }
+
+  .rf-works__stage {
+    margin-top: clamp(0.65rem, 1.5vh, 1rem);
   }
 }
 

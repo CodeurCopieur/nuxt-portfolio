@@ -65,6 +65,7 @@
   /* Inset sous la nav quand la section se fige (chorégraphie) */
   --rf-section-pin-pad: clamp(3.75rem, 7vw, 5.5rem);
   --rf-section-title-size: clamp(2rem, 5vw, 3.5rem);
+  --rf-section-stack-gap: clamp(0.85rem, 2vw, 1.35rem);
 
   --rf-scroll-track: rgba(255, 255, 255, 0.16);
   --rf-scroll-thumb: var(--rf-accent);
@@ -113,6 +114,25 @@ html:has(.refonte-root) ::-webkit-scrollbar {
   padding-block: 0;
 }
 
+/* Laptops bas (MacBook Air, 13–14") : densifier sans toucher aux grands écrans */
+@media (max-height: 900px) and (min-width: 768px) {
+  :root {
+    --rf-nav-h: 3.75rem;
+    --rf-section-pin-pad: clamp(1.25rem, 2.5vh, 2rem);
+    --rf-section-title-size: clamp(1.55rem, 3.2vh, 2.35rem);
+    --rf-section-stack-gap: 0.65rem;
+  }
+}
+
+@media (max-height: 780px) and (min-width: 768px) {
+  :root {
+    --rf-nav-h: 3.5rem;
+    --rf-section-pin-pad: 1rem;
+    --rf-section-title-size: clamp(1.35rem, 2.8vh, 1.95rem);
+    --rf-section-stack-gap: 0.5rem;
+  }
+}
+
 @media (max-width: 767px) {
   :root {
     --rf-section-y: 2.75rem;
@@ -120,6 +140,7 @@ html:has(.refonte-root) ::-webkit-scrollbar {
     --rf-chapter-gap: 2.5rem;
     --rf-block-gap: 1.15rem;
     --rf-section-pin-pad: 2.75rem;
+    --rf-section-stack-gap: 0.85rem;
   }
 
   .refonte-section--chapter {

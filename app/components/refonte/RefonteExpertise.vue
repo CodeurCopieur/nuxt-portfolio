@@ -521,8 +521,8 @@ onUnmounted(() => unbind())
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(0.75rem, 2vw, 1.5rem);
-  margin-top: 0.55rem;
-  padding-block: 0.65rem;
+  margin-top: var(--rf-section-stack-gap);
+  padding-block: 0.55rem;
   border-top: 1px solid var(--rf-line);
   border-bottom: 1px solid var(--rf-line);
   width: 100%;
@@ -538,8 +538,8 @@ onUnmounted(() => unbind())
 .rf-expertise__stat-value {
   /* Compacte au scroll via --rf-compact (0→1), sans scale qui déborde */
   font-size: calc(
-    (1 - var(--rf-compact, 0)) * clamp(2.75rem, 7vw, 4.5rem)
-    + var(--rf-compact, 0) * clamp(1.65rem, 3.5vw, 2.4rem)
+    (1 - var(--rf-compact, 0)) * clamp(2rem, 5.5vw, 4.5rem)
+    + var(--rf-compact, 0) * clamp(1.45rem, 3vw, 2.2rem)
   );
   color: var(--rf-accent);
   line-height: 0.95;
@@ -560,9 +560,8 @@ onUnmounted(() => unbind())
   display: grid;
   place-items: center;
   overflow: hidden;
-  /* Respire entre chiffres et radar / liste */
-  margin-top: clamp(1.25rem, 3vw, 2rem);
-  padding-top: clamp(0.35rem, 1vw, 0.75rem);
+  margin-top: var(--rf-section-stack-gap);
+  padding-top: 0.25rem;
 }
 
 .rf-expertise__radar {
@@ -635,8 +634,8 @@ onUnmounted(() => unbind())
   z-index: 2;
   display: grid;
   align-content: start;
-  gap: clamp(1rem, 2.2vw, 1.45rem);
-  padding: clamp(0.5rem, 1.5vw, 1rem) 0 1rem;
+  gap: var(--rf-section-stack-gap);
+  padding: 0.35rem 0 0.75rem;
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -652,7 +651,7 @@ onUnmounted(() => unbind())
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin-bottom: 0.65rem;
+  margin-bottom: 0.4rem;
   width: 100%;
   padding: 0;
   border: none;

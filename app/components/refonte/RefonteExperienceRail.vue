@@ -334,7 +334,7 @@ watch(total, () => nextTick(() => {
 
         <div class="refonte-container refonte-xp__head">
           <div class="refonte-xp__head-copy">
-            <p class="rf-movement__num">005 — Expériences</p>
+            <p class="rf-movement__num">05 — Expériences</p>
             <h2 class="refonte-display refonte-xp__title">Expériences</h2>
             <p class="refonte-xp__lead">
               <template v-if="isDesktop && !isComplete">
@@ -524,9 +524,12 @@ watch(total, () => nextTick(() => {
   top: var(--rf-nav-h);
   min-height: calc(100dvh - var(--rf-nav-h));
   display: grid;
-  gap: var(--rf-section-pin-pad);
-  padding-bottom: clamp(1.5rem, 4vw, 2.5rem);
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: var(--rf-section-stack-gap);
+  padding-top: var(--rf-section-pin-pad);
+  padding-bottom: clamp(1rem, 2.5vw, 1.75rem);
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .refonte-xp__pin.is-locked {
@@ -563,8 +566,8 @@ watch(total, () => nextTick(() => {
 .refonte-xp__lead {
   max-width: 46ch;
   margin: 0;
-  font-size: 0.95rem;
-  line-height: 1.6;
+  font-size: clamp(0.82rem, 1.5vh, 0.95rem);
+  line-height: 1.5;
   color: var(--rf-text-soft);
 }
 
@@ -578,7 +581,7 @@ watch(total, () => nextTick(() => {
 }
 
 .refonte-xp__counter-current {
-  font-size: clamp(3rem, 8vw, 5rem);
+  font-size: clamp(2.25rem, 5.5vw, 5rem);
   color: var(--rf-accent);
 }
 
@@ -589,7 +592,7 @@ watch(total, () => nextTick(() => {
 }
 
 .refonte-xp__stage {
-  min-height: clamp(380px, 48vh, 480px);
+  min-height: 0;
 }
 
 .refonte-xp__mission {
@@ -597,8 +600,9 @@ watch(total, () => nextTick(() => {
   grid-template-columns: minmax(12rem, 0.9fr) minmax(0, 1.4fr);
   gap: clamp(1.5rem, 4vw, 3rem);
   align-items: center;
-  min-height: clamp(380px, 48vh, 480px);
-  padding-block: clamp(1rem, 2.5vw, 1.5rem);
+  min-height: 0;
+  height: 100%;
+  padding-block: clamp(0.65rem, 1.5vw, 1.15rem);
   border-top: 1px solid var(--rf-line);
   border-bottom: 1px solid var(--rf-line);
 }
@@ -629,18 +633,20 @@ watch(total, () => nextTick(() => {
 
 .refonte-xp__mission-role {
   margin: 0;
-  font-size: clamp(1.35rem, 3vw, 2rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
-  color: var(--rf-text);
+  font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  color: var(--rf-text-soft);
 }
 
 .refonte-xp__mission-company {
-  margin: 0.55rem 0 0;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--rf-text-soft);
+  margin: 0.45rem 0 0;
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+  color: var(--rf-accent);
 }
 
 .refonte-xp__mission-place {
@@ -689,8 +695,8 @@ watch(total, () => nextTick(() => {
 
 .refonte-xp__mission-body {
   display: grid;
-  gap: clamp(1.15rem, 2.5vw, 1.65rem);
-  align-content: center;
+  gap: var(--rf-section-stack-gap);
+  align-content: start;
   min-width: 0;
 }
 
@@ -764,12 +770,12 @@ watch(total, () => nextTick(() => {
 
 .refonte-xp__beat-stack span {
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.04em;
   padding: 0.35rem 0.7rem;
-  border: 1px solid var(--rf-line);
+  border: 1px solid rgba(var(--rf-accent-rgb), 0.45);
   border-radius: 999px;
-  color: var(--rf-text-muted);
+  color: var(--rf-accent);
   will-change: opacity, transform;
 }
 
@@ -927,7 +933,9 @@ watch(total, () => nextTick(() => {
     position: relative;
     top: auto;
     min-height: auto;
+    grid-template-rows: none;
     gap: 1.15rem;
+    padding-top: var(--rf-section-pin-pad);
     padding-bottom: 1.25rem;
     overflow: visible;
   }
@@ -988,6 +996,169 @@ watch(total, () => nextTick(() => {
     flex: 0 0 min(78vw, 260px);
     width: min(78vw, 260px);
     max-width: none;
+  }
+}
+
+@media (max-height: 900px) and (min-width: 960px) {
+  .refonte-xp__head {
+    gap: 0.75rem;
+  }
+
+  .refonte-xp__lead {
+    font-size: 0.86rem;
+    line-height: 1.45;
+  }
+
+  .refonte-xp__stage {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .refonte-xp__stage > * {
+    width: 100%;
+  }
+
+  .refonte-xp__mission {
+    align-items: center;
+    gap: clamp(1.1rem, 2.4vh, 1.65rem);
+    padding-block: clamp(0.5rem, 1.5vh, 1rem);
+  }
+
+  .refonte-xp__mission-lead {
+    align-content: center;
+  }
+
+  .refonte-xp__mission-body {
+    align-content: center;
+    gap: clamp(0.7rem, 1.45vh, 1rem);
+  }
+
+  .refonte-xp__mission-index {
+    margin: 0 0 0.2rem;
+    font-size: clamp(2rem, 5vh, 2.85rem);
+  }
+
+  .refonte-xp__mission-role {
+    font-size: clamp(0.88rem, 1.55vh, 1rem);
+  }
+
+  .refonte-xp__mission-company {
+    margin-top: 0.3rem;
+    font-size: clamp(1.12rem, 2.35vh, 1.45rem);
+  }
+
+  .refonte-xp__mission-place {
+    font-size: clamp(0.76rem, 1.3vh, 0.82rem);
+  }
+
+  .refonte-xp__mission-period {
+    margin-top: 0.5rem;
+    font-size: 0.66rem;
+  }
+
+  .refonte-xp__mission-steps {
+    margin-top: 0.65rem;
+  }
+
+  .refonte-xp__beat {
+    grid-template-columns: 1.65rem minmax(0, 1fr);
+    gap: 0.65rem;
+  }
+
+  .refonte-xp__beat-num {
+    margin-top: 0.05rem;
+    font-size: clamp(0.9rem, 1.55vh, 1rem);
+  }
+
+  .refonte-xp__beat-content {
+    gap: 0.35rem;
+  }
+
+  .refonte-xp__beat-text {
+    font-size: clamp(0.86rem, 1.55vh, 0.94rem);
+    line-height: 1.5;
+  }
+
+  .refonte-xp__beat-list {
+    gap: 0.42rem;
+  }
+
+  .refonte-xp__beat-list li {
+    grid-template-columns: 1.35rem minmax(0, 1fr);
+    gap: 0.42rem;
+    font-size: clamp(0.82rem, 1.45vh, 0.9rem);
+    line-height: 1.4;
+  }
+
+  .refonte-xp__beat-list-idx {
+    font-size: 0.82rem;
+  }
+
+  .refonte-xp__beat-stack {
+    gap: 0.35rem;
+  }
+
+  .refonte-xp__beat-stack span {
+    font-size: clamp(0.68rem, 1.2vh, 0.74rem);
+    padding: 0.28rem 0.58rem;
+  }
+
+  .refonte-xp__pin {
+    padding-bottom: 0.65rem;
+  }
+
+  .refonte-xp__rail-area {
+    gap: 0.4rem;
+  }
+
+  .refonte-xp__timeline {
+    padding-bottom: 0.35rem;
+  }
+
+  .refonte-xp__timeline-dot {
+    padding: 0.15rem 0;
+    font-size: 0.55rem;
+    letter-spacing: 0.08em;
+  }
+
+  .refonte-xp__track {
+    gap: 0.45rem;
+    padding: 0.1rem 0 0.2rem;
+  }
+
+  .refonte-xp__card {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: 0.55rem;
+    row-gap: 0.12rem;
+    padding: 0.5rem 0.65rem;
+  }
+
+  .refonte-xp__card-num {
+    grid-row: 1 / span 2;
+    font-size: clamp(0.95rem, 1.8vh, 1.15rem);
+  }
+
+  .refonte-xp__card-company {
+    font-size: clamp(0.76rem, 1.35vh, 0.88rem);
+    line-height: 1.1;
+  }
+
+  .refonte-xp__card-role {
+    font-size: 0.65rem;
+    line-height: 1.2;
+  }
+
+  .refonte-xp__card-period,
+  .refonte-xp__card-location {
+    display: none;
+  }
+
+  .refonte-xp__card.is-active {
+    transform: none;
+    box-shadow: 2px 2px 0 rgba(11, 26, 58, 0.3);
   }
 }
 

@@ -246,4 +246,53 @@ async function goContact(event: MouseEvent) {
 .refonte-footer__legal-link:hover {
   color: var(--rf-accent);
 }
+
+@media (max-height: 900px) and (min-width: 768px) {
+  .refonte-footer {
+    padding-block: clamp(4.25rem, 10vh, 5.75rem) clamp(2rem, 4.2vh, 2.85rem);
+  }
+
+  .refonte-footer__climax {
+    gap: var(--rf-block-gap);
+    margin-bottom: clamp(2.75rem, 6.5vh, 4.25rem);
+  }
+
+  .refonte-footer__hero {
+    font-size: clamp(2.45rem, 6.8vh, 4.35rem);
+    margin: 0.7rem 0 0.45rem;
+    line-height: 1.02;
+  }
+
+  .refonte-footer__cta {
+    margin-top: 0.5rem;
+  }
+
+  .refonte-footer__meta {
+    gap: var(--rf-block-gap);
+    padding-top: 1.85rem;
+  }
+
+  .refonte-footer__name {
+    font-size: 1.32rem;
+  }
+
+  .refonte-footer__bottom {
+    margin-top: 2.35rem;
+    padding-top: 1rem;
+  }
+}
+
+@media (max-height: 780px) and (min-width: 768px) {
+  .refonte-footer {
+    padding-block: clamp(3.75rem, 8.5vh, 5rem) clamp(1.85rem, 3.8vh, 2.5rem);
+  }
+
+  .refonte-footer__climax {
+    margin-bottom: clamp(2.35rem, 5.5vh, 3.5rem);
+  }
+
+  .refonte-footer__hero {
+    font-size: clamp(2.2rem, 6.2vh, 3.85rem);
+  }
+}
 </style>
