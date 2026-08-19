@@ -275,7 +275,7 @@ const statsStyle = computed(() => {
   const count = statsCount.value
   const lineAlpha = Math.round(dock * 100) / 100
   const pushToCenter = (1 - dock) * 26
-  const scale = 1.42 - dock * 0.32
+  const scale = 1.42 - dock * 0.42
   const riseIn = (1 - count) * 0.85
 
   return {
