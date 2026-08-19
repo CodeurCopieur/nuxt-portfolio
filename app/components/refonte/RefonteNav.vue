@@ -5,7 +5,7 @@ import { PUBLIC_CONTACT_EMAIL } from '@/constants/contact'
 
 const route = useRoute()
 const { navigateTo } = useRefonteTransition()
-const { scrollProgress, activeChapter, refresh } = useRefonteScroll()
+const { scrollProgress, activeChapter, refresh, scroll } = useRefonteScroll()
 const menuOpen = ref(false)
 const contactEmail = PUBLIC_CONTACT_EMAIL
 
@@ -57,14 +57,24 @@ watch(() => route.path, () => {
   nextTick(() => refresh())
 })
 
-watch(menuOpen, (open) => {
-  document.documentElement.classList.toggle('rf-menu-lock', open)
-})
+function setMenuScrollLock(locked: boolean) {
+  document.documentElement.classList.toggle('rf-menu-lock', locked)
+  document.body.classList.toggle('rf-menu-lock', locked)
+
+  const lenis = scroll.value?.lenisInstance
+  if (locked) lenis?.stop()
+  else {
+    lenis?.start()
+    nextTick(() => refresh())
+  }
+}
+
+watch(menuOpen, setMenuScrollLock)
 
 onMounted(() => window.addEventListener('keydown', onKeydown))
 onUnmounted(() => {
   window.removeEventListener('keydown', onKeydown)
-  document.documentElement.classList.remove('rf-menu-lock')
+  setMenuScrollLock(false)
 })
 </script>
 
@@ -270,6 +280,10 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   padding-top: var(--rf-nav-h);
   padding-bottom: clamp(1.5rem, 5vw, 3rem);
   padding-inline: max(1.25rem, env(safe-area-inset-left));
@@ -362,7 +376,13 @@ onUnmounted(() => {
 </style>
 
 <style>
-html.rf-menu-lock {
+html.rf-menu-lock,
+body.rf-menu-lock {
   overflow: hidden;
+  overscroll-behavior: none;
+}
+
+html.rf-menu-lock body {
+  touch-action: none;
 }
 </style>

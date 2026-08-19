@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { categoryAvg, categoryLetter } from '~/utils/skill-ratings'
+import {
+  categoryAvg,
+  categoryLetter,
+  ratingTier,
+  ratingToLetter,
+  skillRating
+} from '~/utils/skill-ratings'
 import { useRefonteScroll } from '@/composables/refonte/useRefonteScroll'
 
 const { sections } = useContent()
@@ -21,23 +27,75 @@ const RADAR_LABELS: Record<string, string> = {
   langages: 'Langages',
   frameworks: 'Frameworks',
   outils_dev: 'Outils',
-  ui_animations: 'UI / Motion',
+  ui_animations: 'UI & motion',
   design: 'Design',
-  environnements: 'Env.',
+  environnements: 'Environnements',
   methodes: 'Méthodes',
-  ia_cursor: 'IA',
-  accessibilite: 'A11y'
+  ia_cursor: 'IA & Cursor',
+  accessibilite: 'Accessibilité'
 }
 
 const scrollerRef = ref<HTMLElement | null>(null)
 const smooth = ref(0)
 const isDesktop = ref(false)
 const openKey = ref<string | null>(null)
+const scrollActive = ref(false)
+const statsIntroStep = ref(0)
+const sectionChoreActive = ref(false)
 
-const SCROLL_TRAVEL = 3000
+const SCROLL_TRAVEL_BASE = 2200
+const SCROLL_TRAVEL_PER_CAT = 380
+const SCROLL_IDLE_MS = 220
+const SCROLL_SETTLE_EPS = 0.002
+
+const DETAIL_START = 0.3
+const DETAIL_END = 0.96
+const FINALE_START = 0.94
 
 let rafId = 0
 let targetP = 0
+let scrollIdleTimer: ReturnType<typeof setTimeout> | null = null
+let statsIntroTimers: ReturnType<typeof setTimeout>[] = []
+let statsIntroPlayed = false
+
+function clearStatsIntroTimers() {
+  statsIntroTimers.forEach(clearTimeout)
+  statsIntroTimers = []
+}
+
+function resetStatsIntro() {
+  clearStatsIntroTimers()
+  statsIntroStep.value = 0
+  statsIntroPlayed = false
+}
+
+function startStatsIntro() {
+  if (!isDesktop.value || statsIntroPlayed) return
+  statsIntroPlayed = true
+  clearStatsIntroTimers()
+  statsIntroStep.value = 1
+  statsIntroTimers.push(setTimeout(() => {
+    statsIntroStep.value = Math.max(statsIntroStep.value, 2)
+  }, 110))
+  statsIntroTimers.push(setTimeout(() => {
+    statsIntroStep.value = 3
+  }, 220))
+}
+
+function markScrolling() {
+  scrollActive.value = true
+  if (scrollIdleTimer) clearTimeout(scrollIdleTimer)
+  scrollIdleTimer = setTimeout(checkScrollIdle, SCROLL_IDLE_MS)
+}
+
+function checkScrollIdle() {
+  if (Math.abs(targetP - smooth.value) > SCROLL_SETTLE_EPS) {
+    scrollIdleTimer = setTimeout(checkScrollIdle, 80)
+    return
+  }
+  scrollActive.value = false
+  scrollIdleTimer = null
+}
 
 function labelFor(key: string) {
   return CATEGORY_LABELS[key] ?? key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
@@ -118,82 +176,172 @@ function easeInOut(t: number) {
 const p = computed(() => smooth.value)
 
 /*
- * 0–0.22  décompte chiffres
- * 0.20–0.55 radar grand / dessiné
- * 0.52–0.64 radar sort
- * 0.60–1.00 liste à la place du radar
+ * 0–0.04  apparition une par une (00, 00, 00)
+ * 0.04–0.16 décompte chiffres
+ * 0.14–0.26 montée vers le titre
+ * 0.22–0.32 radar apparaît / se dessine
+ * 0.30–0.96 parcours catégorie par catégorie (radar + détail droite)
+ * 0.94–1.00 fin de chorégraphie
  */
 
-const liveStats = computed(() => {
-  const t = easeOut(span(p.value, 0.02, 0.2))
-  return statTargets.value.map((s) => ({
-    ...s,
-    display: String(Math.round(s.target * t)).padStart(s.pad, '0')
-  }))
+const activeCatIndex = computed(() => {
+  if (!isDesktop.value || p.value < DETAIL_START) return 0
+  const cats = categories.value
+  if (!cats.length) return 0
+  if (p.value >= DETAIL_END) return cats.length - 1
+  const t = (p.value - DETAIL_START) / (DETAIL_END - DETAIL_START)
+  return Math.min(Math.floor(t * cats.length), cats.length - 1)
 })
 
-const statsCompact = computed(() => easeInOut(span(p.value, 0.18, 0.3)))
+const activeCategory = computed(() => categories.value[activeCatIndex.value] ?? null)
 
-const radarOpacity = computed(() => {
-  const enter = easeOut(span(p.value, 0.18, 0.3))
-  const exit = 1 - easeInOut(span(p.value, 0.52, 0.64))
-  return Math.round(enter * exit * 40) / 40
+const activeSkills = computed(() => {
+  const cat = activeCategory.value
+  if (!cat) return []
+  return cat.skills.map((skill, index) => {
+    const rating = skillRating(skill, cat.key, index)
+    return {
+      skill,
+      rating,
+      letter: ratingToLetter(rating),
+      tier: ratingTier(rating)
+    }
+  })
 })
 
-const radarScale = computed(() => {
-  const grow = 0.92 + easeOut(span(p.value, 0.2, 0.42)) * 0.08
-  const exit = 1 - easeInOut(span(p.value, 0.52, 0.64)) * 0.25
-  return Math.round(grow * exit * 50) / 50
-})
+const detailActive = computed(() => isDesktop.value && p.value >= DETAIL_START)
 
-const radarDraw = computed(() => Math.round(easeOut(span(p.value, 0.22, 0.48)) * 40) / 40)
-const scoreOpacity = computed(() => Math.round(easeOut(span(p.value, 0.34, 0.5)) * 40) / 40)
+const isChoreographyComplete = computed(() =>
+  isDesktop.value
+  && p.value >= FINALE_START
+  && activeCatIndex.value >= Math.max(categories.value.length - 1, 0)
+)
 
-/** Liste apparaît dans la même zone que le radar. */
-const listOpacity = computed(() => {
-  if (!isDesktop.value) return 1
-  return Math.round(easeOut(span(p.value, 0.6, 0.7)) * 40) / 40
-})
+const STAT_STAGGER = 0.013
+const STAT_REVEAL_DUR = 0.022
+const STAT_COUNT_START = 0.042
 
-const listVisible = computed(() => listOpacity.value > 0.02 || !isDesktop.value)
+function statReveal(index: number) {
+  if (!isDesktop.value || !sectionChoreActive.value) return 0
+  if (index === 0) return 1
+  if (p.value >= STAT_COUNT_START) return 1
 
-function groupStyle(catIndex: number) {
-  if (!isDesktop.value) return { opacity: 1, transform: 'none' }
-  const start = 0.62 + catIndex * 0.04
-  const t = easeOut(span(p.value, start, start + 0.08))
+  const scrollReveal = easeOut(span(p.value, index * STAT_STAGGER, index * STAT_STAGGER + STAT_REVEAL_DUR))
+  const introVisible = statsIntroStep.value > index
+  return Math.max(introVisible ? 1 : 0, scrollReveal)
+}
+
+function statItemStyle(reveal: number, index: number) {
+  if (!isDesktop.value || !sectionChoreActive.value) {
+    return { visibility: 'hidden' as const }
+  }
   return {
-    opacity: t,
-    transform: `translateY(${(1 - t) * 20}px)`
+    opacity: Math.round(reveal * 40) / 40,
+    transform: `translateY(${(1 - reveal) * 1.1}rem)`,
+    visibility: reveal < 0.015 && index > 0 ? 'hidden' as const : 'visible' as const
   }
 }
 
-function pillStyle(catIndex: number, skillIndex: number) {
-  if (!isDesktop.value) return { opacity: 1, transform: 'none' }
-  const start = 0.64 + catIndex * 0.04 + skillIndex * 0.005
-  const t = easeOut(span(p.value, start, start + 0.05))
-  return {
-    opacity: t,
-    transform: `translateY(${(1 - t) * 8}px)`
+const liveStats = computed(() => {
+  const t = easeOut(span(p.value, STAT_COUNT_START, STAT_COUNT_START + 0.12))
+  return statTargets.value.map((s, i) => ({
+    ...s,
+    display: String(Math.round(s.target * t)).padStart(s.pad, '0'),
+    reveal: statReveal(i)
+  }))
+})
+
+const statsCompact = computed(() => easeInOut(span(p.value, 0.14, 0.24)))
+
+const statsCount = computed(() => easeOut(span(p.value, STAT_COUNT_START, STAT_COUNT_START + 0.12)))
+
+const statsDock = computed(() => easeInOut(span(p.value, 0.14, 0.26)))
+
+const statsStyle = computed(() => {
+  const compact = statsCompact.value
+
+  if (!isDesktop.value) {
+    return { '--rf-compact': compact }
   }
+
+  if (!sectionChoreActive.value) {
+    return {
+      '--rf-compact': compact,
+      visibility: 'hidden' as const
+    }
+  }
+
+  const dock = statsDock.value
+  const count = statsCount.value
+  const lineAlpha = Math.round(dock * 100) / 100
+  const pushToCenter = (1 - dock) * 26
+  const scale = 1.42 - dock * 0.32
+  const riseIn = (1 - count) * 0.85
+
+  return {
+    '--rf-compact': compact,
+    opacity: 1,
+    transform: `translateY(calc(${pushToCenter}vh + ${riseIn}rem)) scale(${scale})`,
+    transformOrigin: 'center center',
+    borderTopColor: dock > 0.08 ? `rgba(255, 255, 255, ${0.14 * lineAlpha})` : 'transparent',
+    borderBottomColor: dock > 0.08 ? `rgba(255, 255, 255, ${0.14 * lineAlpha})` : 'transparent',
+    visibility: 'visible' as const
+  }
+})
+
+const radarOpacity = computed(() => {
+  if (!isDesktop.value || !sectionChoreActive.value) return 0
+  return Math.round(easeOut(span(p.value, 0.22, 0.32)) * 40) / 40
+})
+
+const radarScale = computed(() => {
+  if (!isDesktop.value || !sectionChoreActive.value) return 1
+  const grow = 0.9 + easeOut(span(p.value, 0.22, 0.38)) * 0.1
+  return Math.round(grow * 50) / 50
+})
+
+const radarDraw = computed(() => Math.round(easeOut(span(p.value, 0.24, 0.38)) * 40) / 40)
+
+const detailOpacity = computed(() => {
+  if (!isDesktop.value || !sectionChoreActive.value) return 0
+  return Math.round(easeOut(span(p.value, 0.28, 0.36)) * 40) / 40
+})
+
+const finaleOpacity = computed(() => {
+  if (!isDesktop.value) return 0
+  return Math.round(easeOut(span(p.value, FINALE_START, 1)) * 40) / 40
+})
+
+function axisScoreOpacity(index: number) {
+  const reveal = easeOut(span(p.value, 0.32, 0.42))
+  if (reveal <= 0.02) return 0
+  if (!detailActive.value) return reveal
+  if (index === activeRadarIndex.value) return 1
+  return scrollActive.value ? 0.4 : 0.58
+}
+
+function isAxisActive(index: number) {
+  return detailActive.value && index === activeRadarIndex.value
 }
 
 const actLabel = computed(() => {
   if (p.value < 0.24) return '01 — Chiffres'
-  if (p.value < 0.6) return '02 — Radar'
-  return '03 — Détail'
+  if (p.value < DETAIL_START) return '02 — Radar'
+  if (isChoreographyComplete.value) return 'Fin — Parcours complet'
+  return activeCategory.value ? `03 — ${activeCategory.value.label}` : '03 — Détail'
 })
 
 function pad(n: number) {
   return String(n + 1).padStart(2, '0')
 }
 
-const radarSize = 640
+const radarSize = 720
 const radarCx = radarSize / 2
 const radarCy = radarSize / 2
-const radarMaxR = 195
+const radarMaxR = 205
 
 const radarAxes = computed(() => {
-  const cats = categories.value.slice(0, 8)
+  const cats = categories.value
   const n = Math.max(cats.length, 3)
   const draw = radarDraw.value
   return cats.map((cat, i) => {
@@ -205,10 +353,8 @@ const radarAxes = computed(() => {
       ...cat,
       x: radarCx + cos * r,
       y: radarCy + sin * r,
-      labelX: radarCx + cos * (radarMaxR + 44),
-      labelY: radarCy + sin * (radarMaxR + 44),
-                  scoreX: radarCx + cos * (r + 28),
-                  scoreY: radarCy + sin * (r + 28),
+      labelX: radarCx + cos * (radarMaxR + 56),
+      labelY: radarCy + sin * (radarMaxR + 56),
       gridX: (level: number) => radarCx + cos * radarMaxR * level,
       gridY: (level: number) => radarCy + sin * radarMaxR * level
     }
@@ -219,6 +365,15 @@ const radarPolygon = computed(() =>
   radarAxes.value.map((a) => `${a.x.toFixed(1)},${a.y.toFixed(1)}`).join(' ')
 )
 
+const activeRadarIndex = computed(() => {
+  const key = activeCategory.value?.key
+  if (!key) return 0
+  const idx = radarAxes.value.findIndex((a) => a.key === key)
+  return idx >= 0 ? idx : 0
+})
+
+const focusedAxis = computed(() => radarAxes.value[activeRadarIndex.value] ?? null)
+
 const radarGridLevels = [0.33, 0.66, 1]
 
 function gridPolygon(level: number) {
@@ -227,9 +382,11 @@ function gridPolygon(level: number) {
   return axes.map((a) => `${a.gridX(level).toFixed(1)},${a.gridY(level).toFixed(1)}`).join(' ')
 }
 
-const scrollerHeight = computed(() =>
-  isDesktop.value ? `calc(100dvh - var(--rf-nav-h) + ${SCROLL_TRAVEL}px)` : 'auto'
-)
+const scrollerHeight = computed(() => {
+  if (!isDesktop.value) return 'auto'
+  const travel = SCROLL_TRAVEL_BASE + Math.max(categories.value.length, 1) * SCROLL_TRAVEL_PER_CAT
+  return `calc(100dvh - var(--rf-nav-h) + ${travel}px)`
+})
 
 function getNavOffset() {
   const raw = getComputedStyle(document.documentElement).getPropertyValue('--rf-nav-h').trim()
@@ -242,8 +399,10 @@ function tickSmooth() {
   if (Math.abs(diff) < 0.0008) {
     smooth.value = targetP
     rafId = 0
+    checkScrollIdle()
     return
   }
+  scrollActive.value = true
   smooth.value += diff * 0.2
   rafId = requestAnimationFrame(tickSmooth)
 }
@@ -252,15 +411,42 @@ function updateProgress() {
   if (!import.meta.client || !isDesktop.value) {
     targetP = 1
     smooth.value = 1
+    scrollActive.value = false
+    sectionChoreActive.value = false
     return
   }
   const el = scrollerRef.value
   if (!el) return
+  markScrolling()
   const nav = getNavOffset()
   const viewportH = window.innerHeight - nav
-  const scrolledInto = Math.max(0, nav - el.getBoundingClientRect().top)
-  const maxScroll = Math.max(el.offsetHeight - viewportH, 1)
+  const midLine = nav + viewportH * 0.5
+  const top = el.getBoundingClientRect().top
+
+  if (top > midLine) {
+    if (sectionChoreActive.value) resetStatsIntro()
+    sectionChoreActive.value = false
+    targetP = 0
+    if (!rafId) rafId = requestAnimationFrame(tickSmooth)
+    return
+  }
+
+  if (!sectionChoreActive.value) {
+    sectionChoreActive.value = true
+    startStatsIntro()
+  }
+
+  const leadIn = viewportH * 0.5
+  const pinTravel = Math.max(el.offsetHeight - viewportH, 1)
+  const maxScroll = leadIn + pinTravel
+  const scrolledInto = midLine - top
   targetP = Math.min(scrolledInto / maxScroll, 1)
+
+  if (targetP >= STAT_COUNT_START) {
+    statsIntroStep.value = 3
+    clearStatsIntroTimers()
+  }
+
   if (!rafId) rafId = requestAnimationFrame(tickSmooth)
 }
 
@@ -296,6 +482,13 @@ function unbind() {
     cancelAnimationFrame(rafId)
     rafId = 0
   }
+  if (scrollIdleTimer) {
+    clearTimeout(scrollIdleTimer)
+    scrollIdleTimer = null
+  }
+  scrollActive.value = false
+  resetStatsIntro()
+  sectionChoreActive.value = false
 }
 
 watch(ready, (ok) => {
@@ -343,102 +536,188 @@ onUnmounted(() => unbind())
           <!-- Chiffres : toujours sous le titre, dans le container — pas de vide géant -->
           <div
             class="rf-expertise__stats"
-            :style="{ '--rf-compact': statsCompact }"
+            :style="statsStyle"
           >
             <div
-              v-for="stat in liveStats"
+              v-for="(stat, si) in liveStats"
               :key="stat.label"
               class="rf-expertise__stat"
+              :style="statItemStyle(stat.reveal, si)"
             >
               <span class="rf-expertise__stat-value refonte-serif">{{ stat.display }}</span>
               <span class="rf-expertise__stat-label">{{ stat.label }}</span>
             </div>
           </div>
 
-          <!-- Même zone : radar (desktop) puis liste -->
+          <!-- Desktop : radar (gauche) + détail catégorie (droite) au scroll -->
           <div class="rf-expertise__stage">
-            <div
-              v-if="isDesktop"
-              class="rf-expertise__radar"
-              aria-hidden="true"
-              :style="{
-                opacity: radarOpacity,
-                transform: `scale(${radarScale})`,
-                visibility: radarOpacity < 0.02 ? 'hidden' : 'visible'
-              }"
-            >
-              <svg
-                class="rf-expertise__radar-svg"
-                :viewBox="`0 0 ${radarSize} ${radarSize}`"
-                fill="none"
+            <template v-if="isDesktop">
+              <div
+                class="rf-expertise__radar"
+                :class="{
+                  'is-scrolling': scrollActive && detailActive,
+                  'has-selection': detailActive
+                }"
+                aria-hidden="true"
+                :style="{
+                  opacity: radarOpacity,
+                  transform: `scale(${radarScale})`,
+                  visibility: radarOpacity < 0.02 ? 'hidden' : 'visible'
+                }"
               >
-                <polygon
-                  v-for="level in radarGridLevels"
-                  :key="level"
-                  :points="gridPolygon(level)"
-                  class="rf-expertise__radar-grid"
-                />
-                <line
-                  v-for="(axis, i) in radarAxes"
-                  :key="`axis-${i}`"
-                  :x1="radarCx"
-                  :y1="radarCy"
-                  :x2="axis.gridX(1)"
-                  :y2="axis.gridY(1)"
-                  class="rf-expertise__radar-axis"
-                />
-                <polygon
-                  v-if="radarAxes.length"
-                  :points="radarPolygon"
-                  class="rf-expertise__radar-shape"
-                />
-                <g v-for="(axis, i) in radarAxes" :key="`pt-${i}`">
-                  <circle :cx="axis.x" :cy="axis.y" r="4.5" class="rf-expertise__radar-dot" />
-                  <text
-                    :x="axis.scoreX"
-                    :y="axis.scoreY"
-                    class="rf-expertise__radar-score"
-                    text-anchor="middle"
-                    dominant-baseline="middle"
-                    :opacity="scoreOpacity"
+                <svg
+                  class="rf-expertise__radar-svg"
+                  :viewBox="`0 0 ${radarSize} ${radarSize}`"
+                  fill="none"
+                >
+                  <g class="rf-expertise__radar-fog">
+                    <polygon
+                      v-for="level in radarGridLevels"
+                      :key="level"
+                      :points="gridPolygon(level)"
+                      class="rf-expertise__radar-grid"
+                    />
+                    <line
+                      v-for="(axis, i) in radarAxes"
+                      :key="`axis-${i}`"
+                      :x1="radarCx"
+                      :y1="radarCy"
+                      :x2="axis.gridX(1)"
+                      :y2="axis.gridY(1)"
+                      class="rf-expertise__radar-axis"
+                      :class="{ 'is-active': isAxisActive(i) }"
+                    />
+                    <polygon
+                      v-if="radarAxes.length"
+                      :points="radarPolygon"
+                      class="rf-expertise__radar-shape"
+                    />
+                    <g
+                      v-for="(axis, i) in radarAxes"
+                      :key="`pt-${i}`"
+                      class="rf-expertise__radar-g"
+                      :class="{ 'is-active': isAxisActive(i) }"
+                    >
+                      <g
+                        class="rf-expertise__radar-note"
+                        :opacity="axisScoreOpacity(i)"
+                      >
+                        <circle
+                          :cx="axis.x"
+                          :cy="axis.y"
+                          r="15"
+                          class="rf-expertise__radar-note-bg"
+                        />
+                        <text
+                          :x="axis.x"
+                          :y="axis.y"
+                          class="rf-expertise__radar-score"
+                          text-anchor="middle"
+                          dominant-baseline="middle"
+                        >
+                          {{ axis.letter }}
+                        </text>
+                      </g>
+                      <text
+                        :x="axis.labelX"
+                        :y="axis.labelY"
+                        class="rf-expertise__radar-label"
+                        text-anchor="middle"
+                        dominant-baseline="middle"
+                      >
+                        {{ axis.radarLabel }}
+                      </text>
+                    </g>
+                  </g>
+
+                  <g v-if="detailActive && focusedAxis && scrollActive" class="rf-expertise__radar-focus is-active">
+                    <g class="rf-expertise__radar-note">
+                      <circle
+                        :cx="focusedAxis.x"
+                        :cy="focusedAxis.y"
+                        r="17"
+                        class="rf-expertise__radar-note-bg"
+                      />
+                      <text
+                        :x="focusedAxis.x"
+                        :y="focusedAxis.y"
+                        class="rf-expertise__radar-score"
+                        text-anchor="middle"
+                        dominant-baseline="middle"
+                      >
+                        {{ focusedAxis.letter }}
+                      </text>
+                    </g>
+                    <text
+                      :x="focusedAxis.labelX"
+                      :y="focusedAxis.labelY"
+                      class="rf-expertise__radar-label"
+                      text-anchor="middle"
+                      dominant-baseline="middle"
+                    >
+                      {{ focusedAxis.radarLabel }}
+                    </text>
+                  </g>
+                </svg>
+              </div>
+
+              <aside
+                class="rf-expertise__detail"
+                :style="{
+                  opacity: detailOpacity,
+                  visibility: detailOpacity < 0.02 ? 'hidden' : 'visible'
+                }"
+              >
+                <Transition name="rf-detail" mode="out-in">
+                  <div
+                    v-if="activeCategory && detailActive"
+                    :key="activeCategory.key"
+                    class="rf-expertise__detail-panel"
                   >
-                    {{ axis.letter }}
-                  </text>
-                  <text
-                    :x="axis.labelX"
-                    :y="axis.labelY"
-                    class="rf-expertise__radar-label"
-                    text-anchor="middle"
-                    dominant-baseline="middle"
-                  >
-                    {{ axis.radarLabel }}
-                  </text>
-                </g>
-              </svg>
-            </div>
+                    <header class="rf-expertise__detail-head">
+                      <h3 class="rf-expertise__detail-title">{{ activeCategory.label }}</h3>
+                      <span class="rf-expertise__detail-grade-value rf-grade">{{ activeCategory.letter }}</span>
+                    </header>
+                    <ul class="rf-expertise__meters">
+                      <li
+                        v-for="item in activeSkills"
+                        :key="item.skill"
+                        class="rf-expertise__meter"
+                        :class="`rf-expertise__meter--${item.tier}`"
+                      >
+                        <span class="rf-expertise__meter-accent" aria-hidden="true" />
+                        <span class="rf-expertise__meter-name">{{ item.skill }}</span>
+                        <span class="rf-expertise__meter-val rf-grade">{{ item.letter }}</span>
+                      </li>
+                    </ul>
+                  </div>
+                </Transition>
+
+                <p
+                  v-if="isChoreographyComplete"
+                  class="rf-expertise__finale"
+                  :style="{ opacity: finaleOpacity }"
+                >
+                  Parcours complet — continuez vers le bas.
+                </p>
+              </aside>
+            </template>
 
             <div
+              v-else
               class="rf-expertise__groups"
-              :style="{
-                opacity: listOpacity,
-                visibility: listVisible ? 'visible' : 'hidden',
-                pointerEvents: listOpacity > 0.2 ? 'auto' : 'none'
-              }"
             >
               <div
                 v-for="(cat, ci) in categories"
                 :key="cat.key"
                 class="rf-expertise__group"
                 :class="{ 'is-open': isGroupOpen(cat.key) }"
-                :style="groupStyle(ci)"
               >
                 <button
                   type="button"
                   class="rf-expertise__group-head"
-                  :class="{ 'is-static': isDesktop }"
                   :aria-expanded="isGroupOpen(cat.key)"
                   :aria-controls="`rf-expertise-panel-${cat.key}`"
-                  :tabindex="isDesktop ? -1 : 0"
                   @click="toggleGroup(cat.key)"
                 >
                   <span class="rf-expertise__group-num">{{ pad(ci) }}</span>
@@ -452,10 +731,9 @@ onUnmounted(() => unbind())
                   :hidden="!isGroupOpen(cat.key)"
                 >
                   <span
-                    v-for="(skill, si) in cat.skills"
+                    v-for="skill in cat.skills"
                     :key="skill"
                     class="rf-expertise__pill"
-                    :style="pillStyle(ci, si)"
                   >{{ skill }}</span>
                 </div>
               </div>
@@ -527,6 +805,22 @@ onUnmounted(() => unbind())
   border-bottom: 1px solid var(--rf-line);
   width: 100%;
   box-sizing: border-box;
+  position: relative;
+  z-index: 4;
+}
+
+@media (min-width: 768px) {
+  .rf-expertise__stats {
+    will-change: transform, opacity;
+    margin-top: clamp(0.55rem, 1.35vw, 0.85rem);
+    padding-block: 0.65rem 0.55rem;
+  }
+
+  .rf-expertise__stat {
+    text-align: center;
+    justify-items: center;
+    transition: opacity 0.32s var(--rf-ease), transform 0.32s var(--rf-ease);
+  }
 }
 
 .rf-expertise__stat {
@@ -538,8 +832,8 @@ onUnmounted(() => unbind())
 .rf-expertise__stat-value {
   /* Compacte au scroll via --rf-compact (0→1), sans scale qui déborde */
   font-size: calc(
-    (1 - var(--rf-compact, 0)) * clamp(2rem, 5.5vw, 4.5rem)
-    + var(--rf-compact, 0) * clamp(1.45rem, 3vw, 2.2rem)
+    (1 - var(--rf-compact, 0)) * clamp(2.35rem, 6.2vw, 5rem)
+    + var(--rf-compact, 0) * clamp(1.95rem, 4.2vw, 3rem)
   );
   color: var(--rf-accent);
   line-height: 0.95;
@@ -547,7 +841,10 @@ onUnmounted(() => unbind())
 }
 
 .rf-expertise__stat-label {
-  font-size: 0.62rem;
+  font-size: calc(
+    (1 - var(--rf-compact, 0)) * 0.68rem
+    + var(--rf-compact, 0) * 0.62rem
+  );
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -557,30 +854,44 @@ onUnmounted(() => unbind())
 .rf-expertise__stage {
   position: relative;
   min-height: 0;
-  display: grid;
-  place-items: center;
   overflow: hidden;
   margin-top: var(--rf-section-stack-gap);
   padding-top: 0.25rem;
 }
 
+@media (min-width: 768px) {
+  .rf-expertise__stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr);
+    gap: clamp(0.75rem, 2vw, 1.5rem);
+    align-items: center;
+    place-items: stretch;
+  }
+}
+
 .rf-expertise__radar {
-  position: absolute;
-  inset: 0;
-  margin: auto;
-  width: min(100%, 98%);
-  height: min(100%, 98%);
-  max-width: 720px;
-  max-height: 720px;
-  aspect-ratio: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding: 0.35rem;
+  box-sizing: border-box;
   will-change: opacity, transform;
   transform-origin: center center;
   z-index: 1;
 }
 
 .rf-expertise__radar-svg {
-  width: 100%;
-  height: 100%;
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  aspect-ratio: 1;
   overflow: visible;
 }
 
@@ -591,8 +902,14 @@ onUnmounted(() => unbind())
 }
 
 .rf-expertise__radar-axis {
-  stroke: rgba(255, 255, 255, 0.16);
+  stroke: rgba(255, 255, 255, 0.12);
   stroke-width: 1.1;
+  transition: stroke 0.55s var(--rf-ease), stroke-width 0.55s var(--rf-ease);
+}
+
+.rf-expertise__radar-axis.is-active {
+  stroke: rgba(var(--rf-accent-rgb), 0.72);
+  stroke-width: 1.65;
 }
 
 .rf-expertise__radar-shape {
@@ -603,34 +920,231 @@ onUnmounted(() => unbind())
 }
 
 .rf-expertise__radar-dot {
-  fill: var(--rf-accent);
+  fill: rgba(255, 255, 255, 0.35);
+  transition: fill 0.35s var(--rf-ease);
+}
+
+.rf-expertise__radar-note {
+  pointer-events: none;
+  transition: opacity 0.55s var(--rf-ease);
+}
+
+.rf-expertise__radar-note-bg {
+  fill: rgba(11, 26, 58, 0.88);
+  stroke: rgba(255, 255, 255, 0.22);
+  stroke-width: 1.25;
+  transition: fill 0.55s var(--rf-ease), stroke 0.55s var(--rf-ease), stroke-width 0.55s var(--rf-ease);
 }
 
 .rf-expertise__radar-score {
-  fill: var(--rf-accent);
-  font-size: 28px;
+  fill: var(--rf-text);
+  font-size: 15px;
   font-family: var(--rf-comic);
   font-style: normal;
   font-weight: 400;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   paint-order: stroke fill;
-  stroke: rgba(11, 26, 58, 0.9);
-  stroke-width: 3.5px;
+  stroke: rgba(11, 26, 58, 0.65);
+  stroke-width: 2px;
+  transition: fill 0.35s var(--rf-ease);
+}
+
+.rf-expertise__radar-g.is-active .rf-expertise__radar-note-bg {
+  fill: rgba(11, 26, 58, 0.95);
+  stroke: var(--rf-accent);
+  stroke-width: 1.85;
+}
+
+.rf-expertise__radar-g.is-active .rf-expertise__radar-score {
+  fill: var(--rf-accent);
 }
 
 .rf-expertise__radar-label {
-  fill: var(--rf-text-soft);
+  fill: var(--rf-text-muted);
   font-size: 12px;
   font-family: var(--rf-sans);
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+  transition: fill 0.55s var(--rf-ease), opacity 0.55s var(--rf-ease);
 }
 
-/* Liste = même place que le radar */
-.rf-expertise__groups {
+.rf-expertise__radar-g.is-active .rf-expertise__radar-label {
+  fill: var(--rf-accent);
+}
+
+.rf-expertise__radar.has-selection .rf-expertise__radar-g:not(.is-active) .rf-expertise__radar-label {
+  opacity: 0.56;
+}
+
+.rf-expertise__radar.has-selection:not(.is-scrolling) .rf-expertise__radar-g.is-active .rf-expertise__radar-label {
+  font-size: 12.5px;
+}
+
+.rf-expertise__radar-fog {
+  transform-origin: center;
+  filter: blur(0);
+  opacity: 1;
+  transition:
+    filter 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.rf-expertise__radar.is-scrolling .rf-expertise__radar-fog {
+  filter: blur(2.75px);
+  opacity: 0.9;
+}
+
+.rf-expertise__radar-focus .rf-expertise__radar-label {
+  fill: var(--rf-accent);
+  font-size: 13px;
+}
+
+.rf-expertise__radar-focus .rf-expertise__radar-note-bg {
+  fill: rgba(11, 26, 58, 0.97);
+  stroke: var(--rf-accent);
+  stroke-width: 2;
+}
+
+.rf-expertise__radar-focus .rf-expertise__radar-score {
+  fill: var(--rf-accent);
+  font-size: 17px;
+}
+
+.rf-expertise__detail {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 0.65rem;
+  min-width: 0;
+  min-height: 0;
+  padding: 0.15rem 0 0.15rem 0.35rem;
+  will-change: opacity;
+}
+
+.rf-expertise__detail-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 0.65rem;
+  width: min(100%, 25rem);
+  min-height: 0;
+  align-content: start;
+}
+
+.rf-expertise__detail-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0 0.1rem 0.5rem;
+  border-bottom: 1px solid var(--rf-line);
+}
+
+.rf-expertise__detail-title {
+  margin: 0;
+  font-size: clamp(0.92rem, 1.85vh, 1.08rem);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  color: var(--rf-accent);
+}
+
+.rf-expertise__detail-grade-value {
+  font-size: clamp(1.45rem, 2.85vh, 1.9rem);
+  line-height: 1;
+  color: var(--rf-accent);
+  flex-shrink: 0;
+}
+
+.rf-expertise__detail .rf-grade {
+  font-weight: inherit;
+}
+
+.rf-expertise__meters {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.38rem;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.rf-expertise__meters::-webkit-scrollbar {
+  display: none;
+}
+
+.rf-expertise__meter {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 2.5rem;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.6rem 0.5rem 0.85rem;
+  border: 1px solid var(--rf-line);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.rf-expertise__meter-accent {
   position: absolute;
-  inset: 0;
+  left: 0;
+  top: 22%;
+  bottom: 22%;
+  width: 3px;
+  background: var(--rf-accent);
+}
+
+.rf-expertise__meter-name {
+  font-size: 0.88rem;
+  color: var(--rf-text);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rf-expertise__meter-val {
+  font-size: 1rem;
+  line-height: 1;
+  text-align: right;
+  color: var(--rf-gold);
+  flex-shrink: 0;
+}
+
+.rf-expertise__meter--elite .rf-expertise__meter-val,
+.rf-expertise__meter--high .rf-expertise__meter-val {
+  color: var(--rf-accent);
+}
+
+.rf-expertise__finale {
+  margin: 0.5rem 0 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--rf-accent);
+}
+
+.rf-detail-enter-active,
+.rf-detail-leave-active {
+  transition: opacity 0.32s var(--rf-ease), transform 0.32s var(--rf-ease);
+}
+
+.rf-detail-enter-from {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.rf-detail-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+/* Liste mobile */
+.rf-expertise__groups {
+  position: relative;
+  inset: auto;
   z-index: 2;
   display: grid;
   align-content: start;
@@ -659,11 +1173,7 @@ onUnmounted(() => unbind())
   color: inherit;
   font: inherit;
   text-align: left;
-  cursor: default;
-}
-
-.rf-expertise__group-head.is-static {
-  pointer-events: none;
+  cursor: pointer;
 }
 
 .rf-expertise__group-num {
@@ -804,10 +1314,128 @@ onUnmounted(() => unbind())
   }
 }
 
+@media (min-width: 768px) and (max-width: 1200px) {
+  .rf-expertise__stage {
+    grid-template-columns: minmax(0, 1.55fr) minmax(10rem, 0.45fr);
+    justify-content: center;
+    align-items: center;
+    gap: clamp(0.65rem, 1.8vw, 1.1rem);
+    width: min(100%, 62rem);
+    margin-inline: auto;
+  }
+
+  .rf-expertise__radar {
+    padding: 0;
+  }
+
+  .rf-expertise__radar-svg {
+    width: min(100%, 40rem);
+    height: auto;
+    max-height: min(78vh, 40rem);
+  }
+
+  .rf-expertise__detail {
+    padding: 0;
+  }
+
+  .rf-expertise__detail-panel {
+    width: min(100%, 21rem);
+    max-width: 21rem;
+  }
+}
+
+@media (max-height: 900px) and (min-width: 1201px) {
+  .rf-expertise__stage {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    width: min(100%, 58rem);
+    margin-inline: auto;
+  }
+
+  .rf-expertise__radar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    padding: 0;
+  }
+
+  .rf-expertise__radar-svg {
+    width: min(100%, 30rem);
+    height: auto;
+    max-height: min(62vh, 30rem);
+  }
+
+  .rf-expertise__radar-label {
+    font-size: 11px;
+  }
+
+  .rf-expertise__radar-score {
+    font-size: 13px;
+  }
+
+  .rf-expertise__radar-note {
+    transform: scale(0.88);
+    transform-origin: center;
+    transform-box: fill-box;
+  }
+
+  .rf-expertise__radar-focus .rf-expertise__radar-score {
+    font-size: 14px;
+  }
+
+  .rf-expertise__detail {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+  }
+
+  .rf-expertise__detail-panel {
+    width: min(100%, 22.5rem);
+    max-width: 22.5rem;
+  }
+
+  .rf-expertise__detail-head {
+    padding-bottom: 0.4rem;
+  }
+
+  .rf-expertise__detail-title {
+    font-size: clamp(0.86rem, 1.6vh, 0.98rem);
+  }
+
+  .rf-expertise__detail-grade-value {
+    font-size: clamp(1.3rem, 2.5vh, 1.65rem);
+  }
+
+  .rf-expertise__meters {
+    gap: 0.32rem;
+  }
+
+  .rf-expertise__meter {
+    padding: 0.44rem 0.5rem 0.44rem 0.78rem;
+  }
+
+  .rf-expertise__meter-name {
+    font-size: 0.82rem;
+  }
+
+  .rf-expertise__meter-val {
+    font-size: 0.94rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .rf-expertise__groups,
   .rf-expertise__group,
-  .rf-expertise__pill {
+  .rf-expertise__pill,
+  .rf-expertise__detail-panel {
     opacity: 1 !important;
     transform: none !important;
     visibility: visible !important;
@@ -817,6 +1445,24 @@ onUnmounted(() => unbind())
     .rf-expertise__radar {
       opacity: 1 !important;
       transform: none !important;
+      visibility: visible !important;
+    }
+
+    .rf-expertise__stats {
+      transform: none !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      border-top-color: var(--rf-line) !important;
+      border-bottom-color: var(--rf-line) !important;
+    }
+
+    .rf-expertise__radar.is-scrolling .rf-expertise__radar-fog {
+      filter: none;
+      opacity: 1;
+    }
+
+    .rf-expertise__detail {
+      opacity: 1 !important;
       visibility: visible !important;
     }
   }
