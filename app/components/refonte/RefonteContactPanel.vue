@@ -129,8 +129,12 @@ async function submit() {
           </span>
         </button>
 
-        <div v-if="success === true" class="rf-contact__alert rf-contact__alert--ok">
-          <p>Message envoyé avec succès ! Je vous répondrai dans les plus brefs délais.</p>
+        <div v-if="success === true" class="rf-contact__alert rf-contact__alert--ok" role="status">
+          <span class="rf-contact__alert-mark" aria-hidden="true">✓</span>
+          <div class="rf-contact__alert-body">
+            <p class="rf-contact__alert-title">Message envoyé avec succès</p>
+            <p class="rf-contact__alert-desc">Je vous répondrai dans les plus brefs délais.</p>
+          </div>
         </div>
 
         <div v-else-if="success === false" class="rf-contact__alert rf-contact__alert--err">
@@ -318,9 +322,47 @@ async function submit() {
 }
 
 .rf-contact__alert--ok {
-  background: rgba(138, 154, 120, 0.14);
-  border: 1px solid rgba(138, 154, 120, 0.35);
-  color: var(--rf-sage);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.1rem;
+  background: rgba(var(--rf-accent-rgb), 0.1);
+  border: 1px solid rgba(var(--rf-accent-rgb), 0.45);
+  color: var(--rf-accent);
+}
+
+.rf-contact__alert-mark {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--rf-accent);
+  background: rgba(var(--rf-accent-rgb), 0.18);
+  color: var(--rf-accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.rf-contact__alert-body {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.rf-contact__alert-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--rf-accent);
+}
+
+.rf-contact__alert-desc {
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--rf-text-soft);
 }
 
 .rf-contact__alert--err {

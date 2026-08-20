@@ -1,15 +1,19 @@
 <script setup lang="ts">
+import { sortProjectsByYear } from '~/utils/sort-projects'
+
 definePageMeta({ layout: 'refonte' })
 
 const route = useRoute()
 const { meta, sections } = useContent()
 
+const sortedProjects = computed(() => sortProjectsByYear(sections.value.projets))
+
 const project = computed(() =>
-  sections.value.projets.find((p) => p.slug === route.params.slug)
+  sortedProjects.value.find((p) => p.slug === route.params.slug)
 )
 
 const index = computed(() =>
-  sections.value.projets.findIndex((p) => p.slug === route.params.slug)
+  sortedProjects.value.findIndex((p) => p.slug === route.params.slug)
 )
 
 watchEffect(() => {
@@ -23,7 +27,7 @@ useHead({
 })
 
 function pad(n: number) {
-  return String(n + 1).padStart(3, '0')
+  return String(n + 1).padStart(2, '0')
 }
 </script>
 

@@ -4,7 +4,7 @@ import type { PortfolioProject } from '~/types/portfolio'
 const props = defineProps<{ project: PortfolioProject; index?: number }>()
 
 function pad(n: number) {
-  return String(n + 1).padStart(3, '0')
+  return String(n + 1).padStart(2, '0')
 }
 </script>
 

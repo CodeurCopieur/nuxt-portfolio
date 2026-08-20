@@ -88,10 +88,10 @@ function selectTech(tech: string | null) {
 
       <div v-else class="rf-projects__list">
         <RefonteProjectCard
-          v-for="(project, index) in filteredProjects"
+          v-for="project in filteredProjects"
           :key="project.slug"
           :project="project"
-          :index="index"
+          :index="allProjects.findIndex((p) => p.slug === project.slug)"
         />
       </div>
     </div>
