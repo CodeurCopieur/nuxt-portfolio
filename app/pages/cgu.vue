@@ -92,7 +92,7 @@ useHead({
       <h2>9. Données personnelles</h2>
       <p>
         Le traitement des données personnelles est décrit dans la
-        <RefonteLink to="/refonte/confidentialite">politique de confidentialité</RefonteLink>.
+        <RefonteLink to="/confidentialite">politique de confidentialité</RefonteLink>.
       </p>
     </section>
 

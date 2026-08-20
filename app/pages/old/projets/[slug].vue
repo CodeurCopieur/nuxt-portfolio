@@ -66,7 +66,7 @@ onMounted(async () => {
 
 // Navigation breadcrumb
 const goBack = () => {
-  navigateTo('/projets')
+  navigateTo('/old/projets')
 }
 </script>
 
@@ -232,7 +232,7 @@ const goBack = () => {
             Découvrez mes autres <span class="bg-gradient-to-r from-sky-500 to-indigo-600 bg-clip-text text-transparent">projets</span>
           </h2>
           <NuxtLink 
-            to="/projets" 
+            to="/old/projets" 
             class="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-2xl font-semibold hover:from-sky-600 hover:to-indigo-700 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
           >
             Voir tous les projets

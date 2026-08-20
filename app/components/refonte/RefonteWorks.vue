@@ -261,7 +261,7 @@ onUnmounted(() => unbind())
             </div>
             <div class="rf-works__head-side">
               <p class="rf-works__act" aria-hidden="true">{{ actLabel }}</p>
-              <RefonteLink to="/refonte/projets" class="refonte-link rf-works__all">
+              <RefonteLink to="/projets" class="refonte-link rf-works__all">
                 Archives →
               </RefonteLink>
             </div>
@@ -314,7 +314,7 @@ onUnmounted(() => unbind())
                     >{{ tech }}</span>
                   </div>
                   <RefonteLink
-                    :to="`/refonte/projets/${activeProject.slug}`"
+                    :to="`/projets/${activeProject.slug}`"
                     class="rf-works__focus-cta"
                   >
                     Voir le projet →
@@ -338,7 +338,7 @@ onUnmounted(() => unbind())
                 class="rf-works__row"
                 :style="rowStyle(index)"
               >
-                <RefonteLink :to="`/refonte/projets/${project.slug}`" class="rf-works__link">
+                <RefonteLink :to="`/projets/${project.slug}`" class="rf-works__link">
                   <span class="rf-works__num">{{ pad(index) }}</span>
                   <span class="rf-works__body">
                     <span class="rf-works__name">{{ project.title }}</span>

@@ -11,7 +11,7 @@ defineProps<{
   <article class="rf-legal" data-scroll-section>
     <div class="refonte-container rf-legal__inner">
       <header class="rf-legal__head">
-        <RefonteLink to="/refonte" class="rf-legal__back">← Retour à l'accueil</RefonteLink>
+        <RefonteLink to="/" class="rf-legal__back">← Retour à l'accueil</RefonteLink>
         <p class="refonte-label">Informations légales</p>
         <h1 class="refonte-display rf-legal__title">{{ title }}</h1>
         <p v-if="lead" class="rf-legal__lead">{{ lead }}</p>

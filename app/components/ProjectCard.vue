@@ -26,7 +26,7 @@ onMounted(async () => {
 
 <template>
   <NuxtLink 
-    :to="`/projets/${p.slug}`"
+    :to="`/old/projets/${p.slug}`"
     ref="cardRef"
     class="group block relative overflow-hidden rounded-3xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-white/20 dark:border-gray-700/30 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl"
   >

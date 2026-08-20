@@ -82,7 +82,7 @@ const techFilters = computed(() => sections.value.filtres_technologies ?? [])
         
         <div class="text-center mt-12">
           <NuxtLink 
-            to="/projets" 
+            to="/old/projets" 
             class="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-2xl font-semibold hover:from-sky-600 hover:to-indigo-700 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
           >
             Voir tous les projets

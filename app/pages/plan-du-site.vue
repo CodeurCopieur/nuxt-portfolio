@@ -11,19 +11,19 @@ useHead({
 
 const mainSections = computed(() => [
   {
-    title: 'Refonte portfolio',
+    title: 'Portfolio',
     links: [
-      { label: 'Accueil', to: '/refonte' },
-      { label: 'Projets', to: '/refonte/projets' },
-      { label: 'Prestations', to: '/refonte/prestations' },
-      { label: 'Contact', to: '/refonte/contact' }
+      { label: 'Accueil', to: '/' },
+      { label: 'Projets', to: '/projets' },
+      { label: 'Prestations', to: '/prestations' },
+      { label: 'Contact', to: '/contact' }
     ]
   },
   {
     title: 'Projets',
     links: sections.value.projets.map((project) => ({
       label: project.title,
-      to: `/refonte/projets/${project.slug}`
+      to: `/projets/${project.slug}`
     }))
   },
   {
@@ -31,11 +31,11 @@ const mainSections = computed(() => [
     links: LEGAL_PAGES.map((page) => ({ label: page.label, to: page.to }))
   },
   {
-    title: 'Autres versions',
+    title: 'Version archivée',
     links: [
-      { label: 'Portfolio classique', to: '/' },
-      { label: 'Projets (classique)', to: '/projets' },
-      { label: 'Contact (classique)', to: '/contact' }
+      { label: 'Ancien portfolio', to: '/old' },
+      { label: 'Projets (ancienne version)', to: '/old/projets' },
+      { label: 'Contact (ancienne version)', to: '/old/contact' }
     ]
   }
 ])

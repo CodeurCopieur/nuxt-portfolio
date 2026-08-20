@@ -35,7 +35,7 @@ onMounted(() => {
       <Container class="flex items-center justify-between py-4">
         <!-- Logo -->
         <NuxtLink 
-          to="/" 
+          to="/old" 
           class="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent hover:from-sky-600 hover:to-indigo-600 dark:hover:from-sky-400 dark:hover:to-indigo-400 transition-all duration-300"
         >
           Widdy<span class="text-sky-500">.Dev</span>
@@ -44,49 +44,49 @@ onMounted(() => {
         <!-- Navigation -->
         <nav class="hidden md:flex items-center gap-8">
           <NuxtLink 
-            to="/" 
+            to="/old" 
             :class="[
               'relative px-3 py-2 text-sm font-medium transition-colors duration-300',
-              route.path === '/' 
+              route.path === '/old' 
                 ? 'text-sky-600 dark:text-sky-400' 
                 : 'text-gray-700 dark:text-gray-300 hover:text-sky-600 dark:hover:text-sky-400'
             ]"
           >
             Accueil
             <div 
-              v-if="route.path === '/'"
+              v-if="route.path === '/old'"
               class="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-sky-500 to-indigo-600 rounded-full"
             ></div>
           </NuxtLink>
           
           <NuxtLink 
-            to="/projets" 
+            to="/old/projets" 
             :class="[
               'relative px-3 py-2 text-sm font-medium transition-colors duration-300',
-              route.path.startsWith('/projets') 
+              route.path.startsWith('/old/projets') 
                 ? 'text-sky-600 dark:text-sky-400' 
                 : 'text-gray-700 dark:text-gray-300 hover:text-sky-600 dark:hover:text-sky-400'
             ]"
           >
             Projets
             <div 
-              v-if="route.path.startsWith('/projets')"
+              v-if="route.path.startsWith('/old/projets')"
               class="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-sky-500 to-indigo-600 rounded-full"
             ></div>
           </NuxtLink>
           
           <NuxtLink 
-            to="/contact" 
+            to="/old/contact" 
             :class="[
               'relative px-3 py-2 text-sm font-medium transition-colors duration-300',
-              route.path === '/contact' 
+              route.path === '/old/contact' 
                 ? 'text-sky-600 dark:text-sky-400' 
                 : 'text-gray-700 dark:text-gray-300 hover:text-sky-600 dark:hover:text-sky-400'
             ]"
           >
             Contact
             <div 
-              v-if="route.path === '/contact'"
+              v-if="route.path === '/old/contact'"
               class="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-sky-500 to-indigo-600 rounded-full"
             ></div>
           </NuxtLink>
@@ -96,7 +96,7 @@ onMounted(() => {
         <div class="flex items-center gap-4">
           <!-- CTA Contact -->
           <NuxtLink 
-            to="/contact" 
+            to="/old/contact" 
             class="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-sky-500 to-indigo-600 text-white text-sm font-medium rounded-xl hover:from-sky-600 hover:to-indigo-700 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -219,16 +219,16 @@ onMounted(() => {
         <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-sm text-gray-500 dark:text-gray-400">
           <p>&copy; {{ new Date().getFullYear() }} Widdy Louis — Tous droits réservés.</p>
           <nav class="flex flex-wrap gap-x-4 gap-y-2" aria-label="Informations légales">
-            <NuxtLink to="/refonte/mentions-legales" class="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
+            <NuxtLink to="/mentions-legales" class="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
               Mentions légales
             </NuxtLink>
-            <NuxtLink to="/refonte/cgu" class="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
+            <NuxtLink to="/cgu" class="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
               CGU
             </NuxtLink>
-            <NuxtLink to="/refonte/confidentialite" class="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
+            <NuxtLink to="/confidentialite" class="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
               Confidentialité
             </NuxtLink>
-            <NuxtLink to="/refonte/plan-du-site" class="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
+            <NuxtLink to="/plan-du-site" class="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
               Plan du site
             </NuxtLink>
           </nav>

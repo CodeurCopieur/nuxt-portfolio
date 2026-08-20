@@ -257,7 +257,7 @@ function onTabKeydown(event: KeyboardEvent, index: number) {
 
 async function goContact(event?: MouseEvent) {
   event?.preventDefault()
-  await navigateTo('/refonte/contact')
+  await navigateTo('/contact')
 }
 </script>
 
@@ -348,7 +348,7 @@ async function goContact(event?: MouseEvent) {
             <p class="rf-pricing__card-fit">{{ offer.fit }}</p>
 
             <a
-              href="/refonte/contact"
+              href="/contact"
               class="refonte-btn"
               :class="offer.featured ? '' : 'refonte-btn--ghost'"
               @click="goContact"
@@ -397,7 +397,7 @@ async function goContact(event?: MouseEvent) {
         L’acompte n’est pas des arrhes : en cas d’annulation après démarrage, les sommes
         correspondant au travail déjà réalisé restent dues. Facturation en HT (TVA selon régime).
       </p>
-      <a href="/refonte/contact" class="refonte-link rf-pricing__note-cta" @click="goContact">
+      <a href="/contact" class="refonte-link rf-pricing__note-cta" @click="goContact">
         Parler de votre projet →
       </a>
     </section>

@@ -13,7 +13,7 @@ const isLegalPage = computed(() => LEGAL_PAGES.some((page) => route.path === pag
 
 async function goContact(event: MouseEvent) {
   event.preventDefault()
-  await navigateTo('/refonte/contact')
+  await navigateTo('/contact')
 }
 </script>
 
@@ -38,7 +38,7 @@ async function goContact(event: MouseEvent) {
         <a :href="`mailto:${PUBLIC_CONTACT_EMAIL}`" class="refonte-btn refonte-footer__email">
           M'écrire
         </a>
-        <a href="/refonte/contact" class="refonte-footer__form-link" @click="goContact">
+        <a href="/contact" class="refonte-footer__form-link" @click="goContact">
           ou via le formulaire →
         </a>
       </div>
@@ -60,7 +60,7 @@ async function goContact(event: MouseEvent) {
           <li v-if="meta.links.github">
             <a :href="meta.links.github" target="_blank" rel="noopener">GitHub</a>
           </li>
-          <li><NuxtLink to="/">Version classique</NuxtLink></li>
+          <li><NuxtLink to="/old">Version classique</NuxtLink></li>
         </ul>
       </div>
 

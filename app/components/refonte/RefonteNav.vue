@@ -10,23 +10,23 @@ const menuOpen = ref(false)
 const contactEmail = PUBLIC_CONTACT_EMAIL
 
 const links = [
-  { to: '/refonte', label: 'Accueil', num: '01' },
-  { to: '/refonte/projets', label: 'Projets', num: '02' },
-  { to: '/refonte/prestations', label: 'Prestations', num: '03' },
-  { to: '/refonte/contact', label: 'Contact', num: '04' }
+  { to: '/', label: 'Accueil', num: '01' },
+  { to: '/projets', label: 'Projets', num: '02' },
+  { to: '/prestations', label: 'Prestations', num: '03' },
+  { to: '/contact', label: 'Contact', num: '04' }
 ]
 
 const scrollPct = computed(() => String(Math.round(scrollProgress.value * 100)).padStart(2, '0'))
 
 const chapterLabel = computed(() => {
   const byRoute: Record<string, string> = {
-    '/refonte/prestations': 'Prestations',
-    '/refonte/contact': 'Contact',
-    '/refonte/plan-du-site': 'Plan du site'
+    '/prestations': 'Prestations',
+    '/contact': 'Contact',
+    '/plan-du-site': 'Plan du site'
   }
 
-  if (route.path.startsWith('/refonte/projets')) return 'Projets'
-  if (route.path.startsWith('/refonte/mentions') || route.path.startsWith('/refonte/cgu') || route.path.startsWith('/refonte/confidentialite')) {
+  if (route.path.startsWith('/projets')) return 'Projets'
+  if (route.path.startsWith('/mentions') || route.path.startsWith('/cgu') || route.path.startsWith('/confidentialite')) {
     return 'Légal'
   }
 
@@ -34,7 +34,7 @@ const chapterLabel = computed(() => {
 })
 
 function isActive(path: string) {
-  if (path === '/refonte') return route.path === '/refonte'
+  if (path === '/') return route.path === '/'
   return route.path.startsWith(path)
 }
 
@@ -85,7 +85,7 @@ onUnmounted(() => {
     </div>
 
     <div class="refonte-nav__bar">
-      <a href="/refonte" class="refonte-nav__logo" @click="onNav('/refonte', $event)">
+      <a href="/" class="refonte-nav__logo" @click="onNav('/', $event)">
         Widdy<span class="refonte-nav__logo-dot">·</span>Louis
       </a>
 

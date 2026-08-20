@@ -47,10 +47,10 @@ export const LEGAL_THIRD_PARTIES = {
 } as const
 
 export const LEGAL_PAGES = [
-  { to: '/refonte/mentions-legales', label: 'Mentions légales' },
-  { to: '/refonte/cgu', label: 'CGU' },
-  { to: '/refonte/confidentialite', label: 'Confidentialité' },
-  { to: '/refonte/plan-du-site', label: 'Plan du site' }
+  { to: '/mentions-legales', label: 'Mentions légales' },
+  { to: '/cgu', label: 'CGU' },
+  { to: '/confidentialite', label: 'Confidentialité' },
+  { to: '/plan-du-site', label: 'Plan du site' }
 ] as const
 
 export const LEGAL_LAST_UPDATED = '15 août 2026'

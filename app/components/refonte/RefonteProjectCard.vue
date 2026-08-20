@@ -10,7 +10,7 @@ function pad(n: number) {
 
 <template>
   <RefonteLink
-    :to="`/refonte/projets/${project.slug}`"
+    :to="`/projets/${project.slug}`"
     class="rf-prow"
     v-reveal="{ index: (index ?? 0) % 5, stagger: 55 }"
   >

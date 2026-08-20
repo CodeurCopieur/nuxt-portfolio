@@ -118,7 +118,7 @@ useHead({
       <h2>Données personnelles</h2>
       <p>
         Pour en savoir plus sur la collecte et le traitement de vos données, consultez la
-        <RefonteLink to="/refonte/confidentialite">politique de confidentialité</RefonteLink>.
+        <RefonteLink to="/confidentialite">politique de confidentialité</RefonteLink>.
       </p>
     </section>
 

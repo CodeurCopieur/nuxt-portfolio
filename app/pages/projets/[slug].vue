@@ -32,7 +32,7 @@ function pad(n: number) {
     <span class="rf-case__ghost" aria-hidden="true">{{ pad(index) }}</span>
 
     <div class="refonte-container rf-case__inner">
-      <RefonteLink to="/refonte/projets" class="rf-case__back" v-reveal>← Retour aux projets</RefonteLink>
+      <RefonteLink to="/projets" class="rf-case__back" v-reveal>← Retour aux projets</RefonteLink>
 
       <header class="rf-case__head">
         <p class="refonte-label" v-reveal="{ delay: 40 }">{{ project.year }} · {{ project.org }}</p>

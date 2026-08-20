@@ -42,10 +42,10 @@ export default defineNuxtConfig({
     }
   },
   robots: {
-    disallow: ['/admin', '/api/admin']
+    disallow: ['/admin', '/api/admin', '/old']
   },
   sitemap: {
-    exclude: ['/admin/**', '/api/**']
+    exclude: ['/admin/**', '/api/**', '/old', '/old/**']
   },
   ogImage: {
     enabled: false
@@ -85,11 +85,30 @@ export default defineNuxtConfig({
     '/api/admin/**': {
       cors: false
     },
-    '/refonte': {
+    '/': {
       headers: {
         'Cache-Control': 'public, max-age=0, must-revalidate'
       }
-    }
+    },
+    // Ancienne version conservée pour archive : accessible mais hors index
+    '/old': {
+      robots: false,
+      headers: { 'X-Robots-Tag': 'noindex, follow' }
+    },
+    '/old/**': {
+      robots: false,
+      headers: { 'X-Robots-Tag': 'noindex, follow' }
+    },
+    // La refonte est passée à la racine — on préserve les URLs déjà indexées
+    '/refonte': { redirect: { to: '/', statusCode: 301 } },
+    '/refonte/projets': { redirect: { to: '/projets', statusCode: 301 } },
+    '/refonte/projets/**': { redirect: { to: '/projets/**', statusCode: 301 } },
+    '/refonte/prestations': { redirect: { to: '/prestations', statusCode: 301 } },
+    '/refonte/contact': { redirect: { to: '/contact', statusCode: 301 } },
+    '/refonte/mentions-legales': { redirect: { to: '/mentions-legales', statusCode: 301 } },
+    '/refonte/cgu': { redirect: { to: '/cgu', statusCode: 301 } },
+    '/refonte/confidentialite': { redirect: { to: '/confidentialite', statusCode: 301 } },
+    '/refonte/plan-du-site': { redirect: { to: '/plan-du-site', statusCode: 301 } }
   },
   runtimeConfig: {
     supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',

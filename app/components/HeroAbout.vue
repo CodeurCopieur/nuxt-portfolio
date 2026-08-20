@@ -108,7 +108,7 @@ onMounted(async () => {
       <!-- CTA -->
       <div class="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
         <NuxtLink 
-          to="/projets" 
+          to="/old/projets" 
           class="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-2xl font-semibold hover:from-sky-600 hover:to-indigo-700 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
         >
           Voir mes projets
@@ -118,7 +118,7 @@ onMounted(async () => {
         </NuxtLink>
         
         <NuxtLink 
-          to="/contact" 
+          to="/old/contact" 
           class="inline-flex items-center gap-2 px-8 py-4 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-2xl font-semibold hover:border-sky-500 hover:text-sky-600 dark:hover:border-sky-400 dark:hover:text-sky-400 transition-all duration-300"
         >
           Me contacter
