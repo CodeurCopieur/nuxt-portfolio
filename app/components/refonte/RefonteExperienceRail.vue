@@ -435,7 +435,7 @@ watch(isDesktop, () => {
 .refonte-xp__progress {
   position: relative;
   height: 4px;
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--rf-panel-wash);
   overflow: hidden;
 }
 

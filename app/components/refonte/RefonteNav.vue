@@ -6,6 +6,7 @@ import { PUBLIC_CONTACT_EMAIL } from '@/constants/contact'
 const route = useRoute()
 const { navigateTo } = useRefonteTransition()
 const { scrollProgress, activeChapter, refresh, scroll } = useRefonteScroll()
+const { mode: themeMode, toggle: toggleTheme } = useThemeMode()
 const menuOpen = ref(false)
 const contactEmail = PUBLIC_CONTACT_EMAIL
 
@@ -93,6 +94,40 @@ onUnmounted(() => {
         <p class="refonte-nav__chapter" aria-live="polite">{{ chapterLabel }}</p>
         <button
           type="button"
+          class="refonte-nav__theme"
+          :aria-label="themeMode === 'light' ? 'Passer en thème sombre bleu roi' : 'Passer en thème clair'"
+          :aria-pressed="themeMode === 'light'"
+          :title="themeMode === 'light' ? 'Thème sombre bleu roi' : 'Thème clair'"
+          @click="toggleTheme"
+        >
+          <svg
+            v-if="themeMode === 'light'"
+            class="refonte-nav__theme-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" />
+          </svg>
+          <svg
+            v-else
+            class="refonte-nav__theme-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="4.2" />
+            <path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7" />
+          </svg>
+        </button>
+        <button
+          type="button"
           class="refonte-nav__trigger"
           :class="{ 'is-open': menuOpen }"
           :aria-expanded="menuOpen"
@@ -146,7 +181,7 @@ onUnmounted(() => {
 
 .refonte-nav__progress {
   height: 2px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--rf-nav-progress-track);
 }
 
 .refonte-nav__progress-fill {
@@ -164,8 +199,9 @@ onUnmounted(() => {
   padding-inline: max(1rem, env(safe-area-inset-left)) max(1rem, env(safe-area-inset-right));
   max-width: var(--rf-container-max);
   margin-inline: auto;
-  background: rgba(20, 19, 16, 0.72);
+  background: var(--rf-nav-bar-bg);
   backdrop-filter: blur(14px);
+  transition: background 0.35s var(--rf-ease);
 }
 
 .refonte-nav__logo {
@@ -209,6 +245,48 @@ onUnmounted(() => {
     font-size: 0.62rem;
     letter-spacing: 0.04em;
   }
+}
+
+.refonte-nav__theme {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  border: 1px solid var(--rf-line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--rf-text);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.3s var(--rf-ease), color 0.3s var(--rf-ease),
+    transform 0.2s var(--rf-ease);
+}
+
+.refonte-nav__theme:hover {
+  border-color: rgba(var(--rf-accent-rgb), 0.5);
+  color: var(--rf-accent);
+  transform: translateY(-1px);
+}
+
+.refonte-nav__theme-icon {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+/* Thème clair : fond blanc plat + bordures visibles */
+html.rf-light .refonte-nav__bar {
+  background: var(--rf-nav-bar-bg);
+  border-bottom: 1px solid var(--rf-line);
+}
+
+html.rf-light .refonte-nav__overlay {
+  background-image: none;
+  border-top: 1px solid var(--rf-line);
+}
+
+html.rf-light .refonte-nav__overlay-link {
+  border-bottom-color: var(--rf-line);
 }
 
 .refonte-nav__trigger {

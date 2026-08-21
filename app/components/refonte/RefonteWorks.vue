@@ -623,7 +623,7 @@ onUnmounted(() => unbind())
 
 .rf-works__link:hover,
 .rf-works__link:focus-visible {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--rf-hover-wash);
 }
 
 .rf-works__num {

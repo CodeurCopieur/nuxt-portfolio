@@ -38,6 +38,13 @@ export default defineNuxtConfig({
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      ],
+      script: [
+        {
+          innerHTML:
+            "(function(){try{if(localStorage.getItem('rf-theme')==='light'){document.documentElement.classList.add('rf-light')}}catch(e){}})()",
+          tagPriority: 'critical'
+        }
       ]
     }
   },

@@ -70,9 +70,84 @@
   --rf-scroll-track: rgba(255, 255, 255, 0.16);
   --rf-scroll-thumb: var(--rf-accent);
 
+  /* Surfaces d'interaction & chrome */
+  --rf-nav-bar-bg: rgba(20, 19, 16, 0.72);
+  --rf-nav-progress-track: rgba(255, 255, 255, 0.08);
+  --rf-hover-wash: rgba(255, 255, 255, 0.03);
+  --rf-panel-wash: rgba(255, 255, 255, 0.12);
+  --rf-line-rgb: 255, 255, 255;
+
+  /* Graphique radar (Expertise) */
+  --rf-radar-grid: rgba(255, 255, 255, 0.14);
+  --rf-radar-axis: rgba(255, 255, 255, 0.12);
+  --rf-radar-dot: rgba(255, 255, 255, 0.35);
+  --rf-note-bg: rgba(11, 26, 58, 0.88);
+  --rf-note-bg-active: rgba(11, 26, 58, 0.95);
+  --rf-note-bg-focus: rgba(11, 26, 58, 0.97);
+  --rf-note-stroke: rgba(255, 255, 255, 0.22);
+  --rf-score-stroke: rgba(11, 26, 58, 0.65);
+
   --rf-muted: var(--rf-text-muted);
   --rf-sage-paper: var(--rf-sage-deep);
   --rf-gold-paper: var(--rf-gold-deep);
+}
+
+/* -------------------------------------------
+   🌞 Thème clair — papier blanc + bleu roi + or
+------------------------------------------- */
+html.rf-light {
+  /* Fonds — blanc plat, sans dégradé */
+  --rf-bg: #ffffff;
+  --rf-bg-deep: #f2f5fa;
+  --rf-bg-soft: #ffffff;
+  --rf-paper: #ffffff;
+  --rf-paper-deep: #eef2fa;
+
+  /* Texte */
+  --rf-text: #0b1a3a;
+  --rf-text-muted: #43557b;
+  --rf-text-soft: #2a3f66;
+
+  /* Accent or approfondi pour le contraste sur fond clair */
+  --rf-accent: #b8942a;
+  --rf-accent-deep: #96761d;
+  --rf-accent-rgb: 184, 148, 42;
+  --rf-accent-deep-rgb: 150, 118, 29;
+
+  /* Neutres secondaires */
+  --rf-gold: #c9a227;
+  --rf-gold-deep: #96761d;
+  --rf-sage: #64789e;
+  --rf-sage-deep: #4c6086;
+  --rf-clay: #7488ab;
+  --rf-clay-deep: #5a6f95;
+  --rf-sky: #3d5f96;
+  --rf-sky-deep: #2c4a7d;
+
+  /* Lignes & ombres */
+  --rf-line: rgba(11, 26, 58, 0.28);
+  --rf-line-ink: rgba(11, 26, 58, 0.2);
+  --rf-shadow: 0 18px 48px rgba(20, 35, 70, 0.12);
+  --rf-shadow-soft: 0 28px 70px rgba(20, 35, 70, 0.16);
+
+  /* Surfaces d'interaction & chrome */
+  --rf-nav-bar-bg: rgba(247, 249, 253, 0.85);
+  --rf-nav-progress-track: rgba(11, 26, 58, 0.1);
+  --rf-hover-wash: rgba(11, 26, 58, 0.04);
+  --rf-panel-wash: rgba(11, 26, 58, 0.06);
+  --rf-line-rgb: 11, 26, 58;
+
+  /* Graphique radar (Expertise) */
+  --rf-radar-grid: rgba(11, 26, 58, 0.18);
+  --rf-radar-axis: rgba(11, 26, 58, 0.15);
+  --rf-radar-dot: rgba(11, 26, 58, 0.4);
+  --rf-note-bg: rgba(255, 255, 255, 0.94);
+  --rf-note-bg-active: rgba(255, 255, 255, 0.98);
+  --rf-note-bg-focus: rgba(255, 255, 255, 1);
+  --rf-note-stroke: rgba(11, 26, 58, 0.22);
+  --rf-score-stroke: rgba(255, 255, 255, 0.8);
+
+  --rf-scroll-track: rgba(11, 26, 58, 0.2);
 }
 
 html:has(.refonte-root) {
@@ -100,6 +175,12 @@ html:has(.refonte-root) ::-webkit-scrollbar {
 .refonte-root ::selection {
   background: rgba(var(--rf-accent-rgb), 0.35);
   color: var(--rf-ink);
+}
+
+/* Fond de page : blanc plat en thème clair, sans aucun dégradé */
+html.rf-light .refonte-root {
+  background-image: none;
+  background: var(--rf-bg);
 }
 
 .refonte-section {
@@ -294,19 +375,16 @@ html:has(.refonte-root) ::-webkit-scrollbar {
   color: var(--rf-accent);
 }
 
-/* Note / grade style comics */
+/* Note / grade — police du site, accent or */
 .rf-grade {
-  font-family: var(--rf-comic);
+  font-family: var(--rf-sans);
   font-style: normal;
-  font-weight: 400;
-  letter-spacing: 0.04em;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
   line-height: 1;
   color: var(--rf-accent);
   text-transform: uppercase;
-  transform: rotate(-8deg);
-  text-shadow:
-    2px 2px 0 rgba(0, 0, 0, 0.55),
-    -1px -1px 0 rgba(20, 19, 16, 0.35);
 }
 
 /* Système de révélation au scroll — v-reveal */

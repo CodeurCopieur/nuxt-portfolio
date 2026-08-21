@@ -283,8 +283,8 @@ const statsStyle = computed(() => {
     opacity: 1,
     transform: `translateY(calc(${pushToCenter}vh + ${riseIn}rem)) scale(${scale})`,
     transformOrigin: 'center center',
-    borderTopColor: dock > 0.08 ? `rgba(255, 255, 255, ${0.14 * lineAlpha})` : 'transparent',
-    borderBottomColor: dock > 0.08 ? `rgba(255, 255, 255, ${0.14 * lineAlpha})` : 'transparent',
+    borderTopColor: dock > 0.08 ? `rgba(var(--rf-line-rgb), ${0.14 * lineAlpha})` : 'transparent',
+    borderBottomColor: dock > 0.08 ? `rgba(var(--rf-line-rgb), ${0.14 * lineAlpha})` : 'transparent',
     visibility: 'visible' as const
   }
 })
@@ -896,13 +896,13 @@ onUnmounted(() => unbind())
 }
 
 .rf-expertise__radar-grid {
-  stroke: rgba(255, 255, 255, 0.14);
+  stroke: var(--rf-radar-grid);
   stroke-width: 1.35;
   fill: rgba(var(--rf-accent-rgb), 0.06);
 }
 
 .rf-expertise__radar-axis {
-  stroke: rgba(255, 255, 255, 0.12);
+  stroke: var(--rf-radar-axis);
   stroke-width: 1.1;
   transition: stroke 0.55s var(--rf-ease), stroke-width 0.55s var(--rf-ease);
 }
@@ -920,7 +920,7 @@ onUnmounted(() => unbind())
 }
 
 .rf-expertise__radar-dot {
-  fill: rgba(255, 255, 255, 0.35);
+  fill: var(--rf-radar-dot);
   transition: fill 0.35s var(--rf-ease);
 }
 
@@ -930,8 +930,8 @@ onUnmounted(() => unbind())
 }
 
 .rf-expertise__radar-note-bg {
-  fill: rgba(11, 26, 58, 0.88);
-  stroke: rgba(255, 255, 255, 0.22);
+  fill: var(--rf-note-bg);
+  stroke: var(--rf-note-stroke);
   stroke-width: 1.25;
   transition: fill 0.55s var(--rf-ease), stroke 0.55s var(--rf-ease), stroke-width 0.55s var(--rf-ease);
 }
@@ -939,18 +939,18 @@ onUnmounted(() => unbind())
 .rf-expertise__radar-score {
   fill: var(--rf-text);
   font-size: 15px;
-  font-family: var(--rf-comic);
+  font-family: var(--rf-sans);
   font-style: normal;
-  font-weight: 400;
+  font-weight: 800;
   letter-spacing: 0.02em;
   paint-order: stroke fill;
-  stroke: rgba(11, 26, 58, 0.65);
+  stroke: var(--rf-score-stroke);
   stroke-width: 2px;
   transition: fill 0.35s var(--rf-ease);
 }
 
 .rf-expertise__radar-g.is-active .rf-expertise__radar-note-bg {
-  fill: rgba(11, 26, 58, 0.95);
+  fill: var(--rf-note-bg-active);
   stroke: var(--rf-accent);
   stroke-width: 1.85;
 }
@@ -1001,7 +1001,7 @@ onUnmounted(() => unbind())
 }
 
 .rf-expertise__radar-focus .rf-expertise__radar-note-bg {
-  fill: rgba(11, 26, 58, 0.97);
+  fill: var(--rf-note-bg-focus);
   stroke: var(--rf-accent);
   stroke-width: 2;
 }
@@ -1084,7 +1084,7 @@ onUnmounted(() => unbind())
   gap: 0.55rem;
   padding: 0.5rem 0.6rem 0.5rem 0.85rem;
   border: 1px solid var(--rf-line);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--rf-hover-wash);
 }
 
 .rf-expertise__meter-accent {
