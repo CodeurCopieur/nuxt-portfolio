@@ -273,18 +273,18 @@ const statsStyle = computed(() => {
 
   const dock = statsDock.value
   const count = statsCount.value
-  const lineAlpha = Math.round(dock * 100) / 100
   const pushToCenter = (1 - dock) * 26
   const scale = 1.42 - dock * 0.42
   const riseIn = (1 - count) * 0.85
+  const bordersOn = dock > 0.08
 
   return {
     '--rf-compact': compact,
     opacity: 1,
     transform: `translateY(calc(${pushToCenter}vh + ${riseIn}rem)) scale(${scale})`,
     transformOrigin: 'center center',
-    borderTopColor: dock > 0.08 ? `rgba(var(--rf-line-rgb), ${0.14 * lineAlpha})` : 'transparent',
-    borderBottomColor: dock > 0.08 ? `rgba(var(--rf-line-rgb), ${0.14 * lineAlpha})` : 'transparent',
+    borderTopColor: bordersOn ? 'var(--rf-line)' : 'transparent',
+    borderBottomColor: bordersOn ? 'var(--rf-line)' : 'transparent',
     visibility: 'visible' as const
   }
 })
@@ -800,9 +800,7 @@ onUnmounted(() => unbind())
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(0.75rem, 2vw, 1.5rem);
   margin-top: var(--rf-section-stack-gap);
-  padding-block: 0.55rem;
-  border-top: 1px solid var(--rf-line);
-  border-bottom: 1px solid var(--rf-line);
+  padding-block: 0;
   width: 100%;
   box-sizing: border-box;
   position: relative;
@@ -814,6 +812,8 @@ onUnmounted(() => unbind())
     will-change: transform, opacity;
     margin-top: clamp(0.55rem, 1.35vw, 0.85rem);
     padding-block: 0.65rem 0.55rem;
+    border-top: 1px solid var(--rf-line);
+    border-bottom: 1px solid var(--rf-line);
   }
 
   .rf-expertise__stat {
@@ -1236,9 +1236,18 @@ onUnmounted(() => unbind())
     padding-top: var(--rf-section-pin-pad);
   }
 
+  .rf-expertise__head {
+    padding-bottom: 0.55rem;
+    border-bottom: 1px solid var(--rf-line);
+  }
+
+  .rf-expertise__stats {
+    display: none;
+  }
+
   .rf-expertise__frame {
     height: auto;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: auto auto;
     padding-block: 0 0.5rem;
   }
 
