@@ -276,7 +276,7 @@ const statsStyle = computed(() => {
   const pushToCenter = (1 - dock) * 26
   const scale = 1.42 - dock * 0.42
   const riseIn = (1 - count) * 0.85
-  const bordersOn = dock > 0.08
+  const bordersOn = dock > 0.92
 
   return {
     '--rf-compact': compact,
@@ -960,7 +960,7 @@ onUnmounted(() => unbind())
 }
 
 .rf-expertise__radar-label {
-  fill: var(--rf-text-muted);
+  fill: var(--rf-text);
   font-size: 12px;
   font-family: var(--rf-sans);
   font-weight: 700;
@@ -974,7 +974,7 @@ onUnmounted(() => unbind())
 }
 
 .rf-expertise__radar.has-selection .rf-expertise__radar-g:not(.is-active) .rf-expertise__radar-label {
-  opacity: 0.56;
+  opacity: 0.82;
 }
 
 .rf-expertise__radar.has-selection:not(.is-scrolling) .rf-expertise__radar-g.is-active .rf-expertise__radar-label {

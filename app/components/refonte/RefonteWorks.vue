@@ -123,8 +123,6 @@ const listOpacity = computed(() => {
 
 const listVisible = computed(() => listOpacity.value > 0.02 || !isDesktop.value)
 
-const headCompact = computed(() => easeInOut(span(p.value, 0.1, 0.2)))
-
 const actLabel = computed(() => {
   if (p.value < FOCUS_START) return '01 — Projets'
   if (p.value < LIST_START) {
@@ -248,10 +246,7 @@ onUnmounted(() => unbind())
     >
       <div class="rf-works__pin">
         <div class="refonte-container rf-works__frame">
-          <header
-            class="rf-works__head"
-            :style="{ '--rf-compact': headCompact }"
-          >
+          <header class="rf-works__head">
             <div class="rf-works__head-main">
               <p class="refonte-label">03 — Réalisations</p>
               <h2 class="refonte-display rf-works__title">
@@ -388,7 +383,7 @@ onUnmounted(() => unbind())
   align-items: flex-end;
   justify-content: space-between;
   gap: 1rem 2rem;
-  padding-bottom: calc(0.55rem + (1 - var(--rf-compact, 0)) * 0.3rem);
+  padding-bottom: 0.55rem;
   border-bottom: 1px solid var(--rf-line);
 }
 
@@ -398,10 +393,7 @@ onUnmounted(() => unbind())
 
 .rf-works__title {
   margin: 0.35rem 0 0;
-  font-size: calc(
-    (1 - var(--rf-compact, 0)) * var(--rf-section-title-size)
-    + var(--rf-compact, 0) * clamp(1.65rem, 3.5vw, 2.35rem)
-  );
+  font-size: var(--rf-section-title-size);
   line-height: 1.02;
   letter-spacing: -0.03em;
 }

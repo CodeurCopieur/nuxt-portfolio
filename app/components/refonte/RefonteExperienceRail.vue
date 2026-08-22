@@ -199,10 +199,6 @@ watch(isDesktop, () => {
                   <p class="refonte-xp__mission-company">
                     {{ activeExperience.company }}
                   </p>
-                  <p class="refonte-xp__mission-place">
-                    {{ activeExperience.location }}
-                  </p>
-                  <p class="refonte-xp__mission-period">{{ activeExperience.period }}</p>
 
                   <div class="refonte-xp__mission-steps" aria-hidden="true">
                     <span
@@ -312,7 +308,6 @@ watch(isDesktop, () => {
                 >
                   <span class="refonte-xp__card-num">{{ pad(index) }}</span>
                   <h4 class="refonte-xp__card-company">{{ xp.company }}</h4>
-                  <p class="refonte-xp__card-role">{{ xp.role }}</p>
                   <p class="refonte-xp__card-period">{{ xp.period }}</p>
                   <p class="refonte-xp__card-location">{{ xp.location }}</p>
                 </article>
@@ -351,8 +346,6 @@ watch(isDesktop, () => {
             >
               <aside class="refonte-xp__mission-lead">
                 <h3 class="refonte-xp__mission-role">{{ activeExperience.role }}</h3>
-                <p class="refonte-xp__mission-place">{{ activeExperience.location }}</p>
-                <p class="refonte-xp__mission-period">{{ activeExperience.period }}</p>
               </aside>
 
               <div class="refonte-xp__mission-body">
@@ -493,7 +486,7 @@ watch(isDesktop, () => {
 
 .refonte-xp__mission {
   display: grid;
-  grid-template-columns: minmax(12rem, 0.9fr) minmax(0, 1.4fr);
+  grid-template-columns: minmax(10rem, 0.55fr) minmax(0, 1.85fr);
   gap: clamp(1.5rem, 4vw, 3rem);
   align-items: center;
   min-height: 0;
@@ -598,7 +591,7 @@ watch(isDesktop, () => {
 
 .refonte-xp__beat {
   display: grid;
-  grid-template-columns: 2rem minmax(0, 1fr);
+  grid-template-columns: 2.75rem minmax(0, 1fr);
   gap: 0.85rem;
   will-change: opacity, transform;
 }
@@ -607,7 +600,7 @@ watch(isDesktop, () => {
   margin: 0.15rem 0 0;
   font-family: var(--rf-serif);
   font-style: italic;
-  font-size: 1.05rem;
+  font-size: clamp(1.35rem, 2.2vw, 1.75rem);
   color: var(--rf-text-muted);
 }
 
@@ -619,7 +612,7 @@ watch(isDesktop, () => {
 
 .refonte-xp__beat-title {
   margin: 0;
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -628,9 +621,9 @@ watch(isDesktop, () => {
 
 .refonte-xp__beat-text {
   margin: 0;
-  font-size: 0.95rem;
-  line-height: 1.65;
-  color: var(--rf-text-soft);
+  font-size: clamp(1rem, 1.35vw, 1.12rem);
+  line-height: 1.7;
+  color: var(--rf-text);
 }
 
 .refonte-xp__beat-list {
@@ -638,23 +631,23 @@ watch(isDesktop, () => {
   padding: 0;
   list-style: none;
   display: grid;
-  gap: 0.55rem;
+  gap: 0.65rem;
 }
 
 .refonte-xp__beat-list li {
   display: grid;
   grid-template-columns: 1.6rem minmax(0, 1fr);
   gap: 0.55rem;
-  font-size: 0.88rem;
-  line-height: 1.45;
-  color: var(--rf-text-soft);
+  font-size: clamp(0.95rem, 1.2vw, 1.05rem);
+  line-height: 1.55;
+  color: var(--rf-text);
   will-change: opacity, transform;
 }
 
 .refonte-xp__beat-list-idx {
   font-family: var(--rf-serif);
   font-style: italic;
-  font-size: 0.85rem;
+  font-size: 1.05rem;
   color: var(--rf-text-muted);
 }
 
@@ -808,13 +801,7 @@ watch(isDesktop, () => {
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.15;
-}
-
-.refonte-xp__card-role {
-  margin: 0;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--rf-ink-soft);
+  color: var(--rf-ink);
 }
 
 .refonte-xp__card-period,
@@ -1001,13 +988,13 @@ watch(isDesktop, () => {
   }
 
   .refonte-xp__beat {
-    grid-template-columns: 1.65rem minmax(0, 1fr);
+    grid-template-columns: 2.25rem minmax(0, 1fr);
     gap: 0.65rem;
   }
 
   .refonte-xp__beat-num {
     margin-top: 0.05rem;
-    font-size: clamp(0.9rem, 1.55vh, 1rem);
+    font-size: clamp(1.15rem, 2.1vh, 1.4rem);
   }
 
   .refonte-xp__beat-content {
@@ -1015,19 +1002,19 @@ watch(isDesktop, () => {
   }
 
   .refonte-xp__beat-text {
-    font-size: clamp(0.86rem, 1.55vh, 0.94rem);
-    line-height: 1.5;
+    font-size: clamp(0.95rem, 1.7vh, 1.05rem);
+    line-height: 1.6;
   }
 
   .refonte-xp__beat-list {
-    gap: 0.42rem;
+    gap: 0.5rem;
   }
 
   .refonte-xp__beat-list li {
     grid-template-columns: 1.35rem minmax(0, 1fr);
     gap: 0.42rem;
-    font-size: clamp(0.82rem, 1.45vh, 0.9rem);
-    line-height: 1.4;
+    font-size: clamp(0.9rem, 1.55vh, 0.98rem);
+    line-height: 1.5;
   }
 
   .refonte-xp__beat-list-idx {
@@ -1082,16 +1069,6 @@ watch(isDesktop, () => {
   .refonte-xp__card-company {
     font-size: clamp(0.76rem, 1.35vh, 0.88rem);
     line-height: 1.1;
-  }
-
-  .refonte-xp__card-role {
-    font-size: 0.65rem;
-    line-height: 1.2;
-  }
-
-  .refonte-xp__card-period,
-  .refonte-xp__card-location {
-    display: none;
   }
 
   .refonte-xp__card.is-active {
