@@ -9,10 +9,10 @@ const { navigateTo } = useRefonteTransition()
 useSeoMeta({
   title: computed(() => `Prestations — ${meta.value?.name ?? 'Portfolio'}`),
   description:
-    'Tarifs indicatifs : page unique, site multipage (avec ou sans backend), et projets sur-mesure (Nuxt, Vue, motion, Supabase).',
+    'Offres web sur devis et missions front Vue/Nuxt (TJM 500 €), avec Supabase ou Firebase si besoin (TJM 600 €).',
   ogTitle: computed(() => `Prestations — ${meta.value?.name ?? 'Portfolio'}`),
   ogDescription:
-    'Tarifs indicatifs : page unique, site multipage (avec ou sans backend), et projets sur-mesure.',
+    'Landing, multipage, sur-mesure sur devis. Missions au TJM 500 € (front) ou 600 € (avec back léger).',
   twitterCard: 'summary_large_image'
 })
 
@@ -20,9 +20,13 @@ type Offer = {
   id: string
   name: string
   tagline: string
-  price: string
-  priceNote: string
-  unit: string
+  showTjm?: boolean
+  /** Affichage TJM dual front / back */
+  tjmFront?: string
+  tjmBack?: string
+  price?: string
+  priceNote?: string
+  unit?: string
   duration: string
   featured: boolean
   includes: string[]
@@ -35,23 +39,66 @@ type Category = {
   tab: string
   num: string
   lead: string
+  kind: 'mission' | 'devis'
   offers: Offer[]
 }
 
+const MISSION_INCLUDES = [
+  'Front Vue 3 / Nuxt 4 (UI, composants, state)',
+  'Responsive, micro-interactions, accessibilité de base',
+  'Si besoin : Supabase ou Firebase (auth, data, admin)',
+  'Intégration Figma → production',
+  'Formulaires, notifications, CRUD simple',
+  'Missions courtes ou longues — même cadre'
+]
+
+const MISSION_STACK = [
+  'Vue 3',
+  'Nuxt 4',
+  'TypeScript',
+  'Pinia',
+  'Supabase',
+  'Firebase',
+  'Tailwind / SCSS',
+  'GSAP'
+]
+
 const categories: Category[] = [
+  {
+    id: 'mission',
+    tab: 'Mission',
+    num: '01',
+    kind: 'mission',
+    lead: 'Je prends des missions courtes ou longues. Front Vue / Nuxt — et back léger (Supabase / Firebase) si le besoin est là.',
+    offers: [
+      {
+        id: 'mission',
+        name: 'Mission',
+        tagline: 'Courte ou longue — même cadre.',
+        showTjm: true,
+        tjmFront: '500',
+        tjmBack: '600',
+        priceNote: 'TJM',
+        unit: '€ / jour',
+        duration: 'Sprint ou régie',
+        featured: true,
+        includes: MISSION_INCLUDES,
+        stack: MISSION_STACK,
+        fit: 'Feature, POC, renfort d’équipe, accompagnement produit.'
+      }
+    ]
+  },
   {
     id: 'onepage',
     tab: 'Page unique',
-    num: '01',
-    lead: 'Une seule page pour convertir — version statique ou branchée à un backend léger.',
+    num: '02',
+    kind: 'devis',
+    lead: 'Une seule page pour convertir — version statique ou branchée à un backend léger. Devis après brief.',
     offers: [
       {
         id: 'landing',
         name: 'Landing page',
         tagline: 'Une page, un message, un CTA.',
-        price: '450',
-        priceNote: 'à partir de',
-        unit: '€',
         duration: '3 – 7 jours',
         featured: false,
         includes: [
@@ -69,9 +116,6 @@ const categories: Category[] = [
         id: 'landing-backend',
         name: 'Landing + backend',
         tagline: 'Même page, contenu vivant.',
-        price: '900',
-        priceNote: 'à partir de',
-        unit: '€',
         duration: '1 – 2 semaines',
         featured: true,
         includes: [
@@ -82,7 +126,7 @@ const categories: Category[] = [
           'Formulaire avancé & notifications',
           'Structure prête à évoluer vers un multipage'
         ],
-        stack: ['Nuxt 4', 'Vue 3', 'Supabase', 'Pinia'],
+        stack: ['Nuxt 4', 'Vue 3', 'Supabase', 'Firebase', 'Pinia'],
         fit: 'Lead gen, waitlist, contenu qui change souvent.'
       }
     ]
@@ -90,16 +134,14 @@ const categories: Category[] = [
   {
     id: 'multipage',
     tab: 'Site multipage',
-    num: '02',
-    lead: 'Plusieurs pages pour présenter l’offre — avec ou sans admin / données dynamiques.',
+    num: '03',
+    kind: 'devis',
+    lead: 'Plusieurs pages pour présenter l’offre — avec ou sans admin / données dynamiques. Devis après brief.',
     offers: [
       {
         id: 'vitrine',
         name: 'Site vitrine',
         tagline: 'Présence claire, rapide, soignée.',
-        price: '900',
-        priceNote: 'à partir de',
-        unit: '€',
         duration: '1 – 2 semaines',
         featured: false,
         includes: [
@@ -118,9 +160,6 @@ const categories: Category[] = [
         id: 'vitrine-backend',
         name: 'Site vitrine + backend',
         tagline: 'Contenu vivant, sans usine à gaz.',
-        price: '1 800',
-        priceNote: 'à partir de',
-        unit: '€',
         duration: '2 – 4 semaines',
         featured: true,
         includes: [
@@ -132,7 +171,7 @@ const categories: Category[] = [
           'Formulaires avancés & notifications',
           'Structure prête à évoluer'
         ],
-        stack: ['Nuxt 4', 'Vue 3', 'Supabase', 'Pinia'],
+        stack: ['Nuxt 4', 'Vue 3', 'Supabase', 'Firebase', 'Pinia'],
         fit: 'Offres qui changent, catalogue, portfolio client.'
       }
     ]
@@ -140,16 +179,14 @@ const categories: Category[] = [
   {
     id: 'custom',
     tab: 'Sur-mesure',
-    num: '03',
+    num: '04',
+    kind: 'devis',
     lead: 'Motion, parcours riches, CMS ou contraintes fortes — chiffrage après brief.',
     offers: [
       {
         id: 'complexe',
         name: 'Projet complexe',
         tagline: 'Motion, parcours, exigences fortes.',
-        price: 'Sur devis',
-        priceNote: 'budget type',
-        unit: '',
         duration: '6 semaines et +',
         featured: false,
         includes: [
@@ -169,64 +206,68 @@ const categories: Category[] = [
 ]
 
 type CategoryId = (typeof categories)[number]['id']
+type TermsMode = 'mission' | 'devis'
 
-const activeId = ref<CategoryId>('onepage')
+const activeId = ref<CategoryId>('mission')
 const activeCategory = computed(
   () => categories.find((category) => category.id === activeId.value) ?? categories[0]
 )
+const showExtras = computed(() => activeCategory.value.kind === 'devis')
+
+const termsMode = ref<TermsMode>('mission')
+const activeTerms = computed(() =>
+  termsMode.value === 'mission' ? termsMission : termsDevis
+)
 
 const extras = [
-  { label: 'Motion / GSAP poussé', value: 'à partir de 600 €' },
-  { label: 'Page additionnelle', value: 'à partir de 250 €' },
-  { label: 'Maintenance mensuelle', value: 'à partir de 180 € / mois' },
-  { label: 'Audit a11y ou perf', value: 'à partir de 450 €' }
+  { label: 'Motion / GSAP poussé', value: 'Sur devis' },
+  { label: 'Page additionnelle', value: 'Sur devis' },
+  { label: 'Maintenance mensuelle', value: 'Sur devis' },
+  { label: 'Audit a11y ou perf', value: 'Sur devis' }
 ]
 
-/** Conditions commerciales communes (acompte ≠ arrhes). */
-const DEPOSIT_RATE = 0.4
+const termsMission = [
+  {
+    title: 'Cadre',
+    text: 'Mission au TJM : 500 € HT / jour en front, 600 € HT / jour si éléments back (Supabase / Firebase). Facturation au réel.'
+  },
+  {
+    title: 'Accord',
+    text: 'Un échange (brief + disponibilités) fixe le démarrage. Pas d’acompte forfaitaire : engagement au temps.'
+  },
+  {
+    title: 'Démarrage',
+    text: 'La mission démarre à la date convenue, après confirmation écrite (mail ou contrat de mission).'
+  },
+  {
+    title: 'Facturation',
+    text: 'Facturation périodique (semaine / quinzaine / mois) ou en fin de mission, selon l’accord.'
+  }
+]
 
-const paymentTerms = [
+const termsDevis = [
+  {
+    title: 'Brief',
+    text: 'Objectifs, contenus, délais et contraintes. Le devis découle de ce périmètre.'
+  },
   {
     title: 'Devis visé',
-    text: 'Le devis est accepté par signature ou « bon pour accord ». Ce visa formalise la commande.'
+    text: 'Acceptation par signature ou « bon pour accord ». Ce visa formalise la commande.'
   },
   {
-    title: 'Acompte à la commande',
-    text: 'Un acompte de 40 % du montant HT est versé à la signature. Il est déduit de la facture finale.'
+    title: 'Acompte',
+    text: 'Acompte de 40 % HT à la commande, déduit de la facture finale. Ce n’est pas des arrhes.'
   },
   {
-    title: 'Démarrage de mission',
-    text: 'La mission commence uniquement après devis visé et réception de l’acompte.'
-  },
-  {
-    title: 'Solde à la livraison',
-    text: 'Le solde (60 %) est dû à la livraison / réception des livrables, sauf échéancier convenu au devis.'
+    title: 'Démarrage & solde',
+    text: 'Travaux après devis visé + acompte. Solde (60 %) à la livraison des livrables.'
   }
 ]
 
-function parsePriceEuro(price: string): number | null {
-  const digits = price.replace(/\s/g, '').replace(/[^\d]/g, '')
-  if (!digits) return null
-  return Number.parseInt(digits, 10)
-}
-
-function formatEuro(amount: number): string {
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'EUR',
-    maximumFractionDigits: 0
-  }).format(amount)
-}
-
-function depositLabel(offer: Offer): string {
-  const total = parsePriceEuro(offer.price)
-  if (total == null) {
-    return 'Acompte 40 % HT à la commande · solde à la livraison (selon devis)'
-  }
-  const deposit = Math.round(total * DEPOSIT_RATE)
-  const balance = total - deposit
-  return `Acompte ${formatEuro(deposit)} HT (40 %) · solde ${formatEuro(balance)} HT`
-}
+watch(activeId, (id) => {
+  const cat = categories.find((c) => c.id === id)
+  if (cat) termsMode.value = cat.kind
+})
 
 function selectCategory(id: CategoryId) {
   activeId.value = id
@@ -255,6 +296,14 @@ function onTabKeydown(event: KeyboardEvent, index: number) {
   })
 }
 
+function scrollToConditions(event?: MouseEvent) {
+  event?.preventDefault()
+  document.getElementById('rf-pricing-conditions')?.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start'
+  })
+}
+
 async function goContact(event?: MouseEvent) {
   event?.preventDefault()
   await navigateTo('/contact')
@@ -266,17 +315,25 @@ async function goContact(event?: MouseEvent) {
     <header class="refonte-container rf-pricing__hero">
       <p class="refonte-label" v-reveal>04 — Prestations</p>
       <h1 class="refonte-display rf-pricing__title" v-reveal="{ delay: 50 }">
-        Tarifs
-        <span class="refonte-serif rf-pricing__title-accent">clairs</span>
+        Offres
+        <span class="refonte-serif rf-pricing__title-accent">& missions</span>
       </h1>
       <p class="rf-pricing__lead" v-reveal="{ delay: 100 }">
-        Trois familles d’offres — Vue / Nuxt 4, motion, intégration soignée et backends légers
-        (Supabase / Firebase). Montants indicatifs HT. Mission démarrée après devis visé
-        (« bon pour accord ») et versement de l’acompte.
+        Forfaits chiffrés après brief, ou mission au TJM
+        (500 € front · 600 € avec back léger Supabase / Firebase).
       </p>
       <p class="rf-pricing__availability" v-reveal="{ delay: 140 }">
         {{ sections.a_propos.availability }}
       </p>
+      <a
+        href="#rf-pricing-conditions"
+        class="rf-pricing__jump"
+        v-reveal="{ delay: 180 }"
+        @click="scrollToConditions"
+      >
+        <span>Voir les conditions</span>
+        <span class="rf-pricing__jump-arrow" aria-hidden="true" />
+      </a>
     </header>
 
     <div class="refonte-container rf-pricing__offers" v-reveal="{ delay: 160 }">
@@ -326,15 +383,28 @@ async function goContact(event?: MouseEvent) {
             </header>
 
             <div class="rf-pricing__card-price">
-              <span class="rf-pricing__card-price-note">{{ offer.priceNote }}</span>
-              <p class="rf-pricing__card-price-value">
-                <span class="refonte-serif">{{ offer.price }}</span>
-                <span v-if="offer.unit" class="rf-pricing__card-price-unit">{{ offer.unit }}</span>
-              </p>
+              <template v-if="offer.showTjm && offer.tjmFront && offer.tjmBack">
+                <span class="rf-pricing__card-price-note">{{ offer.priceNote }}</span>
+                <ul class="rf-pricing__tjm">
+                  <li>
+                    <span class="refonte-serif rf-pricing__tjm-value">{{ offer.tjmFront }}</span>
+                    <span class="rf-pricing__tjm-unit">{{ offer.unit }}</span>
+                    <span class="rf-pricing__tjm-label">front</span>
+                  </li>
+                  <li>
+                    <span class="refonte-serif rf-pricing__tjm-value">{{ offer.tjmBack }}</span>
+                    <span class="rf-pricing__tjm-unit">{{ offer.unit }}</span>
+                    <span class="rf-pricing__tjm-label">avec back</span>
+                  </li>
+                </ul>
+              </template>
+              <template v-else>
+                <span class="rf-pricing__card-price-note">Tarif</span>
+                <p class="rf-pricing__card-price-value rf-pricing__card-price-value--soft">
+                  <span>Sur devis</span>
+                </p>
+              </template>
               <p class="rf-pricing__card-duration">{{ offer.duration }}</p>
-              <p class="rf-pricing__card-deposit">
-                {{ depositLabel(offer) }}
-              </p>
             </div>
 
             <ul class="rf-pricing__card-list">
@@ -349,21 +419,27 @@ async function goContact(event?: MouseEvent) {
 
             <a
               href="/contact"
-              class="refonte-btn"
+              class="refonte-btn rf-pricing__cta"
               :class="offer.featured ? '' : 'refonte-btn--ghost'"
               @click="goContact"
             >
-              Demander un devis
+              {{ offer.showTjm ? 'Mission' : 'Devis' }}
             </a>
           </article>
         </div>
       </div>
     </div>
 
-    <section class="refonte-container rf-pricing__extras">
+    <section
+      v-if="showExtras"
+      class="refonte-container rf-pricing__extras"
+    >
       <div class="rf-pricing__extras-head" v-reveal>
         <p class="refonte-label">Options</p>
         <h2 class="refonte-display rf-pricing__extras-title">À la carte</h2>
+        <p class="rf-pricing__extras-lead">
+          Uniquement pour les offres sur devis — chiffrées avec le brief.
+        </p>
       </div>
       <ul class="rf-pricing__extras-list">
         <li
@@ -378,27 +454,54 @@ async function goContact(event?: MouseEvent) {
       </ul>
     </section>
 
-    <section class="refonte-container rf-pricing__note" v-reveal>
+    <section
+      id="rf-pricing-conditions"
+      class="refonte-container rf-pricing__note"
+      v-reveal
+    >
       <p class="refonte-label">Conditions</p>
       <h2 class="refonte-display rf-pricing__note-title">
-        Devis visé → acompte → mission
+        Comment ça démarre
       </h2>
       <p class="rf-pricing__note-intro">
-        Chaque projet commence par un brief (objectifs, contenus, délais). Le tarif final dépend
-        du volume, du motion, des intégrations et des contenus fournis. Ensuite :
+        Les règles ne sont pas les mêmes selon le cadre. Choisissez le mode qui correspond :
       </p>
+
+      <div class="rf-pricing__terms-switch" role="tablist" aria-label="Type de conditions">
+        <button
+          type="button"
+          class="rf-pricing__terms-tab"
+          role="tab"
+          :aria-selected="termsMode === 'mission'"
+          :class="{ 'is-active': termsMode === 'mission' }"
+          @click="termsMode = 'mission'"
+        >
+          Mission
+        </button>
+        <button
+          type="button"
+          class="rf-pricing__terms-tab"
+          role="tab"
+          :aria-selected="termsMode === 'devis'"
+          :class="{ 'is-active': termsMode === 'devis' }"
+          @click="termsMode = 'devis'"
+        >
+          Devis
+        </button>
+      </div>
+
       <ol class="rf-pricing__terms">
-        <li v-for="term in paymentTerms" :key="term.title">
+        <li v-for="term in activeTerms" :key="term.title">
           <strong>{{ term.title }}</strong>
           <span>{{ term.text }}</span>
         </li>
       </ol>
       <p class="rf-pricing__terms-aside">
-        L’acompte n’est pas des arrhes : en cas d’annulation après démarrage, les sommes
-        correspondant au travail déjà réalisé restent dues. Facturation en HT (TVA selon régime).
+        Facturation en HT (TVA selon régime). En cas d’annulation après démarrage, le travail
+        déjà réalisé reste dû.
       </p>
       <a href="/contact" class="refonte-link rf-pricing__note-cta" @click="goContact">
-        Parler de votre projet →
+        Contact →
       </a>
     </section>
   </div>
@@ -440,6 +543,41 @@ async function goContact(event?: MouseEvent) {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--rf-text-muted);
+}
+
+.rf-pricing__jump {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.35rem;
+  width: fit-content;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rf-accent);
+  text-decoration: none;
+}
+
+.rf-pricing__jump-arrow {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  animation: rf-pricing-bounce 1.4s var(--rf-ease) infinite;
+}
+
+@keyframes rf-pricing-bounce {
+  0%,
+  100% {
+    transform: rotate(45deg) translate(0, 0);
+    opacity: 0.55;
+  }
+  50% {
+    transform: rotate(45deg) translate(2px, 3px);
+    opacity: 1;
+  }
 }
 
 .rf-pricing__offers {
@@ -484,7 +622,7 @@ async function goContact(event?: MouseEvent) {
 
 .rf-pricing__tab:hover:not(.is-active) {
   color: var(--rf-text-soft);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--rf-hover-wash);
 }
 
 .rf-pricing__tab.is-active {
@@ -497,19 +635,19 @@ async function goContact(event?: MouseEvent) {
   font-family: var(--rf-serif);
   font-style: italic;
   font-size: 0.78rem;
-  opacity: 0.7;
+  color: var(--rf-accent);
 }
 
 .rf-pricing__tab-label {
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   font-weight: 700;
   letter-spacing: -0.01em;
-  line-height: 1.25;
 }
 
 .rf-pricing__panel {
   display: grid;
   gap: 1.25rem;
+  padding-top: 1.35rem;
 }
 
 .rf-pricing__panel-lead {
@@ -525,14 +663,16 @@ async function goContact(event?: MouseEvent) {
   gap: 1.25rem;
 }
 
+.rf-pricing__cards.is-single {
+  max-width: 36rem;
+  margin-inline: auto;
+  width: 100%;
+}
+
 @media (min-width: 900px) {
   .rf-pricing__cards:not(.is-single) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: stretch;
-  }
-
-  .rf-pricing__cards.is-single {
-    max-width: 36rem;
   }
 }
 
@@ -543,7 +683,7 @@ async function goContact(event?: MouseEvent) {
   padding: clamp(1.35rem, 3vw, 1.75rem);
   border: 1px solid var(--rf-line);
   border-radius: var(--rf-radius);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--rf-hover-wash);
   color: var(--rf-text);
 }
 
@@ -551,7 +691,7 @@ async function goContact(event?: MouseEvent) {
   border-color: rgba(var(--rf-accent-rgb), 0.55);
   background:
     radial-gradient(ellipse 80% 50% at 50% 0%, rgba(var(--rf-accent-rgb), 0.1), transparent 60%),
-    rgba(255, 255, 255, 0.04);
+    var(--rf-hover-wash);
   box-shadow: 0 0 0 1px rgba(var(--rf-accent-rgb), 0.12);
 }
 
@@ -593,6 +733,48 @@ async function goContact(event?: MouseEvent) {
   gap: 0.35rem;
 }
 
+.rf-pricing__tjm {
+  margin: 0.45rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.rf-pricing__tjm li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.5rem;
+}
+
+.rf-pricing__tjm-value {
+  font-size: clamp(2rem, 4.5vw, 2.75rem);
+  line-height: 1;
+  color: var(--rf-accent);
+}
+
+.rf-pricing__tjm-unit {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--rf-text-soft);
+}
+
+.rf-pricing__tjm-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--rf-text-muted);
+}
+
+.rf-pricing__card-price-value--soft {
+  font-size: clamp(1.45rem, 3vw, 1.85rem);
+  font-family: var(--rf-sans);
+  font-weight: 700;
+  color: var(--rf-text-soft);
+}
+
 .rf-pricing__card-price-unit {
   font-family: var(--rf-sans);
   font-size: 1rem;
@@ -606,13 +788,10 @@ async function goContact(event?: MouseEvent) {
   color: var(--rf-text-muted);
 }
 
-.rf-pricing__card-deposit {
-  margin: 0.55rem 0 0;
-  font-size: 0.72rem;
-  font-weight: 600;
-  line-height: 1.4;
-  letter-spacing: 0.01em;
-  color: var(--rf-accent);
+.rf-pricing__cta {
+  width: fit-content;
+  justify-self: start;
+  padding-inline: 1.25rem;
 }
 
 .rf-pricing__card-list {
@@ -620,14 +799,14 @@ async function goContact(event?: MouseEvent) {
   padding: 0;
   list-style: none;
   display: grid;
-  gap: 0.55rem;
+  gap: 0.45rem;
 }
 
 .rf-pricing__card-list li {
   position: relative;
-  padding-left: 1rem;
-  font-size: 0.86rem;
-  line-height: 1.45;
+  padding-left: 1.1rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
   color: var(--rf-text-soft);
 }
 
@@ -636,43 +815,39 @@ async function goContact(event?: MouseEvent) {
   position: absolute;
   left: 0;
   top: 0.55em;
-  width: 0.35rem;
-  height: 0.35rem;
-  border-radius: 50%;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
   background: var(--rf-accent);
 }
 
 .rf-pricing__card-stack {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem;
+  gap: 0.4rem;
 }
 
 .rf-pricing__card-stack span {
   font-size: 0.68rem;
-  font-weight: 600;
-  padding: 0.28rem 0.55rem;
-  border: 1px solid var(--rf-line);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid rgba(var(--rf-accent-rgb), 0.4);
   border-radius: 999px;
-  color: var(--rf-text-muted);
+  color: var(--rf-accent);
 }
 
 .rf-pricing__card-fit {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   line-height: 1.45;
   color: var(--rf-text-muted);
 }
 
-.rf-pricing__card .refonte-btn {
-  justify-self: start;
-  margin-top: 0.15rem;
-}
-
 .rf-pricing__extras {
-  margin-top: clamp(3.5rem, 8vw, 5rem);
-  padding-top: clamp(2rem, 4vw, 2.75rem);
-  border-top: 1px solid var(--rf-line);
+  margin-top: clamp(3rem, 8vw, 5rem);
+  display: grid;
+  gap: 1.25rem;
 }
 
 .rf-pricing__extras-title {
@@ -680,96 +855,126 @@ async function goContact(event?: MouseEvent) {
   font-size: clamp(1.75rem, 4vw, 2.5rem);
 }
 
+.rf-pricing__extras-lead {
+  margin: 0.45rem 0 0;
+  font-size: 0.88rem;
+  color: var(--rf-text-muted);
+}
+
 .rf-pricing__extras-list {
-  margin: 1.5rem 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
+  border-top: 1px solid var(--rf-line);
 }
 
 .rf-pricing__extras-row {
   display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
-  gap: 0.5rem 1.5rem;
-  padding-block: 1rem;
+  gap: 1rem;
+  padding: 0.95rem 0;
   border-bottom: 1px solid var(--rf-line);
-  font-size: 0.95rem;
-  color: var(--rf-text-soft);
+  font-size: 0.92rem;
 }
 
 .rf-pricing__extras-value {
+  flex-shrink: 0;
   font-weight: 700;
-  color: var(--rf-accent);
-  font-variant-numeric: tabular-nums;
+  color: var(--rf-text-muted);
 }
 
 .rf-pricing__note {
-  margin-top: clamp(3rem, 7vw, 4.5rem);
+  margin-top: clamp(3rem, 8vw, 5rem);
   display: grid;
   gap: 0.85rem;
-  max-width: 44rem;
+  max-width: 40rem;
+  scroll-margin-top: calc(var(--rf-nav-h) + 1rem);
 }
 
 .rf-pricing__note-title {
   margin: 0;
-  font-size: clamp(1.5rem, 3.5vw, 2.15rem);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
 }
 
-.rf-pricing__note-intro,
-.rf-pricing__terms-aside {
+.rf-pricing__note-intro {
   margin: 0;
+  font-size: 0.95rem;
   line-height: 1.65;
   color: var(--rf-text-soft);
 }
 
+.rf-pricing__terms-switch {
+  display: inline-flex;
+  gap: 0.35rem;
+  padding: 0.25rem;
+  border: 1px solid var(--rf-line);
+  border-radius: 999px;
+  width: fit-content;
+}
+
+.rf-pricing__terms-tab {
+  padding: 0.45rem 1rem;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--rf-text-muted);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    color 0.2s var(--rf-ease),
+    background 0.2s var(--rf-ease);
+}
+
+.rf-pricing__terms-tab.is-active {
+  background: rgba(var(--rf-accent-rgb), 0.16);
+  color: var(--rf-accent);
+}
+
 .rf-pricing__terms {
-  margin: 0.35rem 0 0;
+  margin: 0.5rem 0 0;
   padding: 0;
   list-style: none;
   display: grid;
   gap: 0.85rem;
-  counter-reset: rf-term;
 }
 
 .rf-pricing__terms li {
   display: grid;
   gap: 0.25rem;
-  padding-left: 2.1rem;
-  position: relative;
-  counter-increment: rf-term;
-}
-
-.rf-pricing__terms li::before {
-  content: counter(rf-term, decimal-leading-zero);
-  position: absolute;
-  left: 0;
-  top: 0.1em;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--rf-accent);
 }
 
 .rf-pricing__terms strong {
-  font-size: 0.92rem;
-  color: var(--rf-text);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--rf-accent);
 }
 
 .rf-pricing__terms span {
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   line-height: 1.55;
   color: var(--rf-text-soft);
 }
 
 .rf-pricing__terms-aside {
+  margin: 0.35rem 0 0;
   font-size: 0.82rem;
+  line-height: 1.5;
   color: var(--rf-text-muted);
 }
 
 .rf-pricing__note-cta {
   margin-top: 0.5rem;
-  font-weight: 700;
-  color: var(--rf-accent);
-  width: fit-content;
+  justify-self: start;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rf-pricing__jump-arrow {
+    animation: none;
+  }
 }
 </style>
