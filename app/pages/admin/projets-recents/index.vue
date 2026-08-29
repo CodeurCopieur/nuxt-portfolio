@@ -1,15 +1,28 @@
 <script setup lang="ts">
 import type { PortfolioProject } from '~/types/portfolio'
+import { FEATURED_WORKS_LIMIT } from '~/composables/useContent'
 
 definePageMeta({ layout: 'admin', middleware: 'admin-auth' })
 
 const { supabase } = useAdminAuth()
 const projects = ref<PortfolioProject[]>([])
-const slots = ref<(string | null)[]>([null, null, null])
+const slots = ref<(string | null)[]>(Array.from({ length: FEATURED_WORKS_LIMIT }, () => null))
 const saving = ref(false)
 const message = ref<string | null>(null)
 
-const slotLabels = ['Projet récent n°1', 'Projet récent n°2', 'Projet récent n°3']
+const slotLabels = Array.from({ length: FEATURED_WORKS_LIMIT }, (_, i) => `Travail sélectionné n°${i + 1}`)
+const slotIndexes = Array.from({ length: FEATURED_WORKS_LIMIT }, (_, i) => i + 1)
+
+function formatProjectsError(error: { message?: string; code?: string }) {
+  const msg = error.message ?? 'Erreur inconnue'
+  if (msg.includes('does not exist') && msg.includes('featured_slot')) {
+    return 'Colonne manquante : exécutez supabase/migration-featured-projects.sql dans le SQL Editor Supabase.'
+  }
+  if (msg.includes('featured_slot_check') || msg.includes('featured_slot_range') || error.code === '23514') {
+    return 'Contrainte SQL trop restrictive (slots 1–3). Exécutez supabase/migration-featured-projects.sql pour autoriser les slots 1–6.'
+  }
+  return msg
+}
 
 async function load() {
   const { data, error } = await supabase
@@ -18,9 +31,7 @@ async function load() {
     .order('sort_order', { ascending: true })
 
   if (error) {
-    message.value = error.message.includes('featured_slot')
-      ? 'Colonne manquante : exécutez supabase/migration-featured-projects.sql dans le SQL Editor Supabase.'
-      : error.message
+    message.value = formatProjectsError(error)
     return
   }
 
@@ -39,7 +50,7 @@ async function load() {
     featured_slot: p.featured_slot ?? null
   }))
 
-  slots.value = [1, 2, 3].map((n) => {
+  slots.value = slotIndexes.map((n) => {
     const found = projects.value.find((p) => p.featured_slot === n)
     return found?.id ?? null
   })
@@ -66,7 +77,7 @@ async function save() {
     .update({ featured_slot: null, updated_at: new Date().toISOString() })
     .not('featured_slot', 'is', null)
 
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < FEATURED_WORKS_LIMIT; i++) {
     const projectId = slots.value[i]
     if (!projectId) continue
 
@@ -77,15 +88,13 @@ async function save() {
 
     if (error) {
       saving.value = false
-      message.value = error.message.includes('featured_slot')
-        ? 'Colonne manquante : exécutez supabase/migration-featured-projects.sql dans le SQL Editor Supabase.'
-        : error.message
+      message.value = formatProjectsError(error)
       return
     }
   }
 
   saving.value = false
-  message.value = 'Projets récents enregistrés'
+  message.value = 'Travaux sélectionnés enregistrés'
   await load()
   await refreshNuxtData('portfolio-content')
 }
@@ -95,9 +104,10 @@ onMounted(load)
 
 <template>
   <div>
-    <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Projets récents</h1>
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Travaux sélectionnés</h1>
     <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
-      Choisissez les 3 projets affichés sur la page d'accueil, section « Projets Récents ».
+      Choisissez jusqu’à {{ FEATURED_WORKS_LIMIT }} projets affichés sur la page d’accueil, section « Travaux sélectionnés ».
+      L’ordre des slots définit l’ordre d’affichage.
     </p>
 
     <p v-if="message" class="mb-4 text-sm" :class="message.includes('enregistr') ? 'text-green-600' : 'text-red-500'">

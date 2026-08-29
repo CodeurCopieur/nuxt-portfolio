@@ -11,7 +11,7 @@ const sections = [
   { title: 'Expériences', desc: 'Parcours professionnel et filtres technologie', to: '/admin/experiences', icon: '💼' },
   { title: 'Compétences', desc: 'Technologies et outils', to: '/admin/competences', icon: '🛠️' },
   { title: 'Projets', desc: 'Réalisations et portfolio', to: '/admin/projets', icon: '🚀' },
-  { title: 'Projets récents', desc: '3 projets page d\'accueil', to: '/admin/projets-recents', icon: '⭐' }
+  { title: 'Travaux sélectionnés', desc: '6 projets page d\'accueil', to: '/admin/projets-recents', icon: '⭐' }
 ]
 </script>
 

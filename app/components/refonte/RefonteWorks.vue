@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { sortProjectsByYear } from '~/utils/sort-projects'
 import { useRefonteScroll } from '@/composables/refonte/useRefonteScroll'
 
-const { sections } = useContent()
+const { featuredWorks } = useContent()
 const { scroll, ready, refresh } = useRefonteScroll()
 
 const scrollerRef = ref<HTMLElement | null>(null)
@@ -16,7 +15,8 @@ const LIST_START = 0.7
 let rafId = 0
 let targetP = 0
 
-const projects = computed(() => sortProjectsByYear(sections.value.projets).slice(0, 6))
+/** Ordre = slots admin (`featured_slot` 1…6), jamais un re-tri par année. */
+const projects = computed(() => featuredWorks.value)
 const total = computed(() => projects.value.length)
 
 /** Course adaptée au nombre de projets (assez de dwell par focus). */

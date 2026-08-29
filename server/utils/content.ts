@@ -125,7 +125,7 @@ export async function fetchPortfolioContent(): Promise<PortfolioContent | null> 
           summary: p.summary,
           link: p.link ?? undefined,
           github: p.github ?? undefined,
-          featured_slot: p.featured_slot ?? null,
+          featured_slot: p.featured_slot != null ? Number(p.featured_slot) : null,
           experience_id: p.experience_id ?? null
         })),
         filtres_technologies: filtersRes.error

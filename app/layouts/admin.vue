@@ -8,7 +8,7 @@ const navItems = [
   { label: 'Expériences', to: '/admin/experiences' },
   { label: 'Compétences', to: '/admin/competences' },
   { label: 'Projets', to: '/admin/projets' },
-  { label: 'Récents', to: '/admin/projets-recents' }
+  { label: 'Sélectionnés', to: '/admin/projets-recents' }
 ]
 </script>
 

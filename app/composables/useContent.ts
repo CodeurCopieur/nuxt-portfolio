@@ -1,6 +1,10 @@
 import type { PortfolioContent, PortfolioProject } from '~/types/portfolio'
 import fallbackData from '@/data/content.json'
 import { sortExperiencesChronologically } from '~/utils/experience-map'
+import { sortProjectsByYear } from '~/utils/sort-projects'
+
+/** Nombre max de projets dans « Travaux sélectionnés » (accueil refonte). */
+export const FEATURED_WORKS_LIMIT = 6
 
 function withSortedExperiences(content: PortfolioContent): PortfolioContent {
   return {
@@ -12,13 +16,25 @@ function withSortedExperiences(content: PortfolioContent): PortfolioContent {
   }
 }
 
-export function getRecentProjects(projets: PortfolioProject[]): PortfolioProject[] {
+/** Projets mis en avant : ordre strict des slots admin (1 → N). */
+export function getFeaturedWorks(
+  projets: PortfolioProject[],
+  limit = FEATURED_WORKS_LIMIT
+): PortfolioProject[] {
   const featured = projets
-    .filter((p) => p.featured_slot != null)
-    .sort((a, b) => (a.featured_slot ?? 99) - (b.featured_slot ?? 99))
+    .filter((p) => {
+      const slot = Number(p.featured_slot)
+      return Number.isFinite(slot) && slot > 0
+    })
+    .sort((a, b) => Number(a.featured_slot) - Number(b.featured_slot))
 
-  if (featured.length > 0) return featured.slice(0, 3)
-  return projets.slice(0, 3)
+  if (featured.length > 0) return featured.slice(0, limit)
+  return sortProjectsByYear(projets).slice(0, limit)
+}
+
+/** Ancienne home `/old` — 3 projets max. */
+export function getRecentProjects(projets: PortfolioProject[]): PortfolioProject[] {
+  return getFeaturedWorks(projets, 3)
 }
 
 export function useContent() {
@@ -32,6 +48,7 @@ export function useContent() {
   const meta = computed(() => data.value?.meta ?? fallback.meta)
   const sections = computed(() => data.value?.sections ?? fallback.sections)
   const recentProjects = computed(() => getRecentProjects(sections.value.projets))
+  const featuredWorks = computed(() => getFeaturedWorks(sections.value.projets))
 
-  return { meta, sections, recentProjects, data }
+  return { meta, sections, recentProjects, featuredWorks, data }
 }
