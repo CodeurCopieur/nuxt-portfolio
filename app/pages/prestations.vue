@@ -792,6 +792,28 @@ async function goContact(event?: MouseEvent) {
   width: fit-content;
   justify-self: start;
   padding-inline: 1.25rem;
+  background: var(--rf-text);
+  color: var(--rf-bg);
+  border: 1px solid var(--rf-text);
+}
+
+.rf-pricing__cta:hover {
+  background: var(--rf-accent);
+  border-color: var(--rf-accent);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.rf-pricing__cta.refonte-btn--ghost {
+  background: transparent;
+  color: var(--rf-text);
+  border: 1px solid var(--rf-text);
+}
+
+.rf-pricing__cta.refonte-btn--ghost:hover {
+  background: var(--rf-text);
+  color: var(--rf-bg);
+  border-color: var(--rf-text);
 }
 
 .rf-pricing__card-list {
