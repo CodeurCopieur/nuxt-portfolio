@@ -1,4 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { fileURLToPath } from 'node:url'
+
+const emptyAppManifest = fileURLToPath(
+  new URL('./stubs/empty-app-manifest.mjs', import.meta.url)
+)
+
 const siteUrl =
   process.env.NUXT_PUBLIC_SITE_URL
   || (process.env.VERCEL_PROJECT_PRODUCTION_URL
@@ -64,7 +70,14 @@ export default defineNuxtConfig({
   tailwindcss: { viewer: false },
   vite: {
     optimizeDeps: {
-      include: ['leaflet', 'locomotive-scroll', 'scrollmagic', '@barba/core']
+      include: ['leaflet', 'locomotive-scroll', 'scrollmagic', '@barba/core'],
+      exclude: ['#app-manifest']
+    },
+    resolve: {
+      alias: {
+        // Vite analyse cet import virtuel avant l’alias interne de Nuxt.
+        '#app-manifest': emptyAppManifest
+      }
     },
     build: {
       cssCodeSplit: true
