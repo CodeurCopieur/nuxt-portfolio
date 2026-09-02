@@ -29,6 +29,7 @@
     "@emailjs/browser": "^4.1.0",
     "@nuxtjs/pwa": "^3.3.5",
     "@supabase/supabase-js": "^2.111.0",
+    "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^1.2.0",
     "defu": "6.1.4",
     "leaflet": "^1.9.4",

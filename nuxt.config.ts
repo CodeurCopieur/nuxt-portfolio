@@ -13,7 +13,8 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     '@nuxtjs/tailwindcss',
     '@nuxtjs/seo',
-    'nuxt-schema-org'
+    'nuxt-schema-org',
+    '@vercel/analytics/nuxt'
   ],
   css: ['@/assets/css/base.css'],
   site: {

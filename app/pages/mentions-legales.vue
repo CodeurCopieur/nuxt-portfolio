@@ -111,6 +111,9 @@ useHead({
         <li>
           {{ LEGAL_THIRD_PARTIES.vercelAnalytics.name }} — {{ LEGAL_THIRD_PARTIES.vercelAnalytics.purpose }}.
         </li>
+        <li>
+          {{ LEGAL_THIRD_PARTIES.vercelWebAnalytics.name }} — {{ LEGAL_THIRD_PARTIES.vercelWebAnalytics.purpose }}.
+        </li>
       </ul>
     </section>
 

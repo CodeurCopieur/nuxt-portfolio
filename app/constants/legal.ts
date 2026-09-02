@@ -43,6 +43,11 @@ export const LEGAL_THIRD_PARTIES = {
     name: 'Vercel Speed Insights',
     purpose: 'Mesure anonymisée des performances du site',
     website: 'https://vercel.com/docs/speed-insights'
+  },
+  vercelWebAnalytics: {
+    name: 'Vercel Web Analytics',
+    purpose: 'Mesure d’audience anonymisée (pages vues, visiteurs), sans cookies',
+    website: 'https://vercel.com/docs/analytics'
   }
 } as const
 
@@ -53,7 +58,7 @@ export const LEGAL_PAGES = [
   { to: '/plan-du-site', label: 'Plan du site' }
 ] as const
 
-export const LEGAL_LAST_UPDATED = '15 août 2026'
+export const LEGAL_LAST_UPDATED = '3 septembre 2026'
 
 export function formatLegalAddress() {
   const { line1, postalCode, city, country } = LEGAL_ENTITY.address

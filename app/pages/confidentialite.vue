@@ -42,7 +42,8 @@ useHead({
         </li>
         <li>
           <strong>Cookies et traceurs</strong> : cookies techniques nécessaires au fonctionnement du site
-          et traceurs de performance (Vercel Speed Insights).
+          et traceurs de mesure d'audience et de performance (Vercel Web Analytics et Speed Insights),
+          sans cookies publicitaires.
         </li>
       </ul>
     </section>
@@ -52,7 +53,7 @@ useHead({
       <ul>
         <li>Répondre aux demandes envoyées via le formulaire de contact.</li>
         <li>Assurer la sécurité, la maintenance et le bon fonctionnement du site.</li>
-        <li>Mesurer les performances et améliorer l'expérience utilisateur.</li>
+        <li>Mesurer l'audience (pages vues) et les performances, afin d'améliorer l'expérience.</li>
         <li>Respecter les obligations légales applicables.</li>
       </ul>
     </section>
@@ -71,7 +72,8 @@ useHead({
       <p>Vos données peuvent être transmises aux prestataires suivants, dans la limite de leurs missions :</p>
       <ul>
         <li>
-          <strong>Vercel Inc.</strong> — hébergement du site et mesure de performance
+          <strong>Vercel Inc.</strong> — hébergement du site, mesure d'audience (Web Analytics)
+          et mesure de performance (Speed Insights)
           (<a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">politique de confidentialité</a>).
         </li>
         <li>
@@ -88,7 +90,10 @@ useHead({
       <ul>
         <li>Messages de contact : jusqu'à 3 ans à compter du dernier échange.</li>
         <li>Données techniques et logs : durée limitée conformément aux obligations de l'hébergeur.</li>
-        <li>Données de mesure d'audience : selon la durée définie par Vercel Speed Insights.</li>
+        <li>
+          Données de mesure d'audience : 30 jours pour Vercel Web Analytics (plan Hobby) ;
+          durées propres à Vercel Speed Insights pour les métriques de performance.
+        </li>
       </ul>
     </section>
 
@@ -110,9 +115,10 @@ useHead({
     <section>
       <h2>Cookies</h2>
       <p>
-        Le site peut déposer des cookies strictement nécessaires à son fonctionnement ainsi que des
-        traceurs de performance. Vous pouvez configurer votre navigateur pour refuser les cookies non
-        essentiels. Le refus de certains traceurs peut limiter certaines fonctionnalités d'analyse.
+        Le site peut déposer des cookies strictement nécessaires à son fonctionnement. Vercel Web Analytics
+        ne repose pas sur des cookies : il mesure les pages vues de façon anonymisée. Speed Insights
+        mesure les performances. Vous pouvez configurer votre navigateur pour bloquer les scripts
+        d'analyse ; cela n'empêche pas la navigation.
       </p>
     </section>
 
