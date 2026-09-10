@@ -206,13 +206,13 @@ const categories: Category[] = [
 ]
 
 type CategoryId = (typeof categories)[number]['id']
-type TermsMode = 'mission' | 'devis'
 
 const activeId = ref<CategoryId>('mission')
 const activeCategory = computed(
   () => categories.find((category) => category.id === activeId.value) ?? categories[0]
 )
 const showExtras = computed(() => activeCategory.value.kind === 'devis')
+const accordionMode = ref(true)
 const termsMode = computed(() => activeCategory.value.kind)
 const activeTerms = computed(() =>
   termsMode.value === 'mission' ? termsMission : termsDevis
@@ -275,16 +275,18 @@ function defaultOpenOfferId() {
 }
 
 function isOfferOpen(id: string) {
-  return openOfferId.value === id
+  return !accordionMode.value || openOfferId.value === id
 }
 
 function toggleOffer(id: string) {
+  if (!accordionMode.value) return
   if (openOfferId.value === id) return
   openOfferId.value = id
 }
 
 function selectCategory(id: CategoryId) {
   activeId.value = id
+  if (!accordionMode.value) return
   nextTick(() => {
     document.getElementById(`rf-pricing-tab-${id}`)?.scrollIntoView({
       inline: 'center',
@@ -329,6 +331,16 @@ async function goContact(event?: MouseEvent) {
   event?.preventDefault()
   await navigateTo('/contact')
 }
+
+onMounted(() => {
+  const mq = window.matchMedia('(max-width: 899px)')
+  const apply = () => {
+    accordionMode.value = mq.matches
+  }
+  apply()
+  mq.addEventListener('change', apply)
+  onUnmounted(() => mq.removeEventListener('change', apply))
+})
 </script>
 
 <template>
@@ -460,8 +472,7 @@ async function goContact(event?: MouseEvent) {
 
             <a
               href="/contact"
-              class="refonte-btn rf-pricing__cta"
-              :class="offer.featured ? '' : 'refonte-btn--ghost'"
+              class="refonte-btn refonte-btn--ghost rf-pricing__cta"
               @click="goContact"
             >
               {{ offer.showTjm ? 'Mission' : 'Devis' }}
@@ -849,8 +860,9 @@ async function goContact(event?: MouseEvent) {
 
 @media (min-width: 900px) {
   .rf-pricing__card {
-    gap: 0;
-    padding: 0 1.25rem;
+    grid-template-rows: auto 1fr auto auto auto;
+    gap: 1.1rem;
+    padding: clamp(1.35rem, 3vw, 1.75rem);
     border: 1px solid var(--rf-line);
     border-radius: var(--rf-radius);
     background: var(--rf-hover-wash);
@@ -862,6 +874,24 @@ async function goContact(event?: MouseEvent) {
       radial-gradient(ellipse 80% 50% at 50% 0%, rgba(var(--rf-accent-rgb), 0.1), transparent 60%),
       var(--rf-hover-wash);
     box-shadow: 0 0 0 1px rgba(var(--rf-accent-rgb), 0.12);
+  }
+
+  .rf-pricing__card-toggle {
+    padding: 0;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .rf-pricing__card-toggle-meta,
+  .rf-pricing__card-chevron {
+    display: none;
+  }
+
+  .rf-pricing__card-body,
+  .rf-pricing__card.is-open .rf-pricing__card-body,
+  .rf-pricing__card-body[hidden] {
+    display: grid !important;
+    padding: 0;
   }
 
   .rf-pricing__card-name {
