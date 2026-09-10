@@ -271,6 +271,13 @@ watch(activeId, (id) => {
 
 function selectCategory(id: CategoryId) {
   activeId.value = id
+  nextTick(() => {
+    document.getElementById(`rf-pricing-tab-${id}`)?.scrollIntoView({
+      inline: 'center',
+      block: 'nearest',
+      behavior: 'smooth'
+    })
+  })
 }
 
 function onTabKeydown(event: KeyboardEvent, index: number) {
@@ -587,6 +594,8 @@ async function goContact(event?: MouseEvent) {
 
 .rf-pricing__tabs-track {
   overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   border-bottom: 1px solid var(--rf-line);
 }
@@ -597,16 +606,17 @@ async function goContact(event?: MouseEvent) {
 
 .rf-pricing__tabs {
   display: flex;
-  gap: 0.25rem;
+  flex-wrap: nowrap;
+  gap: 1.25rem;
   min-width: min-content;
 }
 
 .rf-pricing__tab {
-  display: grid;
-  gap: 0.15rem;
-  flex: 1 1 0;
-  min-width: 8rem;
-  padding: 0.85rem 1rem 1rem;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  padding: 0.2rem 0 0.5rem;
   border: none;
   border-bottom: 2px solid transparent;
   background: transparent;
@@ -614,21 +624,20 @@ async function goContact(event?: MouseEvent) {
   text-align: left;
   cursor: pointer;
   font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
   transition:
-    color 0.2s var(--rf-ease),
-    border-color 0.2s var(--rf-ease),
-    background 0.2s var(--rf-ease);
+    color 0.25s var(--rf-ease),
+    border-color 0.25s var(--rf-ease),
+    opacity 0.25s var(--rf-ease);
 }
 
 .rf-pricing__tab:hover:not(.is-active) {
-  color: var(--rf-text-soft);
-  background: var(--rf-hover-wash);
+  opacity: 0.85;
 }
 
 .rf-pricing__tab.is-active {
   color: var(--rf-text);
   border-bottom-color: var(--rf-accent);
-  background: rgba(var(--rf-accent-rgb), 0.05);
 }
 
 .rf-pricing__tab-num {
@@ -639,9 +648,54 @@ async function goContact(event?: MouseEvent) {
 }
 
 .rf-pricing__tab-label {
-  font-size: 0.88rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.rf-pricing__tab.is-active .rf-pricing__tab-label {
+  color: var(--rf-text);
+}
+
+@media (min-width: 768px) {
+  .rf-pricing__tabs-track {
+    overflow: visible;
+  }
+
+  .rf-pricing__tabs {
+    gap: 0.25rem;
+    width: 100%;
+  }
+
+  .rf-pricing__tab {
+    flex: 1 1 0;
+    display: grid;
+    gap: 0.15rem;
+    padding: 0.85rem 1rem 1rem;
+    transition:
+      color 0.2s var(--rf-ease),
+      border-color 0.2s var(--rf-ease),
+      background 0.2s var(--rf-ease);
+  }
+
+  .rf-pricing__tab:hover:not(.is-active) {
+    opacity: 1;
+    color: var(--rf-text-soft);
+    background: var(--rf-hover-wash);
+  }
+
+  .rf-pricing__tab.is-active {
+    background: rgba(var(--rf-accent-rgb), 0.05);
+  }
+
+  .rf-pricing__tab-label {
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    white-space: normal;
+  }
 }
 
 .rf-pricing__panel {
@@ -932,6 +986,7 @@ async function goContact(event?: MouseEvent) {
   border: 1px solid var(--rf-line);
   border-radius: 999px;
   width: fit-content;
+  max-width: 100%;
 }
 
 .rf-pricing__terms-tab {
