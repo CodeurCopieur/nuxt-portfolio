@@ -213,8 +213,7 @@ const activeCategory = computed(
   () => categories.find((category) => category.id === activeId.value) ?? categories[0]
 )
 const showExtras = computed(() => activeCategory.value.kind === 'devis')
-
-const termsMode = ref<TermsMode>('mission')
+const termsMode = computed(() => activeCategory.value.kind)
 const activeTerms = computed(() =>
   termsMode.value === 'mission' ? termsMission : termsDevis
 )
@@ -264,10 +263,25 @@ const termsDevis = [
   }
 ]
 
-watch(activeId, (id) => {
-  const cat = categories.find((c) => c.id === id)
-  if (cat) termsMode.value = cat.kind
+const openOfferId = ref<string | null>(defaultOpenOfferId())
+
+watch(activeId, () => {
+  openOfferId.value = defaultOpenOfferId()
 })
+
+function defaultOpenOfferId() {
+  const cat = categories.find((c) => c.id === activeId.value) ?? categories[0]
+  return cat.offers[0]?.id ?? null
+}
+
+function isOfferOpen(id: string) {
+  return openOfferId.value === id
+}
+
+function toggleOffer(id: string) {
+  if (openOfferId.value === id) return
+  openOfferId.value = id
+}
 
 function selectCategory(id: CategoryId) {
   activeId.value = id
@@ -382,13 +396,33 @@ async function goContact(event?: MouseEvent) {
             v-for="offer in activeCategory.offers"
             :key="offer.id"
             class="rf-pricing__card"
-            :class="{ 'is-featured': offer.featured }"
+            :class="{
+              'is-featured': offer.featured,
+              'is-open': isOfferOpen(offer.id)
+            }"
           >
-            <header class="rf-pricing__card-head">
-              <h2 class="rf-pricing__card-name">{{ offer.name }}</h2>
-              <p class="rf-pricing__card-tagline">{{ offer.tagline }}</p>
-            </header>
+            <button
+              type="button"
+              class="rf-pricing__card-toggle"
+              :aria-expanded="isOfferOpen(offer.id)"
+              :aria-controls="`rf-pricing-offer-${offer.id}`"
+              @click="toggleOffer(offer.id)"
+            >
+              <span class="rf-pricing__card-toggle-copy">
+                <h2 class="rf-pricing__card-name">{{ offer.name }}</h2>
+                <p class="rf-pricing__card-tagline">{{ offer.tagline }}</p>
+              </span>
+              <span class="rf-pricing__card-toggle-meta">
+                {{ offer.showTjm ? 'TJM' : 'Sur devis' }}
+              </span>
+              <span class="rf-pricing__card-chevron" aria-hidden="true" />
+            </button>
 
+            <div
+              :id="`rf-pricing-offer-${offer.id}`"
+              class="rf-pricing__card-body"
+              :hidden="!isOfferOpen(offer.id)"
+            >
             <div class="rf-pricing__card-price">
               <template v-if="offer.showTjm && offer.tjmFront && offer.tjmBack">
                 <span class="rf-pricing__card-price-note">{{ offer.priceNote }}</span>
@@ -432,6 +466,7 @@ async function goContact(event?: MouseEvent) {
             >
               {{ offer.showTjm ? 'Mission' : 'Devis' }}
             </a>
+            </div>
           </article>
         </div>
       </div>
@@ -471,7 +506,7 @@ async function goContact(event?: MouseEvent) {
         Comment ça démarre
       </h2>
       <p class="rf-pricing__note-intro">
-        Les règles ne sont pas les mêmes selon le cadre. Choisissez le mode qui correspond :
+        Les règles suivent le cadre de l’onglet choisi : mission au TJM, ou devis pour les autres offres.
       </p>
 
       <div class="rf-pricing__terms-switch" role="tablist" aria-label="Type de conditions">
@@ -480,8 +515,9 @@ async function goContact(event?: MouseEvent) {
           class="rf-pricing__terms-tab"
           role="tab"
           :aria-selected="termsMode === 'mission'"
+          :aria-disabled="termsMode !== 'mission'"
+          :disabled="termsMode !== 'mission'"
           :class="{ 'is-active': termsMode === 'mission' }"
-          @click="termsMode = 'mission'"
         >
           Mission
         </button>
@@ -490,8 +526,9 @@ async function goContact(event?: MouseEvent) {
           class="rf-pricing__terms-tab"
           role="tab"
           :aria-selected="termsMode === 'devis'"
+          :aria-disabled="termsMode !== 'devis'"
+          :disabled="termsMode !== 'devis'"
           :class="{ 'is-active': termsMode === 'devis' }"
-          @click="termsMode = 'devis'"
         >
           Devis
         </button>
@@ -714,16 +751,25 @@ async function goContact(event?: MouseEvent) {
 
 .rf-pricing__cards {
   display: grid;
-  gap: 1.25rem;
+  gap: 0;
 }
 
 .rf-pricing__cards.is-single {
-  max-width: 36rem;
-  margin-inline: auto;
+  max-width: none;
+  margin-inline: 0;
   width: 100%;
 }
 
 @media (min-width: 900px) {
+  .rf-pricing__cards {
+    gap: 1.25rem;
+  }
+
+  .rf-pricing__cards.is-single {
+    max-width: 36rem;
+    margin-inline: auto;
+  }
+
   .rf-pricing__cards:not(.is-single) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: stretch;
@@ -732,31 +778,100 @@ async function goContact(event?: MouseEvent) {
 
 .rf-pricing__card {
   display: grid;
-  grid-template-rows: auto auto 1fr auto auto auto;
-  gap: 1.1rem;
-  padding: clamp(1.35rem, 3vw, 1.75rem);
-  border: 1px solid var(--rf-line);
-  border-radius: var(--rf-radius);
-  background: var(--rf-hover-wash);
+  gap: 0;
   color: var(--rf-text);
+  border-bottom: 1px solid var(--rf-line);
+  background: transparent;
 }
 
 .rf-pricing__card.is-featured {
-  border-color: rgba(var(--rf-accent-rgb), 0.55);
-  background:
-    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(var(--rf-accent-rgb), 0.1), transparent 60%),
-    var(--rf-hover-wash);
-  box-shadow: 0 0 0 1px rgba(var(--rf-accent-rgb), 0.12);
+  border-color: var(--rf-line);
 }
 
-.rf-pricing__card-head {
+.rf-pricing__card-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.95rem 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.rf-pricing__card-toggle-copy {
   display: grid;
-  gap: 0.3rem;
+  gap: 0.2rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.rf-pricing__card-toggle-meta {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--rf-accent);
+}
+
+.rf-pricing__card-chevron {
+  display: block;
+  width: 0.55rem;
+  height: 0.55rem;
+  flex-shrink: 0;
+  border-right: 1.5px solid var(--rf-text-muted);
+  border-bottom: 1.5px solid var(--rf-text-muted);
+  transform: rotate(45deg);
+  transition:
+    transform 0.25s var(--rf-ease),
+    border-color 0.25s var(--rf-ease);
+}
+
+.rf-pricing__card.is-open .rf-pricing__card-chevron {
+  transform: rotate(225deg);
+  border-color: var(--rf-accent);
+}
+
+.rf-pricing__card-body {
+  display: none;
+  gap: 1.1rem;
+  padding: 0 0 1.15rem;
+}
+
+.rf-pricing__card.is-open .rf-pricing__card-body {
+  display: grid;
+}
+
+@media (min-width: 900px) {
+  .rf-pricing__card {
+    gap: 0;
+    padding: 0 1.25rem;
+    border: 1px solid var(--rf-line);
+    border-radius: var(--rf-radius);
+    background: var(--rf-hover-wash);
+  }
+
+  .rf-pricing__card.is-featured {
+    border-color: rgba(var(--rf-accent-rgb), 0.55);
+    background:
+      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(var(--rf-accent-rgb), 0.1), transparent 60%),
+      var(--rf-hover-wash);
+    box-shadow: 0 0 0 1px rgba(var(--rf-accent-rgb), 0.12);
+  }
+
+  .rf-pricing__card-name {
+    font-size: clamp(1.25rem, 2.4vw, 1.55rem);
+  }
 }
 
 .rf-pricing__card-name {
   margin: 0;
-  font-size: clamp(1.25rem, 2.4vw, 1.55rem);
+  font-size: 1.12rem;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
@@ -1009,6 +1124,12 @@ async function goContact(event?: MouseEvent) {
 .rf-pricing__terms-tab.is-active {
   background: rgba(var(--rf-accent-rgb), 0.16);
   color: var(--rf-accent);
+  cursor: default;
+}
+
+.rf-pricing__terms-tab:disabled:not(.is-active) {
+  cursor: not-allowed;
+  opacity: 0.4;
 }
 
 .rf-pricing__terms {
