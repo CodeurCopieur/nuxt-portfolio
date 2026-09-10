@@ -240,7 +240,7 @@ const termsMission = [
   },
   {
     title: 'Facturation',
-    text: 'Facturation périodique (semaine / quinzaine / mois) ou en fin de mission, selon l’accord.'
+    text: 'Facturation en fin de chaque mois, au réel des jours effectués.'
   }
 ]
 
@@ -280,8 +280,7 @@ function isOfferOpen(id: string) {
 
 function toggleOffer(id: string) {
   if (!accordionMode.value) return
-  if (openOfferId.value === id) return
-  openOfferId.value = id
+  openOfferId.value = openOfferId.value === id ? null : id
 }
 
 function selectCategory(id: CategoryId) {
@@ -402,7 +401,10 @@ onMounted(() => {
 
         <div
           class="rf-pricing__cards"
-          :class="{ 'is-single': activeCategory.offers.length === 1 }"
+          :class="{
+            'is-single': activeCategory.offers.length === 1 && activeCategory.kind !== 'mission',
+            'is-split': activeCategory.kind === 'mission'
+          }"
         >
           <article
             v-for="offer in activeCategory.offers"
@@ -427,7 +429,9 @@ onMounted(() => {
               <span class="rf-pricing__card-toggle-meta">
                 {{ offer.showTjm ? 'TJM' : 'Sur devis' }}
               </span>
-              <span class="rf-pricing__card-chevron" aria-hidden="true" />
+              <span class="rf-pricing__card-icon" aria-hidden="true">{{
+                isOfferOpen(offer.id) ? '×' : '+'
+              }}</span>
             </button>
 
             <div
@@ -456,8 +460,8 @@ onMounted(() => {
                 <p class="rf-pricing__card-price-value rf-pricing__card-price-value--soft">
                   <span>Sur devis</span>
                 </p>
+                <p class="rf-pricing__card-duration">{{ offer.duration }}</p>
               </template>
-              <p class="rf-pricing__card-duration">{{ offer.duration }}</p>
             </div>
 
             <ul class="rf-pricing__card-list">
@@ -470,6 +474,8 @@ onMounted(() => {
 
             <p class="rf-pricing__card-fit">{{ offer.fit }}</p>
 
+            <p v-if="offer.showTjm" class="rf-pricing__card-duration">{{ offer.duration }}</p>
+
             <a
               href="/contact"
               class="refonte-btn refonte-btn--ghost rf-pricing__cta"
@@ -479,6 +485,25 @@ onMounted(() => {
             </a>
             </div>
           </article>
+
+          <aside
+            v-if="activeCategory.kind === 'mission'"
+            id="rf-pricing-conditions"
+            class="rf-pricing__how"
+          >
+            <p class="refonte-label">Conditions</p>
+            <h2 class="rf-pricing__how-title">Comment ça démarre</h2>
+            <ol class="rf-pricing__terms">
+              <li v-for="term in termsMission" :key="term.title">
+                <strong>{{ term.title }}</strong>
+                <span>{{ term.text }}</span>
+              </li>
+            </ol>
+            <p class="rf-pricing__terms-aside">
+              Facturation en HT (TVA selon régime). En cas d’annulation après démarrage, le travail
+              déjà réalisé reste dû.
+            </p>
+          </aside>
         </div>
       </div>
     </div>
@@ -508,6 +533,7 @@ onMounted(() => {
     </section>
 
     <section
+      v-if="activeCategory.kind === 'devis'"
       id="rf-pricing-conditions"
       class="refonte-container rf-pricing__note"
       v-reveal
@@ -781,9 +807,21 @@ onMounted(() => {
     margin-inline: auto;
   }
 
-  .rf-pricing__cards:not(.is-single) {
+  .rf-pricing__cards:not(.is-single):not(.is-split) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: stretch;
+  }
+
+  .rf-pricing__cards.is-split {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: 0;
+    max-width: none;
+    margin-inline: 0;
+    align-items: stretch;
+    border: 1px solid var(--rf-line);
+    border-radius: var(--rf-radius);
+    overflow: hidden;
+    background: var(--rf-hover-wash);
   }
 }
 
@@ -830,22 +868,20 @@ onMounted(() => {
   color: var(--rf-accent);
 }
 
-.rf-pricing__card-chevron {
-  display: block;
-  width: 0.55rem;
-  height: 0.55rem;
+.rf-pricing__card-icon {
   flex-shrink: 0;
-  border-right: 1.5px solid var(--rf-text-muted);
-  border-bottom: 1.5px solid var(--rf-text-muted);
-  transform: rotate(45deg);
-  transition:
-    transform 0.25s var(--rf-ease),
-    border-color 0.25s var(--rf-ease);
+  width: 1rem;
+  color: var(--rf-text-muted);
+  font-size: 1.2rem;
+  font-weight: 300;
+  line-height: 1;
+  text-align: center;
 }
 
-.rf-pricing__card.is-open .rf-pricing__card-chevron {
-  transform: rotate(225deg);
-  border-color: var(--rf-accent);
+.rf-pricing__card.is-open .rf-pricing__card-icon {
+  color: var(--rf-accent);
+  font-size: 1.35rem;
+  font-weight: 200;
 }
 
 .rf-pricing__card-body {
@@ -883,7 +919,7 @@ onMounted(() => {
   }
 
   .rf-pricing__card-toggle-meta,
-  .rf-pricing__card-chevron {
+  .rf-pricing__card-icon {
     display: none;
   }
 
@@ -937,7 +973,8 @@ onMounted(() => {
   padding: 0;
   list-style: none;
   display: grid;
-  gap: 0.55rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 1.25rem;
 }
 
 .rf-pricing__tjm li {
@@ -981,10 +1018,39 @@ onMounted(() => {
   color: var(--rf-text-soft);
 }
 
-.rf-pricing__card-duration {
-  margin: 0.45rem 0 0;
-  font-size: 0.78rem;
-  color: var(--rf-text-muted);
+.rf-pricing__how {
+  padding: 1.25rem 0 0.25rem;
+  border-top: 1px solid var(--rf-line);
+  scroll-margin-top: calc(var(--rf-nav-h) + 1rem);
+}
+
+.rf-pricing__how-title {
+  margin: 0.35rem 0 1rem;
+  font-size: clamp(1.45rem, 3.2vw, 2rem);
+}
+
+@media (min-width: 900px) {
+  .rf-pricing__cards.is-split .rf-pricing__card,
+  .rf-pricing__cards.is-split .rf-pricing__card.is-featured {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  .rf-pricing__how {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    padding: clamp(1.35rem, 3vw, 1.75rem);
+    border-top: none;
+    border-left: 1px solid var(--rf-line);
+  }
 }
 
 .rf-pricing__cta {
