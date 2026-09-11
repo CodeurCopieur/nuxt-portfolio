@@ -46,6 +46,7 @@ useSchemaOrg([
   <div>
     <RefonteHero />
     <RefonteIntro />
+    <RefonteOffers />
     <RefonteWorks />
     <RefonteExpertise />
     <RefonteExperienceRail />

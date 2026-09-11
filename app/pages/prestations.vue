@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useRefonteTransition } from '@/composables/refonte/useRefonteTransition'
+import { MISSION_OFFER, PAGE_UNIQUE, SITE_MULTIPAGE } from '@/data/refonte-offers'
 
 definePageMeta({ layout: 'refonte' })
 
@@ -9,10 +10,10 @@ const { navigateTo } = useRefonteTransition()
 useSeoMeta({
   title: computed(() => `Prestations — ${meta.value?.name ?? 'Portfolio'}`),
   description:
-    'Offres web sur devis et missions front Vue/Nuxt (TJM 500 €), avec Supabase ou Firebase si besoin (TJM 600 €).',
+    'Offres web sur devis et missions front Vue/Nuxt au TJM 500 €.',
   ogTitle: computed(() => `Prestations — ${meta.value?.name ?? 'Portfolio'}`),
   ogDescription:
-    'Landing, multipage, sur-mesure sur devis. Missions au TJM 500 € (front) ou 600 € (avec back léger).',
+    'Landing, multipage, sur-mesure sur devis. Missions front Vue/Nuxt au TJM 500 €.',
   twitterCard: 'summary_large_image'
 })
 
@@ -21,16 +22,21 @@ type Offer = {
   name: string
   tagline: string
   showTjm?: boolean
-  /** Affichage TJM dual front / back */
   tjmFront?: string
-  tjmBack?: string
   price?: string
   priceNote?: string
   unit?: string
   duration: string
   featured: boolean
-  includes: string[]
-  stack: string[]
+  copy?: {
+    hook: string
+    lines: readonly string[]
+    close: string
+  }
+  skillsTitle?: string
+  billing?: string
+  includes: readonly string[]
+  stack: readonly string[]
   fit: string
 }
 
@@ -43,138 +49,76 @@ type Category = {
   offers: Offer[]
 }
 
-const MISSION_INCLUDES = [
-  'Front Vue 3 / Nuxt 4 (UI, composants, state)',
-  'Responsive, micro-interactions, accessibilité de base',
-  'Si besoin : Supabase ou Firebase (auth, data, admin)',
-  'Intégration Figma → production',
-  'Formulaires, notifications, CRUD simple',
-  'Missions courtes ou longues — même cadre'
-]
-
-const MISSION_STACK = [
-  'Vue 3',
-  'Nuxt 4',
-  'TypeScript',
-  'Pinia',
-  'Supabase',
-  'Firebase',
-  'Tailwind / SCSS',
-  'GSAP'
-]
+function offerFromPane(
+  pane: {
+    id: string
+    name: string
+    tagline: string
+    duration: string
+    copy: Offer['copy']
+    skillsTitle: string
+    includes: readonly string[]
+    stack: readonly string[]
+    fit: string
+  },
+  featured: boolean
+): Offer {
+  return {
+    id: pane.id,
+    name: pane.name,
+    tagline: pane.tagline,
+    duration: pane.duration,
+    featured,
+    copy: pane.copy,
+    skillsTitle: pane.skillsTitle,
+    includes: pane.includes,
+    stack: pane.stack,
+    fit: pane.fit
+  }
+}
 
 const categories: Category[] = [
   {
     id: 'mission',
     tab: 'Mission',
-    num: '01',
+    num: MISSION_OFFER.num,
     kind: 'mission',
-    lead: 'Je prends des missions courtes ou longues. Front Vue / Nuxt — et back léger (Supabase / Firebase) si le besoin est là.',
+    lead: MISSION_OFFER.tagline,
     offers: [
       {
         id: 'mission',
-        name: 'Mission',
-        tagline: 'Courte ou longue — même cadre.',
+        name: MISSION_OFFER.name,
+        tagline: MISSION_OFFER.tagline,
         showTjm: true,
-        tjmFront: '500',
-        tjmBack: '600',
+        tjmFront: MISSION_OFFER.tjm,
         priceNote: 'TJM',
-        unit: '€ / jour',
-        duration: 'Sprint ou régie',
+        unit: MISSION_OFFER.unit,
+        duration: MISSION_OFFER.duration,
         featured: true,
-        includes: MISSION_INCLUDES,
-        stack: MISSION_STACK,
-        fit: 'Feature, POC, renfort d’équipe, accompagnement produit.'
+        copy: MISSION_OFFER.copy,
+        skillsTitle: MISSION_OFFER.skillsTitle,
+        billing: MISSION_OFFER.billing,
+        includes: MISSION_OFFER.includes,
+        stack: MISSION_OFFER.stack,
+        fit: MISSION_OFFER.fit
       }
     ]
   },
   {
     id: 'onepage',
     tab: 'Page unique',
-    num: '02',
+    num: PAGE_UNIQUE.num,
     kind: 'devis',
-    lead: 'Une seule page pour convertir — version statique ou branchée à un backend léger. Devis après brief.',
-    offers: [
-      {
-        id: 'landing',
-        name: 'Landing page',
-        tagline: 'Une page, un message, un CTA.',
-        duration: '3 – 7 jours',
-        featured: false,
-        includes: [
-          'Une page unique (hero → offre → contact)',
-          'Intégration responsive (mobile → desktop)',
-          'Micro-interactions légères',
-          'SEO technique de base + balises',
-          'Formulaire de contact (EmailJS / mailto)',
-          'Mise en ligne'
-        ],
-        stack: ['HTML / SCSS', 'Vue ou Nuxt 4', 'Tailwind', 'SEO'],
-        fit: 'Lancement d’offre, event, campagne ciblée.'
-      },
-      {
-        id: 'landing-backend',
-        name: 'Landing + backend',
-        tagline: 'Même page, contenu vivant.',
-        duration: '1 – 2 semaines',
-        featured: true,
-        includes: [
-          'Tout le pack Landing page',
-          'Nuxt 4 + contenu dynamique',
-          'Backend léger (Supabase ou Firebase)',
-          'Admin simple (éditer textes / leads)',
-          'Formulaire avancé & notifications',
-          'Structure prête à évoluer vers un multipage'
-        ],
-        stack: ['Nuxt 4', 'Vue 3', 'Supabase', 'Firebase', 'Pinia'],
-        fit: 'Lead gen, waitlist, contenu qui change souvent.'
-      }
-    ]
+    lead: PAGE_UNIQUE.lead,
+    offers: PAGE_UNIQUE.panes.map((pane, index) => offerFromPane(pane, index === 1))
   },
   {
     id: 'multipage',
     tab: 'Site multipage',
-    num: '03',
+    num: SITE_MULTIPAGE.num,
     kind: 'devis',
-    lead: 'Plusieurs pages pour présenter l’offre — avec ou sans admin / données dynamiques. Devis après brief.',
-    offers: [
-      {
-        id: 'vitrine',
-        name: 'Site vitrine',
-        tagline: 'Présence claire, rapide, soignée.',
-        duration: '1 – 2 semaines',
-        featured: false,
-        includes: [
-          'Multipage (jusqu’à 5 pages)',
-          'Intégration responsive (mobile → desktop)',
-          'Animations légères & micro-interactions',
-          'SEO technique de base + balises',
-          'Accessibilité de départ (sémantique, clavier)',
-          'Formulaire de contact (EmailJS / mailto)',
-          'Mise en ligne & formation courte'
-        ],
-        stack: ['HTML / SCSS', 'Vue ou Nuxt 4', 'Tailwind', 'SEO'],
-        fit: 'Indépendants, studios, lancements de marque.'
-      },
-      {
-        id: 'vitrine-backend',
-        name: 'Site vitrine + backend',
-        tagline: 'Contenu vivant, sans usine à gaz.',
-        duration: '2 – 4 semaines',
-        featured: true,
-        includes: [
-          'Tout le pack Site vitrine',
-          'Nuxt 4 + données dynamiques',
-          'Backend léger (Supabase ou Firebase)',
-          'Espace admin / CRUD simple',
-          'Auth basique si besoin',
-          'Formulaires avancés & notifications',
-          'Structure prête à évoluer'
-        ],
-        stack: ['Nuxt 4', 'Vue 3', 'Supabase', 'Firebase', 'Pinia'],
-        fit: 'Offres qui changent, catalogue, portfolio client.'
-      }
-    ]
+    lead: SITE_MULTIPAGE.lead,
+    offers: SITE_MULTIPAGE.panes.map((pane, index) => offerFromPane(pane, index === 1))
   },
   {
     id: 'custom',
@@ -211,24 +155,52 @@ const activeId = ref<CategoryId>('mission')
 const activeCategory = computed(
   () => categories.find((category) => category.id === activeId.value) ?? categories[0]
 )
-const showExtras = computed(() => activeCategory.value.kind === 'devis')
 const accordionMode = ref(true)
 const termsMode = computed(() => activeCategory.value.kind)
 const activeTerms = computed(() =>
   termsMode.value === 'mission' ? termsMission : termsDevis
 )
 
-const extras = [
-  { label: 'Motion / GSAP poussé', value: 'Sur devis' },
-  { label: 'Page additionnelle', value: 'Sur devis' },
-  { label: 'Maintenance mensuelle', value: 'Sur devis' },
-  { label: 'Audit a11y ou perf', value: 'Sur devis' }
-]
+const switchSets = {
+  onepage: PAGE_UNIQUE,
+  multipage: SITE_MULTIPAGE
+} as const
+
+const switchSet = computed(() => switchSets[activeId.value as keyof typeof switchSets] ?? null)
+const switchPaneId = ref(PAGE_UNIQUE.panes[0].id)
+const switchLabel = computed(() =>
+  activeId.value === 'multipage' ? 'Type de site multipage' : 'Type de page unique'
+)
+
+const visibleOffers = computed(() => {
+  if (!switchSet.value) return activeCategory.value.offers
+  return activeCategory.value.offers.filter((offer) => offer.id === switchPaneId.value)
+})
+
+function selectSwitchPane(id: string) {
+  switchPaneId.value = id
+}
+
+function onSwitchPaneKeydown(event: KeyboardEvent, index: number) {
+  const panes = switchSet.value?.panes
+  if (!panes?.length) return
+
+  let next = index
+  if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = (index + 1) % panes.length
+  else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') next = (index - 1 + panes.length) % panes.length
+  else if (event.key === 'Home') next = 0
+  else if (event.key === 'End') next = panes.length - 1
+  else return
+
+  event.preventDefault()
+  switchPaneId.value = panes[next].id
+  document.getElementById(`rf-pricing-switch-tab-${panes[next].id}`)?.focus()
+}
 
 const termsMission = [
   {
     title: 'Cadre',
-    text: 'Mission au TJM : 500 € HT / jour en front, 600 € HT / jour si éléments back (Supabase / Firebase). Facturation au réel.'
+    text: 'Mission au TJM : 500 € HT / jour. Facturation au réel.'
   },
   {
     title: 'Accord',
@@ -265,13 +237,18 @@ const termsDevis = [
 
 const openOfferId = ref<string | null>(defaultOpenOfferId())
 
-watch(activeId, () => {
+watch(activeId, (id) => {
+  const set = switchSets[id as keyof typeof switchSets]
+  if (set) switchPaneId.value = set.panes[0].id
   openOfferId.value = defaultOpenOfferId()
 })
 
+watch(switchPaneId, (id) => {
+  if (switchSet.value && openOfferId.value) openOfferId.value = id
+})
+
 function defaultOpenOfferId() {
-  const cat = categories.find((c) => c.id === activeId.value) ?? categories[0]
-  return cat.offers[0]?.id ?? null
+  return null
 }
 
 function isOfferOpen(id: string) {
@@ -351,8 +328,7 @@ onMounted(() => {
         <span class="refonte-serif rf-pricing__title-accent">& missions</span>
       </h1>
       <p class="rf-pricing__lead" v-reveal="{ delay: 100 }">
-        Forfaits chiffrés après brief, ou mission au TJM
-        (500 € front · 600 € avec back léger Supabase / Firebase).
+        Forfaits chiffrés après brief, ou mission au TJM 500 € / jour.
       </p>
       <p class="rf-pricing__availability" v-reveal="{ delay: 140 }">
         {{ sections.a_propos.availability }}
@@ -397,17 +373,45 @@ onMounted(() => {
         role="tabpanel"
         :aria-labelledby="`rf-pricing-tab-${activeCategory.id}`"
       >
-        <p class="rf-pricing__panel-lead">{{ activeCategory.lead }}</p>
+        <p
+          v-if="!switchSet"
+          class="rf-pricing__panel-lead"
+        >
+          {{ activeCategory.lead }}
+        </p>
+
+        <div
+          v-if="switchSet"
+          class="rf-pricing__switch"
+          role="tablist"
+          :aria-label="switchLabel"
+        >
+          <button
+            v-for="(pane, index) in switchSet.panes"
+            :id="`rf-pricing-switch-tab-${pane.id}`"
+            :key="pane.id"
+            type="button"
+            class="rf-pricing__switch-btn"
+            role="tab"
+            :aria-selected="switchPaneId === pane.id"
+            :aria-controls="`rf-pricing-offer-${pane.id}`"
+            :tabindex="switchPaneId === pane.id ? 0 : -1"
+            :class="{ 'is-active': switchPaneId === pane.id }"
+            @click="selectSwitchPane(pane.id)"
+            @keydown="onSwitchPaneKeydown($event, index)"
+          >
+            {{ pane.name }}
+          </button>
+        </div>
 
         <div
           class="rf-pricing__cards"
           :class="{
-            'is-single': activeCategory.offers.length === 1 && activeCategory.kind !== 'mission',
-            'is-split': activeCategory.kind === 'mission'
+            'is-single': visibleOffers.length === 1
           }"
         >
           <article
-            v-for="offer in activeCategory.offers"
+            v-for="offer in visibleOffers"
             :key="offer.id"
             class="rf-pricing__card"
             :class="{
@@ -423,11 +427,9 @@ onMounted(() => {
               @click="toggleOffer(offer.id)"
             >
               <span class="rf-pricing__card-toggle-copy">
+                <span class="rf-pricing__card-num" aria-hidden="true">{{ activeCategory.num }}</span>
                 <h2 class="rf-pricing__card-name">{{ offer.name }}</h2>
                 <p class="rf-pricing__card-tagline">{{ offer.tagline }}</p>
-              </span>
-              <span class="rf-pricing__card-toggle-meta">
-                {{ offer.showTjm ? 'TJM' : 'Sur devis' }}
               </span>
               <span class="rf-pricing__card-icon" aria-hidden="true">{{
                 isOfferOpen(offer.id) ? '×' : '+'
@@ -440,20 +442,15 @@ onMounted(() => {
               :hidden="!isOfferOpen(offer.id)"
             >
             <div class="rf-pricing__card-price">
-              <template v-if="offer.showTjm && offer.tjmFront && offer.tjmBack">
+              <template v-if="offer.showTjm && offer.tjmFront">
                 <span class="rf-pricing__card-price-note">{{ offer.priceNote }}</span>
                 <ul class="rf-pricing__tjm">
                   <li>
                     <span class="refonte-serif rf-pricing__tjm-value">{{ offer.tjmFront }}</span>
                     <span class="rf-pricing__tjm-unit">{{ offer.unit }}</span>
-                    <span class="rf-pricing__tjm-label">front</span>
-                  </li>
-                  <li>
-                    <span class="refonte-serif rf-pricing__tjm-value">{{ offer.tjmBack }}</span>
-                    <span class="rf-pricing__tjm-unit">{{ offer.unit }}</span>
-                    <span class="rf-pricing__tjm-label">avec back</span>
                   </li>
                 </ul>
+                <p class="rf-pricing__card-duration">{{ offer.duration }}</p>
               </template>
               <template v-else>
                 <span class="rf-pricing__card-price-note">Tarif</span>
@@ -464,6 +461,16 @@ onMounted(() => {
               </template>
             </div>
 
+            <div v-if="offer.copy" class="rf-pricing__copy">
+              <p class="rf-pricing__copy-hook">{{ offer.copy.hook }}</p>
+              <p v-for="line in offer.copy.lines" :key="line" class="rf-pricing__copy-line">
+                {{ line }}
+              </p>
+              <p class="rf-pricing__copy-close">{{ offer.copy.close }}</p>
+            </div>
+
+            <p v-if="offer.skillsTitle" class="rf-pricing__skills-title">{{ offer.skillsTitle }}</p>
+
             <ul class="rf-pricing__card-list">
               <li v-for="item in offer.includes" :key="item">{{ item }}</li>
             </ul>
@@ -473,8 +480,7 @@ onMounted(() => {
             </div>
 
             <p class="rf-pricing__card-fit">{{ offer.fit }}</p>
-
-            <p v-if="offer.showTjm" class="rf-pricing__card-duration">{{ offer.duration }}</p>
+            <p v-if="offer.billing" class="rf-pricing__card-billing">{{ offer.billing }}</p>
 
             <a
               href="/contact"
@@ -485,55 +491,11 @@ onMounted(() => {
             </a>
             </div>
           </article>
-
-          <aside
-            v-if="activeCategory.kind === 'mission'"
-            id="rf-pricing-conditions"
-            class="rf-pricing__how"
-          >
-            <p class="refonte-label">Conditions</p>
-            <h2 class="rf-pricing__how-title">Comment ça démarre</h2>
-            <ol class="rf-pricing__terms">
-              <li v-for="term in termsMission" :key="term.title">
-                <strong>{{ term.title }}</strong>
-                <span>{{ term.text }}</span>
-              </li>
-            </ol>
-            <p class="rf-pricing__terms-aside">
-              Facturation en HT (TVA selon régime). En cas d’annulation après démarrage, le travail
-              déjà réalisé reste dû.
-            </p>
-          </aside>
         </div>
       </div>
     </div>
 
     <section
-      v-if="showExtras"
-      class="refonte-container rf-pricing__extras"
-    >
-      <div class="rf-pricing__extras-head" v-reveal>
-        <p class="refonte-label">Options</p>
-        <h2 class="refonte-display rf-pricing__extras-title">À la carte</h2>
-        <p class="rf-pricing__extras-lead">
-          Uniquement pour les offres sur devis — chiffrées avec le brief.
-        </p>
-      </div>
-      <ul class="rf-pricing__extras-list">
-        <li
-          v-for="(extra, i) in extras"
-          :key="extra.label"
-          class="rf-pricing__extras-row"
-          v-reveal="{ index: i, total: extras.length, stagger: 55 }"
-        >
-          <span>{{ extra.label }}</span>
-          <span class="rf-pricing__extras-value">{{ extra.value }}</span>
-        </li>
-      </ul>
-    </section>
-
-    <section
-      v-if="activeCategory.kind === 'devis'"
       id="rf-pricing-conditions"
       class="refonte-container rf-pricing__note"
       v-reveal
@@ -546,7 +508,12 @@ onMounted(() => {
         Les règles suivent le cadre de l’onglet choisi : mission au TJM, ou devis pour les autres offres.
       </p>
 
-      <div class="rf-pricing__terms-switch" role="tablist" aria-label="Type de conditions">
+      <div
+        v-if="activeCategory.kind === 'devis'"
+        class="rf-pricing__terms-switch"
+        role="tablist"
+        aria-label="Type de conditions"
+      >
         <button
           type="button"
           class="rf-pricing__terms-tab"
@@ -581,8 +548,12 @@ onMounted(() => {
         Facturation en HT (TVA selon régime). En cas d’annulation après démarrage, le travail
         déjà réalisé reste dû.
       </p>
-      <a href="/contact" class="refonte-link rf-pricing__note-cta" @click="goContact">
-        Contact →
+      <a
+        href="/contact"
+        class="refonte-btn rf-pricing__note-cta"
+        @click="goContact"
+      >
+        Contact
       </a>
     </section>
   </div>
@@ -786,9 +757,50 @@ onMounted(() => {
   color: var(--rf-text-soft);
 }
 
+.rf-pricing__switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+  width: 100%;
+  max-width: 36rem;
+  margin: 0 auto 1rem;
+  padding: 0.25rem;
+  border: 1px solid var(--rf-line);
+  border-radius: 999px;
+}
+
+.rf-pricing__switch-btn {
+  min-width: 0;
+  padding: 0.5rem 0.65rem;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--rf-text-muted);
+  font-family: inherit;
+  font-size: clamp(0.62rem, 1.7vw, 0.72rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    color 0.2s var(--rf-ease),
+    background 0.2s var(--rf-ease);
+}
+
+.rf-pricing__switch-btn.is-active {
+  background: rgba(var(--rf-accent-rgb), 0.16);
+  color: var(--rf-accent);
+}
+
+.rf-pricing__switch-btn:focus-visible {
+  outline: 2px solid var(--rf-accent);
+  outline-offset: 2px;
+}
+
 .rf-pricing__cards {
   display: grid;
-  gap: 0;
+  gap: 1.15rem;
 }
 
 .rf-pricing__cards.is-single {
@@ -814,35 +826,38 @@ onMounted(() => {
 
   .rf-pricing__cards.is-split {
     grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-    gap: 0;
+    gap: 1.5rem 2rem;
     max-width: none;
     margin-inline: 0;
     align-items: stretch;
-    border: 1px solid var(--rf-line);
-    border-radius: var(--rf-radius);
-    overflow: hidden;
-    background: var(--rf-hover-wash);
+    background: transparent;
   }
 }
 
 .rf-pricing__card {
   display: grid;
+  align-content: start;
   gap: 0;
   color: var(--rf-text);
-  border-bottom: 1px solid var(--rf-line);
-  background: transparent;
+  padding: 0.95rem 1.1rem 1.05rem;
+  border: 1px solid var(--rf-line);
+  border-radius: var(--rf-radius);
+  background: var(--rf-hover-wash);
 }
 
 .rf-pricing__card.is-featured {
-  border-color: var(--rf-line);
+  border-color: rgba(var(--rf-accent-rgb), 0.5);
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(var(--rf-accent-rgb), 0.1), transparent 60%),
+    var(--rf-hover-wash);
 }
 
 .rf-pricing__card-toggle {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.75rem;
   width: 100%;
-  padding: 0.95rem 0;
+  padding: 0;
   border: none;
   background: transparent;
   color: inherit;
@@ -852,6 +867,12 @@ onMounted(() => {
   -webkit-tap-highlight-color: transparent;
 }
 
+.rf-pricing__card-toggle:focus-visible {
+  outline: 2px solid var(--rf-accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
 .rf-pricing__card-toggle-copy {
   display: grid;
   gap: 0.2rem;
@@ -859,18 +880,17 @@ onMounted(() => {
   flex: 1;
 }
 
-.rf-pricing__card-toggle-meta {
-  flex-shrink: 0;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+.rf-pricing__card-num {
+  font-family: var(--rf-serif);
+  font-style: italic;
+  font-size: 0.82rem;
   color: var(--rf-accent);
 }
 
 .rf-pricing__card-icon {
   flex-shrink: 0;
   width: 1rem;
+  margin-top: 0.15rem;
   color: var(--rf-text-muted);
   font-size: 1.2rem;
   font-weight: 300;
@@ -885,9 +905,13 @@ onMounted(() => {
 }
 
 .rf-pricing__card-body {
-  display: none;
+  display: grid;
   gap: 1.1rem;
-  padding: 0 0 1.15rem;
+  padding-top: 0.75rem;
+}
+
+.rf-pricing__card-body[hidden] {
+  display: none;
 }
 
 .rf-pricing__card.is-open .rf-pricing__card-body {
@@ -896,12 +920,8 @@ onMounted(() => {
 
 @media (min-width: 900px) {
   .rf-pricing__card {
-    grid-template-rows: auto 1fr auto auto auto;
-    gap: 1.1rem;
-    padding: clamp(1.35rem, 3vw, 1.75rem);
-    border: 1px solid var(--rf-line);
-    border-radius: var(--rf-radius);
-    background: var(--rf-hover-wash);
+    min-height: 100%;
+    padding: clamp(1.35rem, 3vw, 1.85rem);
   }
 
   .rf-pricing__card.is-featured {
@@ -909,7 +929,6 @@ onMounted(() => {
     background:
       radial-gradient(ellipse 80% 50% at 50% 0%, rgba(var(--rf-accent-rgb), 0.1), transparent 60%),
       var(--rf-hover-wash);
-    box-shadow: 0 0 0 1px rgba(var(--rf-accent-rgb), 0.12);
   }
 
   .rf-pricing__card-toggle {
@@ -918,7 +937,6 @@ onMounted(() => {
     pointer-events: none;
   }
 
-  .rf-pricing__card-toggle-meta,
   .rf-pricing__card-icon {
     display: none;
   }
@@ -929,15 +947,11 @@ onMounted(() => {
     display: grid !important;
     padding: 0;
   }
-
-  .rf-pricing__card-name {
-    font-size: clamp(1.25rem, 2.4vw, 1.55rem);
-  }
 }
 
 .rf-pricing__card-name {
   margin: 0;
-  font-size: 1.12rem;
+  font-size: clamp(1.35rem, 2.6vw, 1.7rem);
   font-weight: 700;
   letter-spacing: -0.02em;
 }
@@ -973,7 +987,6 @@ onMounted(() => {
   padding: 0;
   list-style: none;
   display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 0.75rem 1.25rem;
 }
 
@@ -1019,14 +1032,22 @@ onMounted(() => {
 }
 
 .rf-pricing__how {
+  display: grid;
+  gap: 0.85rem;
   padding: 1.25rem 0 0.25rem;
-  border-top: 1px solid var(--rf-line);
   scroll-margin-top: calc(var(--rf-nav-h) + 1rem);
 }
 
-.rf-pricing__how-title {
-  margin: 0.35rem 0 1rem;
-  font-size: clamp(1.45rem, 3.2vw, 2rem);
+.rf-pricing__how .rf-pricing__note-title {
+  margin: 0;
+}
+
+.rf-pricing__how .rf-pricing__terms {
+  margin-top: 0;
+}
+
+.rf-pricing__how .rf-pricing__note-cta {
+  margin-top: 0.15rem;
 }
 
 @media (min-width: 900px) {
@@ -1043,13 +1064,11 @@ onMounted(() => {
   }
 
   .rf-pricing__how {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    display: grid;
+    align-content: center;
     height: 100%;
-    padding: clamp(1.35rem, 3vw, 1.75rem);
-    border-top: none;
-    border-left: 1px solid var(--rf-line);
+    padding: 0;
+    border: none;
   }
 }
 
@@ -1079,6 +1098,53 @@ onMounted(() => {
   background: var(--rf-text);
   color: var(--rf-bg);
   border-color: var(--rf-text);
+}
+
+.rf-pricing__copy {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0 0 0.35rem;
+}
+
+.rf-pricing__copy-hook {
+  margin: 0;
+  font-size: clamp(1.05rem, 2vw, 1.2rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.25;
+  color: var(--rf-text);
+}
+
+.rf-pricing__copy-line {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.55;
+  color: var(--rf-text-soft);
+}
+
+.rf-pricing__copy-close {
+  margin: 0.2rem 0 0;
+  font-family: var(--rf-serif);
+  font-style: italic;
+  font-size: 1.05rem;
+  line-height: 1.35;
+  color: var(--rf-accent);
+}
+
+.rf-pricing__skills-title {
+  margin: 0.2rem 0 0;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--rf-text-muted);
+}
+
+.rf-pricing__card-billing {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--rf-text-soft);
 }
 
 .rf-pricing__card-list {
@@ -1128,45 +1194,6 @@ onMounted(() => {
   margin: 0;
   font-size: 0.8rem;
   line-height: 1.45;
-  color: var(--rf-text-muted);
-}
-
-.rf-pricing__extras {
-  margin-top: clamp(3rem, 8vw, 5rem);
-  display: grid;
-  gap: 1.25rem;
-}
-
-.rf-pricing__extras-title {
-  margin: 0.35rem 0 0;
-  font-size: clamp(1.75rem, 4vw, 2.5rem);
-}
-
-.rf-pricing__extras-lead {
-  margin: 0.45rem 0 0;
-  font-size: 0.88rem;
-  color: var(--rf-text-muted);
-}
-
-.rf-pricing__extras-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  border-top: 1px solid var(--rf-line);
-}
-
-.rf-pricing__extras-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.95rem 0;
-  border-bottom: 1px solid var(--rf-line);
-  font-size: 0.92rem;
-}
-
-.rf-pricing__extras-value {
-  flex-shrink: 0;
-  font-weight: 700;
   color: var(--rf-text-muted);
 }
 
@@ -1262,8 +1289,14 @@ onMounted(() => {
 }
 
 .rf-pricing__note-cta {
-  margin-top: 0.5rem;
+  margin-top: 0.35rem;
+  width: fit-content;
   justify-self: start;
+}
+
+.rf-pricing__note-cta:focus-visible {
+  outline: 2px solid var(--rf-accent);
+  outline-offset: 3px;
 }
 
 @media (prefers-reduced-motion: reduce) {
