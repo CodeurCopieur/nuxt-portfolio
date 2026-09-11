@@ -159,10 +159,6 @@ function onPagePaneKeydown(event: KeyboardEvent, index: number) {
           Mission
           <span class="refonte-serif rf-offers__title-accent">front-end</span>
         </h2>
-        <p class="rf-offers__lead" v-reveal="{ delay: 110 }">
-          Vue 3 / Nuxt 4, TypeScript, intégration soignée. Landing et landing + backend
-          ci-dessous — tarifs et conditions sur la page Prestations.
-        </p>
       </header>
 
       <div class="rf-offers__grid">
@@ -305,13 +301,6 @@ function onPagePaneKeydown(event: KeyboardEvent, index: number) {
   color: var(--rf-accent);
 }
 
-.rf-offers__lead {
-  margin: 0;
-  font-size: 0.98rem;
-  line-height: 1.6;
-  color: var(--rf-text-soft);
-}
-
 .rf-offers__grid {
   display: grid;
   gap: 1.15rem;
@@ -319,11 +308,16 @@ function onPagePaneKeydown(event: KeyboardEvent, index: number) {
 
 @media (min-width: 960px) {
   .rf-offers__grid {
-    grid-template-columns: 1fr 1fr;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 36rem));
+    justify-content: center;
     align-items: stretch;
+    gap: clamp(1.5rem, 3.5vw, 2.75rem);
   }
 
   .rf-offers__card {
+    width: 100%;
+    max-width: 36rem;
     min-height: 100%;
     padding: clamp(1.35rem, 3vw, 1.85rem);
   }
@@ -672,6 +666,10 @@ function onPagePaneKeydown(event: KeyboardEvent, index: number) {
   display: flex;
   justify-content: center;
   margin-top: 1.75rem;
+}
+
+.rf-offers__more:hover {
+  color: #ffffff;
 }
 
 .rf-offers__more:focus-visible {
