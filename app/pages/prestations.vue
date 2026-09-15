@@ -320,10 +320,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="rf-pricing" data-scroll-section data-rf-chapter="Prestations">
+  <div class="rf-route">
     <div class="rf-page-ghost-wrap" aria-hidden="true">
       <span class="rf-page-ghost">03</span>
     </div>
+    <div class="rf-pricing" data-scroll-section data-rf-chapter="Prestations">
     <header class="refonte-container rf-pricing__hero">
       <p class="refonte-label" v-reveal>03 — Prestations</p>
       <h1 class="refonte-display rf-pricing__title" v-reveal="{ delay: 50 }">
@@ -559,6 +560,7 @@ onMounted(() => {
         Contact
       </a>
     </section>
+    </div>
   </div>
 </template>
 

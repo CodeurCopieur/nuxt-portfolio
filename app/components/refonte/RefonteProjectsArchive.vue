@@ -43,9 +43,6 @@ function selectTech(tech: string | null) {
 
 <template>
   <div class="rf-projects">
-    <div class="rf-page-ghost-wrap" aria-hidden="true">
-      <span class="rf-page-ghost">02</span>
-    </div>
     <div class="refonte-container rf-projects__head">
       <p class="refonte-label" v-reveal>Archives</p>
       <h1 class="refonte-display rf-projects__title" v-reveal="{ delay: 60 }">Tous les projets</h1>

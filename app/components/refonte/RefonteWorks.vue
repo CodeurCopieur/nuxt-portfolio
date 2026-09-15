@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { RF_A11Y_CHANGE_EVENT, restoreRfScrollSnap, rfMotionReduced } from '@/composables/refonte/useRefonteA11y'
 import { useRefonteScroll } from '@/composables/refonte/useRefonteScroll'
+import { useRefonteTransition } from '@/composables/refonte/useRefonteTransition'
+import type { PortfolioProject } from '~/types/portfolio'
 
 const { featuredWorks } = useContent()
 const { scroll, ready, refresh } = useRefonteScroll()
+const { navigateTo } = useRefonteTransition()
 
 const scrollerRef = ref<HTMLElement | null>(null)
 const smooth = ref(0)
@@ -25,6 +28,21 @@ const SCROLL_TRAVEL = computed(() => 720 + Math.max(total.value, 1) * 640)
 
 function pad(n: number) {
   return String(n + 1).padStart(2, '0')
+}
+
+function workHref(project: PortfolioProject) {
+  const live = project.link?.trim()
+  return live || `/projets/${project.slug}`
+}
+
+function isLiveWork(project: PortfolioProject) {
+  return Boolean(project.link?.trim())
+}
+
+async function onWorkClick(project: PortfolioProject, event: MouseEvent) {
+  if (isLiveWork(project)) return
+  event.preventDefault()
+  await navigateTo(`/projets/${project.slug}`)
 }
 
 function span(p: number, start: number, end: number) {
@@ -326,12 +344,15 @@ onUnmounted(() => {
                       :key="tech"
                     >{{ tech }}</span>
                   </div>
-                  <RefonteLink
-                    :to="`/projets/${activeProject.slug}`"
+                  <a
+                    :href="workHref(activeProject)"
                     class="rf-works__focus-cta"
+                    :target="isLiveWork(activeProject) ? '_blank' : undefined"
+                    :rel="isLiveWork(activeProject) ? 'noopener noreferrer' : undefined"
+                    @click="onWorkClick(activeProject, $event)"
                   >
                     Voir le projet →
-                  </RefonteLink>
+                  </a>
                 </div>
               </Transition>
             </div>
@@ -351,7 +372,13 @@ onUnmounted(() => {
                 class="rf-works__row"
                 :style="rowStyle(index)"
               >
-                <RefonteLink :to="`/projets/${project.slug}`" class="rf-works__link">
+                <a
+                  :href="workHref(project)"
+                  class="rf-works__link"
+                  :target="isLiveWork(project) ? '_blank' : undefined"
+                  :rel="isLiveWork(project) ? 'noopener noreferrer' : undefined"
+                  @click="onWorkClick(project, $event)"
+                >
                   <span class="rf-works__num">{{ pad(index) }}</span>
                   <span class="rf-works__body">
                     <span class="rf-works__name">{{ project.title }}</span>
@@ -359,7 +386,7 @@ onUnmounted(() => {
                     <span class="rf-works__meta">{{ project.org }} · {{ project.year }}</span>
                   </span>
                   <span class="rf-works__arrow" aria-hidden="true">→</span>
-                </RefonteLink>
+                </a>
               </li>
             </ul>
           </div>

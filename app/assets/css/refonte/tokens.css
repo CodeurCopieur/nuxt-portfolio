@@ -411,6 +411,10 @@ html.rf-light .refonte-root {
   user-select: none;
 }
 
+.rf-route {
+  position: relative;
+}
+
 /* Système de révélation au scroll — v-reveal */
 .rf-reveal {
   opacity: 0;

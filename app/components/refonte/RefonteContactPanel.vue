@@ -52,9 +52,6 @@ async function submit() {
 
 <template>
   <div class="rf-contact">
-    <div class="rf-page-ghost-wrap" aria-hidden="true">
-      <span class="rf-page-ghost">04</span>
-    </div>
 
     <section class="refonte-container rf-contact__head refonte-section" data-scroll-section>
       <p class="refonte-label" v-reveal>Contact</p>
