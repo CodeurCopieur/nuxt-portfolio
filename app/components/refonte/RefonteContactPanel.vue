@@ -52,7 +52,9 @@ async function submit() {
 
 <template>
   <div class="rf-contact">
-    <span class="rf-contact__ghost" aria-hidden="true">03</span>
+    <div class="rf-page-ghost-wrap" aria-hidden="true">
+      <span class="rf-page-ghost">04</span>
+    </div>
 
     <section class="refonte-container rf-contact__head refonte-section" data-scroll-section>
       <p class="refonte-label" v-reveal>Contact</p>
@@ -155,21 +157,13 @@ async function submit() {
   overflow: clip;
 }
 
-.rf-contact__ghost {
-  position: absolute;
-  top: -1rem;
-  right: max(0.5rem, calc((100vw - var(--rf-container-max)) / -2));
-  font-family: var(--rf-serif);
-  font-style: italic;
-  font-size: clamp(5rem, 16vw, 13rem);
-  line-height: 1;
-  color: var(--rf-accent);
-  opacity: 0.12;
-  pointer-events: none;
+.rf-contact__head,
+.rf-contact__grid {
+  position: relative;
+  z-index: 1;
 }
 
 .rf-contact__head {
-  position: relative;
   padding-bottom: clamp(2rem, 5vw, 3rem);
 }
 

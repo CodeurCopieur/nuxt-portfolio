@@ -321,8 +321,11 @@ onMounted(() => {
 
 <template>
   <div class="rf-pricing" data-scroll-section data-rf-chapter="Prestations">
+    <div class="rf-page-ghost-wrap" aria-hidden="true">
+      <span class="rf-page-ghost">03</span>
+    </div>
     <header class="refonte-container rf-pricing__hero">
-      <p class="refonte-label" v-reveal>04 — Prestations</p>
+      <p class="refonte-label" v-reveal>03 — Prestations</p>
       <h1 class="refonte-display rf-pricing__title" v-reveal="{ delay: 50 }">
         Offres
         <span class="refonte-serif rf-pricing__title-accent">& missions</span>
@@ -561,7 +564,14 @@ onMounted(() => {
 
 <style scoped>
 .rf-pricing {
+  position: relative;
   padding-block: clamp(2.5rem, 6vw, 4rem) clamp(4rem, 10vw, 7rem);
+}
+
+.rf-pricing__hero,
+.rf-pricing__offers {
+  position: relative;
+  z-index: 1;
 }
 
 .rf-pricing__hero {

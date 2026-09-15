@@ -43,8 +43,10 @@ function selectTech(tech: string | null) {
 
 <template>
   <div class="rf-projects">
+    <div class="rf-page-ghost-wrap" aria-hidden="true">
+      <span class="rf-page-ghost">02</span>
+    </div>
     <div class="refonte-container rf-projects__head">
-      <span class="rf-projects__ghost" aria-hidden="true">02</span>
       <p class="refonte-label" v-reveal>Archives</p>
       <h1 class="refonte-display rf-projects__title" v-reveal="{ delay: 60 }">Tous les projets</h1>
       <p class="rf-projects__lead" v-reveal="{ delay: 120 }">
@@ -100,24 +102,13 @@ function selectTech(tech: string | null) {
 
 <style scoped>
 .rf-projects {
+  position: relative;
   padding-block: clamp(3rem, 8vw, 5rem);
 }
 
 .rf-projects__head {
   position: relative;
-}
-
-.rf-projects__ghost {
-  position: absolute;
-  top: -2rem;
-  right: 0;
-  font-family: var(--rf-serif);
-  font-style: italic;
-  font-size: clamp(4rem, 12vw, 9rem);
-  color: var(--rf-accent);
-  opacity: 0.14;
-  pointer-events: none;
-  line-height: 1;
+  z-index: 1;
 }
 
 .rf-projects__title {
@@ -133,6 +124,12 @@ function selectTech(tech: string | null) {
   line-height: 1.65;
   color: var(--rf-text-soft);
   position: relative;
+}
+
+.rf-projects__filters,
+.rf-projects__body {
+  position: relative;
+  z-index: 1;
 }
 
 .rf-projects__filters {

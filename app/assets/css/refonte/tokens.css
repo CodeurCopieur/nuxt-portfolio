@@ -387,6 +387,30 @@ html.rf-light .refonte-root {
   text-transform: uppercase;
 }
 
+/* Grand numéro de page — même DA que le 01 de l’accueil */
+.rf-page-ghost-wrap {
+  position: absolute;
+  inset: 0 0 auto;
+  height: calc(100dvh - var(--rf-nav-h));
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.rf-page-ghost {
+  position: absolute;
+  top: 42%;
+  right: max(-1rem, calc((100vw - var(--rf-container-max)) / -2 - 1rem));
+  transform: translateY(-50%);
+  font-family: var(--rf-serif);
+  font-style: italic;
+  font-size: min(46vw, 32rem);
+  line-height: 1;
+  color: var(--rf-accent);
+  opacity: 0.12;
+  user-select: none;
+}
+
 /* Système de révélation au scroll — v-reveal */
 .rf-reveal {
   opacity: 0;
