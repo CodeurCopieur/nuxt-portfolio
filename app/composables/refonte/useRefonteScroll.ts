@@ -1,6 +1,7 @@
 import type { InjectionKey } from 'vue'
 import type LocomotiveScroll from 'locomotive-scroll'
 import type { Controller, Scene } from 'scrollmagic'
+import { RF_A11Y_CHANGE_EVENT, restoreRfScrollSnap, rfMotionReduced } from '@/composables/refonte/useRefonteA11y'
 
 export interface RefonteScrollApi {
   scroll: Ref<LocomotiveScroll | null>
@@ -68,6 +69,48 @@ export function provideRefonteScroll(): RefonteScrollApi {
   let onMouseMove: ((e: MouseEvent) => void) | null = null
   let onResizeChapters: (() => void) | null = null
   let chapterNodes: HTMLElement[] = []
+  let nativeScrollBound = false
+  let onLenisScroll: ((args: { scroll: number }) => void) | null = null
+  let reducedMode = false
+
+  function onNativeScroll() {
+    const pos = window.scrollY
+    controller.value?.scrollPos(pos)
+    controller.value?.update(true)
+    updateScrollProgress(pos)
+    updateActiveChapter()
+  }
+
+  function bindNativeScroll() {
+    if (nativeScrollBound) return
+    window.addEventListener('scroll', onNativeScroll, { passive: true })
+    nativeScrollBound = true
+  }
+
+  function unbindNativeScroll() {
+    if (!nativeScrollBound) return
+    window.removeEventListener('scroll', onNativeScroll)
+    nativeScrollBound = false
+  }
+
+  function resetDocumentScroll() {
+    if (!import.meta.client) return
+    const html = document.documentElement
+    const body = document.body
+    html.classList.remove('lenis', 'lenis-smooth', 'lenis-stopped', 'lenis-scrolling', 'lenis-autoToggle')
+    html.style.removeProperty('overflow')
+    html.style.removeProperty('height')
+    html.style.removeProperty('transform')
+    body.style.removeProperty('overflow')
+    body.style.removeProperty('height')
+    body.style.removeProperty('transform')
+  }
+
+  function killScrubs() {
+    scrubCleanups.splice(0).forEach((fn) => fn())
+    scrollTriggerModule?.ScrollTrigger.getAll().forEach((st) => st.kill())
+    lenisProxyReady = false
+  }
 
   function updateScrollProgress(pos: number) {
     const max = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)
@@ -120,7 +163,7 @@ export function provideRefonteScroll(): RefonteScrollApi {
   }
 
   async function initScrollTrigger() {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (rfMotionReduced()) return
 
     if (!scrollTriggerModule) {
       scrollTriggerModule = await import('gsap/ScrollTrigger')
@@ -155,7 +198,7 @@ export function provideRefonteScroll(): RefonteScrollApi {
   }
 
   async function bindScrollScrub(options: RefonteScrubOptions): Promise<() => void> {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return () => {}
+    if (rfMotionReduced()) return () => {}
 
     if (!scrollTriggerModule) await initScrollTrigger()
     if (!scrollTriggerModule) return () => {}
@@ -187,6 +230,70 @@ export function provideRefonteScroll(): RefonteScrollApi {
     return cleanup
   }
 
+  async function setupLenis() {
+    if (scroll.value || rfMotionReduced()) return
+
+    unbindNativeScroll()
+    const { default: LocomotiveScrollCtor } = await import('locomotive-scroll')
+
+    scroll.value = new LocomotiveScrollCtor({
+      lenisOptions: {
+        smoothWheel: true,
+        lerp: 0.16,
+        duration: 0.65
+      },
+      autoStart: true
+    })
+
+    onLenisScroll = ({ scroll: pos }) => {
+      controller.value?.scrollPos(pos)
+      controller.value?.update(true)
+      updateScrollProgress(pos)
+      updateActiveChapter()
+      scrollTriggerModule?.ScrollTrigger.update()
+    }
+    scroll.value.lenisInstance.on('scroll', onLenisScroll)
+
+    await initScrollTrigger()
+    requestAnimationFrame(() => scroll.value?.resize())
+  }
+
+  function teardownLenis() {
+    killScrubs()
+    if (scroll.value && onLenisScroll) {
+      scroll.value.lenisInstance.off('scroll', onLenisScroll)
+    }
+    onLenisScroll = null
+    scroll.value?.destroy()
+    scroll.value = null
+    resetDocumentScroll()
+    bindNativeScroll()
+    onNativeScroll()
+  }
+
+  async function syncMotionMode() {
+    if (rfMotionReduced()) {
+      teardownLenis()
+    } else {
+      await setupLenis()
+    }
+    bindChapters()
+    controller.value?.update(true)
+    await nextTick()
+    restoreRfScrollSnap()
+    requestAnimationFrame(() => {
+      restoreRfScrollSnap()
+      window.setTimeout(restoreRfScrollSnap, 60)
+    })
+  }
+
+  function onA11yChange() {
+    const next = rfMotionReduced()
+    if (next === reducedMode) return
+    reducedMode = next
+    void syncMotionMode()
+  }
+
   async function init() {
     if (!import.meta.client) return
 
@@ -206,45 +313,25 @@ export function provideRefonteScroll(): RefonteScrollApi {
     }
     window.addEventListener('mousemove', onMouseMove, { passive: true })
 
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      ready.value = true
+    onResizeChapters = () => bindChapters()
+    window.addEventListener('resize', onResizeChapters, { passive: true })
+    window.addEventListener(RF_A11Y_CHANGE_EVENT, onA11yChange)
+
+    reducedMode = rfMotionReduced()
+    if (reducedMode) {
+      resetDocumentScroll()
+      bindNativeScroll()
       pendingScenes.splice(0).forEach(mountScene)
+      ready.value = true
       nextTick(() => bindChapters())
-      window.addEventListener('scroll', updateActiveChapter, { passive: true })
       return
     }
 
-    const { default: LocomotiveScrollCtor } = await import('locomotive-scroll')
-
-    scroll.value = new LocomotiveScrollCtor({
-      lenisOptions: {
-        smoothWheel: true,
-        lerp: 0.16,
-        duration: 0.65
-      },
-      autoStart: true
-    })
-
-    const lenis = scroll.value.lenisInstance
-    lenis.on('scroll', ({ scroll: pos }) => {
-      controller.value?.scrollPos(pos)
-      controller.value?.update(true)
-      updateScrollProgress(pos)
-      updateActiveChapter()
-      scrollTriggerModule?.ScrollTrigger.update()
-    })
-
-    await initScrollTrigger()
+    await setupLenis()
     pendingScenes.splice(0).forEach(mountScene)
     ready.value = true
 
-    nextTick(() => {
-      bindChapters()
-      onResizeChapters = () => bindChapters()
-      window.addEventListener('resize', onResizeChapters, { passive: true })
-    })
-
-    requestAnimationFrame(() => scroll.value?.resize())
+    nextTick(() => bindChapters())
   }
 
   const api: RefonteScrollApi = {
@@ -266,18 +353,22 @@ export function provideRefonteScroll(): RefonteScrollApi {
     refresh: () => {
       scroll.value?.resize()
       controller.value?.update(true)
-      scrollTriggerModule?.ScrollTrigger.refresh()
+      if (!rfMotionReduced()) {
+        scrollTriggerModule?.ScrollTrigger.refresh()
+      }
       bindChapters()
     },
     scrollTo: (target) => {
+      const instant = rfMotionReduced()
+      const behavior: ScrollBehavior = instant ? 'auto' : 'smooth'
       if (scroll.value) {
-        scroll.value.scrollTo(target, { duration: 900 })
+        scroll.value.scrollTo(target, { duration: instant ? 0 : 900 })
       } else if (typeof target === 'number') {
-        window.scrollTo({ top: target, behavior: 'smooth' })
+        window.scrollTo({ top: target, behavior })
       } else if (typeof target === 'string') {
-        document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' })
+        document.querySelector(target)?.scrollIntoView({ behavior })
       } else {
-        target.scrollIntoView({ behavior: 'smooth' })
+        target.scrollIntoView({ behavior })
       }
     },
     scrollToTop: (immediate = true) => {
@@ -302,14 +393,21 @@ export function provideRefonteScroll(): RefonteScrollApi {
       mountedScenes.length = 0
       scrubCleanups.splice(0).forEach((fn) => fn())
       chapterNodes = []
+      unbindNativeScroll()
+      window.removeEventListener(RF_A11Y_CHANGE_EVENT, onA11yChange)
       window.removeEventListener('scroll', updateActiveChapter)
       if (onMouseMove) window.removeEventListener('mousemove', onMouseMove)
       if (onResizeChapters) window.removeEventListener('resize', onResizeChapters)
-      scrollTriggerModule?.ScrollTrigger.getAll().forEach((st) => st.kill())
+      killScrubs()
+      if (scroll.value && onLenisScroll) {
+        scroll.value.lenisInstance.off('scroll', onLenisScroll)
+      }
+      onLenisScroll = null
       scroll.value?.destroy()
-      controller.value?.destroy(true)
       scroll.value = null
+      controller.value?.destroy(true)
       controller.value = null
+      resetDocumentScroll()
       ready.value = false
     }
   }

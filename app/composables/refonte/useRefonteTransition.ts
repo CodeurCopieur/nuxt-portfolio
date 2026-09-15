@@ -1,3 +1,5 @@
+import { rfMotionReduced } from '@/composables/refonte/useRefonteA11y'
+
 type TransitionFn = () => Promise<void>
 
 const ROUTE_ORDER = ['/', '/projets', '/prestations', '/contact']
@@ -109,7 +111,7 @@ export function provideRefonteTransition(
 
   async function animateLeave() {
     const el = pageRef.value
-    if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (!el || rfMotionReduced()) return
 
     const { gsap } = await import('gsap')
     const out = swipeDirection.value * -100
@@ -124,7 +126,7 @@ export function provideRefonteTransition(
 
   async function animateEnter() {
     const el = pageRef.value
-    if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (!el || rfMotionReduced()) return
 
     const { gsap } = await import('gsap')
     const from = swipeDirection.value * 100

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RF_A11Y_CHANGE_EVENT, restoreRfScrollSnap, rfMotionReduced } from '@/composables/refonte/useRefonteA11y'
 import { useRefonteScroll } from '@/composables/refonte/useRefonteScroll'
 
 const { featuredWorks } = useContent()
@@ -190,7 +191,7 @@ function bind() {
   else window.addEventListener('scroll', scrollHandler, { passive: true })
 
   resizeHandler = () => {
-    isDesktop.value = window.innerWidth >= 768
+    isDesktop.value = window.innerWidth >= 768 && !rfMotionReduced()
     updateProgress()
     refresh()
   }
@@ -220,7 +221,7 @@ watch(ready, (ok) => {
 }, { immediate: true })
 
 onMounted(() => {
-  isDesktop.value = window.innerWidth >= 768
+  isDesktop.value = window.innerWidth >= 768 && !rfMotionReduced()
   if (!isDesktop.value) {
     smooth.value = 1
     targetP = 1
@@ -232,9 +233,26 @@ onMounted(() => {
       refresh()
     }, 300)
   })
+  window.addEventListener(RF_A11Y_CHANGE_EVENT, onA11yChange)
 })
 
-onUnmounted(() => unbind())
+function onA11yChange() {
+  isDesktop.value = window.innerWidth >= 768 && !rfMotionReduced()
+  if (!isDesktop.value) {
+    smooth.value = 1
+    targetP = 1
+  }
+  nextTick(() => {
+    bind()
+    updateProgress()
+    restoreRfScrollSnap()
+  })
+}
+
+onUnmounted(() => {
+  window.removeEventListener(RF_A11Y_CHANGE_EVENT, onA11yChange)
+  unbind()
+})
 </script>
 
 <template>

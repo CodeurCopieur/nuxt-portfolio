@@ -6,6 +6,7 @@ import {
   ratingToLetter,
   skillRating
 } from '~/utils/skill-ratings'
+import { RF_A11Y_CHANGE_EVENT, restoreRfScrollSnap, rfMotionReduced } from '@/composables/refonte/useRefonteA11y'
 import { useRefonteScroll } from '@/composables/refonte/useRefonteScroll'
 
 const { sections } = useContent()
@@ -38,6 +39,8 @@ const RADAR_LABELS: Record<string, string> = {
 const scrollerRef = ref<HTMLElement | null>(null)
 const smooth = ref(0)
 const isDesktop = ref(false)
+const reduceMotion = ref(false)
+const staticCatIndex = ref(0)
 const openKey = ref<string | null>(null)
 const scrollActive = ref(false)
 const statsIntroStep = ref(0)
@@ -128,16 +131,12 @@ const categories = computed(() => {
 watch(
   [categories, isDesktop],
   ([cats, desktop]) => {
-    if (desktop) {
+    if (desktop || !cats.length) {
       openKey.value = null
       return
     }
-    if (!cats.length) {
+    if (openKey.value && !cats.some((cat) => cat.key === openKey.value)) {
       openKey.value = null
-      return
-    }
-    if (!openKey.value || !cats.some((cat) => cat.key === openKey.value)) {
-      openKey.value = cats[0]!.key
     }
   },
   { immediate: true }
@@ -150,6 +149,11 @@ function isGroupOpen(key: string) {
 function toggleGroup(key: string) {
   if (isDesktop.value) return
   openKey.value = openKey.value === key ? null : key
+}
+
+function selectStaticCategory(index: number) {
+  if (!reduceMotion.value || !isDesktop.value) return
+  staticCatIndex.value = Math.max(0, Math.min(index, categories.value.length - 1))
 }
 
 const totalSkills = computed(() => categories.value.reduce((n, c) => n + c.skills.length, 0))
@@ -185,9 +189,12 @@ const p = computed(() => smooth.value)
  */
 
 const activeCatIndex = computed(() => {
-  if (!isDesktop.value || p.value < DETAIL_START) return 0
   const cats = categories.value
   if (!cats.length) return 0
+  if (isDesktop.value && reduceMotion.value) {
+    return Math.min(staticCatIndex.value, cats.length - 1)
+  }
+  if (!isDesktop.value || p.value < DETAIL_START) return 0
   if (p.value >= DETAIL_END) return cats.length - 1
   const t = (p.value - DETAIL_START) / (DETAIL_END - DETAIL_START)
   return Math.min(Math.floor(t * cats.length), cats.length - 1)
@@ -213,6 +220,7 @@ const detailActive = computed(() => isDesktop.value && p.value >= DETAIL_START)
 
 const isChoreographyComplete = computed(() =>
   isDesktop.value
+  && !reduceMotion.value
   && p.value >= FINALE_START
   && activeCatIndex.value >= Math.max(categories.value.length - 1, 0)
 )
@@ -383,7 +391,7 @@ function gridPolygon(level: number) {
 }
 
 const scrollerHeight = computed(() => {
-  if (!isDesktop.value) return 'auto'
+  if (!isDesktop.value || reduceMotion.value) return 'auto'
   const travel = SCROLL_TRAVEL_BASE + Math.max(categories.value.length, 1) * SCROLL_TRAVEL_PER_CAT
   return `calc(100dvh - var(--rf-nav-h) + ${travel}px)`
 })
@@ -407,12 +415,25 @@ function tickSmooth() {
   rafId = requestAnimationFrame(tickSmooth)
 }
 
+function freezeDesktopStatic() {
+  targetP = 1
+  smooth.value = 1
+  scrollActive.value = false
+  sectionChoreActive.value = true
+  statsIntroStep.value = 3
+  statsIntroPlayed = true
+}
+
 function updateProgress() {
   if (!import.meta.client || !isDesktop.value) {
     targetP = 1
     smooth.value = 1
     scrollActive.value = false
     sectionChoreActive.value = false
+    return
+  }
+  if (reduceMotion.value) {
+    freezeDesktopStatic()
     return
   }
   const el = scrollerRef.value
@@ -463,6 +484,7 @@ function bind() {
 
   resizeHandler = () => {
     isDesktop.value = window.innerWidth >= 768
+    reduceMotion.value = rfMotionReduced()
     updateProgress()
     refresh()
   }
@@ -500,9 +522,13 @@ watch(ready, (ok) => {
 
 onMounted(() => {
   isDesktop.value = window.innerWidth >= 768
-  if (!isDesktop.value) {
-    smooth.value = 1
-    targetP = 1
+  reduceMotion.value = rfMotionReduced()
+  if (!isDesktop.value || reduceMotion.value) {
+    if (reduceMotion.value && isDesktop.value) freezeDesktopStatic()
+    else {
+      smooth.value = 1
+      targetP = 1
+    }
   }
   nextTick(() => {
     bind()
@@ -511,9 +537,27 @@ onMounted(() => {
       refresh()
     }, 300)
   })
+  window.addEventListener(RF_A11Y_CHANGE_EVENT, onA11yChange)
 })
 
-onUnmounted(() => unbind())
+function onA11yChange() {
+  isDesktop.value = window.innerWidth >= 768
+  reduceMotion.value = rfMotionReduced()
+  if (!isDesktop.value) {
+    smooth.value = 1
+    targetP = 1
+  }
+  nextTick(() => {
+    bind()
+    updateProgress()
+    restoreRfScrollSnap()
+  })
+}
+
+onUnmounted(() => {
+  window.removeEventListener(RF_A11Y_CHANGE_EVENT, onA11yChange)
+  unbind()
+})
 </script>
 
 <template>
@@ -529,6 +573,9 @@ onUnmounted(() => unbind())
             <div>
               <p class="refonte-label">04 — Savoir-faire</p>
               <h2 class="refonte-display rf-expertise__title">Compétences</h2>
+              <p v-if="isDesktop && reduceMotion" class="rf-expertise__hint">
+                Cliquez une note du radar (A, B, C…) pour afficher le détail de la compétence.
+              </p>
             </div>
             <p class="rf-expertise__act" aria-hidden="true">{{ actLabel }}</p>
           </header>
@@ -596,8 +643,28 @@ onUnmounted(() => unbind())
                       v-for="(axis, i) in radarAxes"
                       :key="`pt-${i}`"
                       class="rf-expertise__radar-g"
-                      :class="{ 'is-active': isAxisActive(i) }"
+                      :class="{ 'is-active': isAxisActive(i), 'is-pickable': reduceMotion }"
+                      :role="reduceMotion ? 'button' : undefined"
+                      :tabindex="reduceMotion ? 0 : undefined"
+                      :aria-label="reduceMotion ? `Afficher ${axis.label}` : undefined"
+                      @click="selectStaticCategory(i)"
+                      @keydown.enter.prevent="selectStaticCategory(i)"
+                      @keydown.space.prevent="selectStaticCategory(i)"
                     >
+                      <circle
+                        v-if="reduceMotion"
+                        class="rf-expertise__radar-hit"
+                        :cx="axis.x"
+                        :cy="axis.y"
+                        r="26"
+                      />
+                      <circle
+                        v-if="reduceMotion"
+                        class="rf-expertise__radar-hit"
+                        :cx="axis.labelX"
+                        :cy="axis.labelY"
+                        r="32"
+                      />
                       <g
                         class="rf-expertise__radar-note"
                         :opacity="axisScoreOpacity(i)"
@@ -720,10 +787,14 @@ onUnmounted(() => unbind())
                   :aria-controls="`rf-expertise-panel-${cat.key}`"
                   @click="toggleGroup(cat.key)"
                 >
-                  <span class="rf-expertise__group-num">{{ pad(ci) }}</span>
-                  <h3 class="rf-expertise__group-label">{{ cat.label }}</h3>
+                  <span class="rf-expertise__toggle-copy">
+                    <span class="rf-expertise__group-num">{{ pad(ci) }}</span>
+                    <h3 class="rf-expertise__group-label">{{ cat.label }}</h3>
+                  </span>
                   <span class="rf-expertise__group-avg rf-grade">{{ cat.letter }}</span>
-                  <span class="rf-expertise__group-chevron" aria-hidden="true" />
+                  <span class="rf-expertise__group-icon" aria-hidden="true">{{
+                    isGroupOpen(cat.key) ? '×' : '+'
+                  }}</span>
                 </button>
                 <div
                   :id="`rf-expertise-panel-${cat.key}`"
@@ -782,6 +853,15 @@ onUnmounted(() => unbind())
   font-size: var(--rf-section-title-size);
   line-height: 1.02;
   letter-spacing: -0.03em;
+}
+
+.rf-expertise__hint {
+  margin: 0.65rem 0 0;
+  max-width: 28rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--rf-text-muted);
 }
 
 .rf-expertise__act {
@@ -929,6 +1009,22 @@ onUnmounted(() => unbind())
   transition: opacity 0.55s var(--rf-ease);
 }
 
+.rf-expertise__radar:has(.is-pickable) .rf-expertise__radar-shape,
+.rf-expertise__radar:has(.is-pickable) .rf-expertise__radar-grid,
+.rf-expertise__radar:has(.is-pickable) .rf-expertise__radar-axis {
+  pointer-events: none;
+}
+
+.rf-expertise__radar-g.is-pickable .rf-expertise__radar-note,
+.rf-expertise__radar-g.is-pickable .rf-expertise__radar-label {
+  pointer-events: auto;
+}
+
+.rf-expertise__radar-hit {
+  fill: transparent;
+  pointer-events: auto;
+}
+
 .rf-expertise__radar-note-bg {
   fill: var(--rf-note-bg);
   stroke: var(--rf-note-stroke);
@@ -957,6 +1053,10 @@ onUnmounted(() => unbind())
 
 .rf-expertise__radar-g.is-active .rf-expertise__radar-score {
   fill: var(--rf-accent);
+}
+
+.rf-expertise__radar-g.is-pickable {
+  cursor: pointer;
 }
 
 .rf-expertise__radar-label {
@@ -1141,14 +1241,13 @@ onUnmounted(() => unbind())
   transform: translateY(-8px);
 }
 
-/* Liste mobile */
 .rf-expertise__groups {
   position: relative;
   inset: auto;
   z-index: 2;
   display: grid;
   align-content: start;
-  gap: var(--rf-section-stack-gap);
+  gap: 1.15rem;
   padding: 0.35rem 0 0.75rem;
   overflow-x: hidden;
   overflow-y: auto;
@@ -1161,11 +1260,23 @@ onUnmounted(() => unbind())
   display: none;
 }
 
+.rf-expertise__group {
+  display: grid;
+  align-content: start;
+  padding: 0.95rem 1.1rem 1.05rem;
+  border: 1px solid var(--rf-line);
+  border-radius: var(--rf-radius);
+  background: var(--rf-hover-wash);
+}
+
+.rf-expertise__group.is-open {
+  border-color: rgba(var(--rf-accent-rgb), 0.45);
+}
+
 .rf-expertise__group-head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.75rem;
-  margin-bottom: 0.4rem;
   width: 100%;
   padding: 0;
   border: none;
@@ -1174,6 +1285,21 @@ onUnmounted(() => unbind())
   font: inherit;
   text-align: left;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.rf-expertise__group-head:focus-visible {
+  outline: 2px solid var(--rf-accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.rf-expertise__toggle-copy {
+  display: flex;
+  align-items: baseline;
+  gap: 0.65rem;
+  min-width: 0;
+  flex: 1;
 }
 
 .rf-expertise__group-num {
@@ -1181,7 +1307,6 @@ onUnmounted(() => unbind())
   font-style: italic;
   font-size: 1.05rem;
   color: var(--rf-text-muted);
-  flex-shrink: 0;
 }
 
 .rf-expertise__group-label {
@@ -1193,19 +1318,32 @@ onUnmounted(() => unbind())
 }
 
 .rf-expertise__group-avg {
-  margin-left: auto;
   flex-shrink: 0;
-  font-size: clamp(1.6rem, 3.2vw, 2.1rem);
+  margin-top: 0.1rem;
+  font-size: 1.45rem;
 }
 
-.rf-expertise__group-chevron {
-  display: none;
+.rf-expertise__group-icon {
+  flex-shrink: 0;
+  width: 1rem;
+  margin-top: 0.15rem;
+  color: var(--rf-text-muted);
+  font-size: 1.2rem;
+  font-weight: 300;
+  line-height: 1;
+  text-align: center;
+}
+
+.rf-expertise__group.is-open .rf-expertise__group-icon {
+  color: var(--rf-accent);
+  font-size: 1.35rem;
 }
 
 .rf-expertise__group-pills {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
+  padding-top: 0.75rem;
 }
 
 .rf-expertise__group-pills[hidden] {
@@ -1275,47 +1413,12 @@ onUnmounted(() => unbind())
     visibility: visible !important;
     overflow: visible;
     padding: 0;
-    gap: 0;
+    gap: 1.15rem;
     justify-self: stretch;
   }
 
-  .rf-expertise__group {
-    width: 100%;
-    border-bottom: 1px solid var(--rf-line);
-  }
-
-  .rf-expertise__group-head {
-    margin-bottom: 0;
-    padding-block: 0.95rem;
-    cursor: pointer;
-    pointer-events: auto;
-    -webkit-tap-highlight-color: transparent;
-  }
-
   .rf-expertise__group-avg {
-    margin-left: auto;
-    margin-right: 0.35rem;
     font-size: 1.45rem;
-  }
-
-  .rf-expertise__group-chevron {
-    display: block;
-    width: 0.55rem;
-    height: 0.55rem;
-    flex-shrink: 0;
-    border-right: 1.5px solid var(--rf-text-muted);
-    border-bottom: 1.5px solid var(--rf-text-muted);
-    transform: rotate(45deg);
-    transition: transform 0.25s var(--rf-ease), border-color 0.25s var(--rf-ease);
-  }
-
-  .rf-expertise__group.is-open .rf-expertise__group-chevron {
-    transform: rotate(225deg);
-    border-color: var(--rf-accent);
-  }
-
-  .rf-expertise__group-pills {
-    padding: 0 0 1rem;
   }
 
   .rf-expertise__stat-value {

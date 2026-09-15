@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RF_A11Y_CHANGE_EVENT, restoreRfScrollSnap, rfMotionReduced } from '@/composables/refonte/useRefonteA11y'
 import { useRefonteExperienceScroll } from '@/composables/refonte/useRefonteExperienceScroll'
 
 const { sections } = useContent()
@@ -8,6 +9,7 @@ const trackRef = ref<HTMLElement | null>(null)
 const railViewportRef = ref<HTMLElement | null>(null)
 const activeIndex = ref(0)
 const isDesktop = ref(false)
+const reduceMotion = ref(false)
 
 const experiences = computed(() => sections.value.experiences)
 const activeExperience = computed(() => experiences.value[activeIndex.value] ?? null)
@@ -22,6 +24,10 @@ function setActive(index: number) {
 }
 
 function focusIndex(index: number) {
+  if (reduceMotion.value) {
+    setActive(index)
+    return
+  }
   goToIndex(index)
 }
 
@@ -47,7 +53,7 @@ const {
   scrollerRef,
   trackRef,
   itemCount: total,
-  enabled: isDesktop,
+  enabled: () => isDesktop.value && !reduceMotion.value,
   onIndexChange: setActive
 })
 
@@ -58,7 +64,7 @@ const timelineProgress = computed(() => {
 })
 
 const detailStep = computed(() => {
-  if (!isDesktop.value) return 3
+  if (!isDesktop.value || reduceMotion.value) return 3
   const f = segmentFrac.value
   // Tout est affiché bien avant la fin du segment (~¾)
   if (f >= 0.55) return 3
@@ -86,7 +92,7 @@ const visibleStack = computed(() => {
 })
 
 function blockStyle(step: number) {
-  if (!isDesktop.value) return { opacity: 1, transform: 'none' }
+  if (!isDesktop.value || reduceMotion.value) return { opacity: 1, transform: 'none' }
   const f = segmentFrac.value
   // 4 temps : intro → contexte → missions → stack, terminé vers ~0.72
   const starts = [0.06, 0.22, 0.42]
@@ -99,7 +105,7 @@ function blockStyle(step: number) {
 }
 
 function missionStyle(index: number) {
-  if (!isDesktop.value) return { opacity: 1, transform: 'none' }
+  if (!isDesktop.value || reduceMotion.value) return { opacity: 1, transform: 'none' }
   const threshold = 0.24 + index * 0.05
   const t = Math.min(Math.max((segmentFrac.value - threshold) / 0.12, 0), 1)
   return {
@@ -109,7 +115,7 @@ function missionStyle(index: number) {
 }
 
 function stackStyle(index: number) {
-  if (!isDesktop.value) return { opacity: 1, transform: 'none' }
+  if (!isDesktop.value || reduceMotion.value) return { opacity: 1, transform: 'none' }
   const threshold = 0.45 + index * 0.03
   const t = Math.min(Math.max((segmentFrac.value - threshold) / 0.1, 0), 1)
   return {
@@ -120,11 +126,21 @@ function stackStyle(index: number) {
 
 function updateBreakpoint() {
   isDesktop.value = window.innerWidth >= 960
+  reduceMotion.value = rfMotionReduced()
+}
+
+function onA11yChange() {
+  updateBreakpoint()
+  nextTick(() => {
+    remeasure()
+    restoreRfScrollSnap()
+  })
 }
 
 onMounted(() => {
   updateBreakpoint()
   window.addEventListener('resize', updateBreakpoint, { passive: true })
+  window.addEventListener(RF_A11Y_CHANGE_EVENT, onA11yChange)
 
   nextTick(() => {
     remeasure()
@@ -134,6 +150,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('resize', updateBreakpoint)
+  window.removeEventListener(RF_A11Y_CHANGE_EVENT, onA11yChange)
 })
 
 watch(isDesktop, () => {
@@ -166,7 +183,10 @@ watch(isDesktop, () => {
             <p class="rf-movement__num">05 — Expériences</p>
             <h2 class="refonte-display refonte-xp__title">Expériences</h2>
             <p class="refonte-xp__lead">
-              <template v-if="isDesktop && !isComplete">
+              <template v-if="isDesktop && reduceMotion">
+                Cliquez une carte pour explorer la mission.
+              </template>
+              <template v-else-if="isDesktop && !isComplete">
                 Scrollez — les détails de chaque mission se dévoilent au fil du scroll.
               </template>
               <template v-else-if="isDesktop">

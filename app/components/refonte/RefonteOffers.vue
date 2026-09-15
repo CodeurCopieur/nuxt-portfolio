@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RF_A11Y_CHANGE_EVENT, rfMotionReduced } from '@/composables/refonte/useRefonteA11y'
 import { useRefonteScroll } from '@/composables/refonte/useRefonteScroll'
 import { useRefonteTransition } from '@/composables/refonte/useRefonteTransition'
 import { MISSION_OFFER, PAGE_UNIQUE } from '@/data/refonte-offers'
@@ -58,7 +59,7 @@ function bindScrub() {
   scrubCleanups.forEach((fn) => fn())
   scrubCleanups = []
   if (!import.meta.client) return
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  if (rfMotionReduced()) return
 
   const section = sectionRef.value
   if (!section) return
@@ -84,12 +85,16 @@ function bindWhenReady() {
   })
 }
 
-onMounted(bindWhenReady)
+onMounted(() => {
+  bindWhenReady()
+  window.addEventListener(RF_A11Y_CHANGE_EVENT, bindWhenReady)
+})
 watch(ready, (isReady) => {
   if (isReady) bindWhenReady()
 })
 
 onUnmounted(() => {
+  window.removeEventListener(RF_A11Y_CHANGE_EVENT, bindWhenReady)
   scrubCleanups.forEach((fn) => fn())
 })
 

@@ -1,4 +1,5 @@
 import type { Directive } from 'vue'
+import { RF_A11Y_CHANGE_EVENT, rfMotionReduced } from '@/composables/refonte/useRefonteA11y'
 
 interface RevealOptions {
   index?: number
@@ -39,7 +40,7 @@ function applyReveal(el: HTMLElement, opts: RevealOptions) {
   el.style.setProperty('--rf-reveal-y', axis === 'y' ? `${distance}px` : '0px')
   el.classList.add('rf-reveal')
 
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  if (rfMotionReduced()) {
     el.classList.add('rf-reveal--in')
     return
   }
@@ -93,4 +94,13 @@ const reveal: Directive<HTMLElement, RevealBinding> = {
 
 export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.directive('reveal', reveal)
+
+  if (import.meta.client) {
+    window.addEventListener(RF_A11Y_CHANGE_EVENT, () => {
+      if (!rfMotionReduced()) return
+      document.querySelectorAll('.rf-reveal').forEach((node) => {
+        node.classList.add('rf-reveal--in')
+      })
+    })
+  }
 })

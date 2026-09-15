@@ -56,11 +56,10 @@ function bindScrollbar() {
   if (lenis) {
     lenisScrollHandler = () => updateCustomScrollbar()
     lenis.on('scroll', lenisScrollHandler)
-  } else {
-    windowScrollHandler = () => updateCustomScrollbar()
-    window.addEventListener('scroll', windowScrollHandler, { passive: true })
   }
 
+  windowScrollHandler = () => updateCustomScrollbar()
+  window.addEventListener('scroll', windowScrollHandler, { passive: true })
   window.addEventListener('resize', updateCustomScrollbar, { passive: true })
 
   if (typeof ResizeObserver !== 'undefined') {
@@ -73,8 +72,8 @@ function unbindScrollbar() {
   const lenis = scroll.value?.lenisInstance
   if (lenis && lenisScrollHandler) {
     lenis.off('scroll', lenisScrollHandler)
-    lenisScrollHandler = null
   }
+  lenisScrollHandler = null
   if (windowScrollHandler) {
     window.removeEventListener('scroll', windowScrollHandler)
     windowScrollHandler = null
@@ -84,7 +83,7 @@ function unbindScrollbar() {
   docResizeObserver = null
 }
 
-watch(ready, (isReady) => {
+watch([ready, scroll], ([isReady]) => {
   if (isReady) nextTick(() => bindScrollbar())
 }, { immediate: true })
 
@@ -115,6 +114,7 @@ onUnmounted(() => unbindScrollbar())
       </div>
     </aside>
   </div>
+  <RefonteA11y />
 </template>
 
 <style scoped>

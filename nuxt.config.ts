@@ -49,7 +49,7 @@ export default defineNuxtConfig({
       script: [
         {
           innerHTML:
-            "(function(){try{if(localStorage.getItem('rf-theme')==='light'){document.documentElement.classList.add('rf-light')}}catch(e){}})()",
+            "(function(){try{var h=document.documentElement;if(localStorage.getItem('rf-theme')==='light'){h.classList.add('rf-light')}var raw=localStorage.getItem('rf-a11y');if(!raw)return;var s=JSON.parse(raw);if(s.contrast)h.classList.add('rf-a11y-contrast');if(s.bigText)h.classList.add('rf-a11y-text');if(s.underline)h.classList.add('rf-a11y-links');if(s.motion)h.classList.add('rf-a11y-motion');if(s.cvd&&s.cvd!=='standard')h.setAttribute('data-rf-cvd',s.cvd)}catch(e){}})()",
           tagPriority: 'critical'
         }
       ]

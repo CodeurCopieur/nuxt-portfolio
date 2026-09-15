@@ -417,3 +417,94 @@ html.rf-light .refonte-root {
   }
 }
 
+html.rf-a11y-contrast {
+  --rf-bg: #000000;
+  --rf-bg-deep: #000000;
+  --rf-bg-soft: #111111;
+  --rf-text: #ffffff;
+  --rf-text-muted: #f0f0f0;
+  --rf-text-soft: #ffffff;
+  --rf-accent: #ffe566;
+  --rf-accent-deep: #ffd84d;
+  --rf-line: rgba(255, 255, 255, 0.5);
+  --rf-hover-wash: rgba(255, 255, 255, 0.1);
+}
+
+html.rf-light.rf-a11y-contrast {
+  --rf-bg: #ffffff;
+  --rf-bg-deep: #ffffff;
+  --rf-bg-soft: #f4f4f4;
+  --rf-text: #000000;
+  --rf-ink: #000000;
+  --rf-text-muted: #222222;
+  --rf-text-soft: #111111;
+  --rf-accent: #8a6200;
+  --rf-accent-deep: #6e4e00;
+  --rf-line: rgba(0, 0, 0, 0.45);
+  --rf-hover-wash: rgba(0, 0, 0, 0.06);
+}
+
+html.rf-a11y-text {
+  font-size: 118%;
+}
+
+html.rf-a11y-links a,
+html.rf-a11y-links a:hover,
+html.rf-a11y-links a:visited,
+html.rf-a11y-links a:focus {
+  text-decoration-line: underline !important;
+  text-decoration-style: solid !important;
+  text-decoration-thickness: 0.16em !important;
+  text-underline-offset: 0.22em !important;
+  text-decoration-color: currentColor !important;
+}
+
+html.rf-a11y-motion,
+html.rf-a11y-motion body {
+  overflow: visible !important;
+  height: auto !important;
+  transform: none !important;
+}
+
+html.rf-a11y-motion .refonte-main *,
+html.rf-a11y-motion .refonte-main *::before,
+html.rf-a11y-motion .refonte-main *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+html.rf-a11y-motion .refonte-root [data-scroll-section],
+html.rf-a11y-motion .rf-intro__word {
+  transform: none !important;
+}
+
+html.rf-a11y-motion .rf-intro__word {
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+html.rf-a11y-motion .rf-offers__card {
+  transform: none !important;
+}
+
+html.rf-a11y-motion .rf-reveal {
+  transition: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+html[data-rf-cvd='deuteranopia'] .refonte-main {
+  filter: url('#rf-cvd-deuteranopia');
+}
+
+html[data-rf-cvd='protanopia'] .refonte-main {
+  filter: url('#rf-cvd-protanopia');
+}
+
+html[data-rf-cvd='tritanopia'] .refonte-main {
+  filter: url('#rf-cvd-tritanopia');
+}
+
