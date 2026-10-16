@@ -20,7 +20,8 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@nuxtjs/seo',
     'nuxt-schema-org',
-    '@vercel/analytics/nuxt'
+    '@vercel/analytics/nuxt',
+    '@vite-pwa/nuxt'
   ],
   css: ['@/assets/css/base.css'],
   site: {
@@ -40,11 +41,17 @@ export default defineNuxtConfig({
             'Widdy Louis — développeur front-end freelance. Interfaces web performantes, accessibles et animées (Nuxt, Vue).'
         },
         { name: 'theme-color', content: '#0b1a3a' },
+        { name: 'mobile-web-app-capable', content: 'yes' },
+        { name: 'apple-mobile-web-app-capable', content: 'yes' },
+        { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
+        { name: 'apple-mobile-web-app-title', content: 'LW' },
         { property: 'og:type', content: 'website' },
         { name: 'twitter:card', content: 'summary_large_image' }
       ],
       link: [
-        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+        { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' },
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' }
       ],
       script: [
         {
@@ -63,6 +70,60 @@ export default defineNuxtConfig({
   },
   ogImage: {
     enabled: false
+  },
+  pwa: {
+    registerType: 'autoUpdate',
+    registerWebManifestInRouteRules: true,
+    manifest: {
+      id: '/',
+      name: 'Widdy Louis',
+      short_name: 'LW',
+      description:
+        'Widdy Louis — développeur front-end freelance. Interfaces web performantes, accessibles et animées (Nuxt, Vue).',
+      lang: 'fr',
+      dir: 'ltr',
+      start_url: '/',
+      scope: '/',
+      display: 'standalone',
+      orientation: 'portrait-primary',
+      background_color: '#0b1a3a',
+      theme_color: '#0b1a3a',
+      categories: ['portfolio', 'productivity'],
+      icons: [
+        {
+          src: 'pwa-192x192.png',
+          sizes: '192x192',
+          type: 'image/png'
+        },
+        {
+          src: 'pwa-512x512.png',
+          sizes: '512x512',
+          type: 'image/png'
+        },
+        {
+          src: 'pwa-maskable-512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'maskable'
+        }
+      ]
+    },
+    workbox: {
+      navigateFallback: '/',
+      globPatterns: ['**/*.{js,css,html,svg,png,ico,webp,woff2,webmanifest}'],
+      globIgnores: ['**/music/**', '**/admin/**'],
+      navigateFallbackDenylist: [/^\/admin/, /^\/api/, /^\/old/]
+    },
+    client: {
+      installPrompt: false,
+      periodicSyncForUpdates: 3600
+    },
+    devOptions: {
+      enabled: true,
+      suppressWarnings: true,
+      navigateFallback: '/',
+      type: 'module'
+    }
   },
   components: [
     { path: '~/components', pathPrefix: false }
