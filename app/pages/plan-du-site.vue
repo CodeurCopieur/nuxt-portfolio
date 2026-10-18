@@ -1,41 +1,47 @@
 <script setup lang="ts">
-import { LEGAL_PAGES } from '@/constants/legal'
-
 definePageMeta({ layout: 'refonte' })
 
-const { meta, sections } = useContent()
+const { meta, sections } = useLocalizedContent()
+const { ui } = useUi()
 
 useHead({
-  title: computed(() => `Plan du site — ${meta.value?.name ?? 'Portfolio'}`)
+  title: computed(() => `${ui.value.sitemap.pageTitle} — ${meta.value?.name ?? 'Portfolio'}`)
 })
+
+const legalLinks = computed(() => [
+  { to: '/mentions-legales', label: ui.value.legalNav.mentions },
+  { to: '/cgu', label: ui.value.legalNav.cgu },
+  { to: '/confidentialite', label: ui.value.legalNav.privacy },
+  { to: '/plan-du-site', label: ui.value.legalNav.sitemap }
+])
 
 const mainSections = computed(() => [
   {
-    title: 'Portfolio',
+    title: ui.value.sitemap.portfolio,
     links: [
-      { label: 'Accueil', to: '/' },
-      { label: 'Projets', to: '/projets' },
-      { label: 'Prestations', to: '/prestations' },
-      { label: 'Contact', to: '/contact' }
+      { label: ui.value.nav.home, to: '/' },
+      { label: ui.value.nav.projects, to: '/projets' },
+      { label: ui.value.nav.services, to: '/prestations' },
+      { label: ui.value.nav.contact, to: '/contact' }
     ]
   },
   {
-    title: 'Projets',
+    title: ui.value.sitemap.projects,
     links: sections.value.projets.map((project) => ({
       label: project.title,
       to: `/projets/${project.slug}`
     }))
   },
   {
-    title: 'Informations légales',
-    links: LEGAL_PAGES.map((page) => ({ label: page.label, to: page.to }))
+    title: ui.value.sitemap.legal,
+    links: legalLinks.value
   },
   {
-    title: 'Version archivée',
+    title: ui.value.sitemap.archive,
     links: [
-      { label: 'Ancien portfolio', to: '/old' },
-      { label: 'Projets (ancienne version)', to: '/old/projets' },
-      { label: 'Contact (ancienne version)', to: '/old/contact' }
+      { label: ui.value.sitemap.oldHome, to: '/old' },
+      { label: ui.value.sitemap.oldProjects, to: '/old/projets' },
+      { label: ui.value.sitemap.oldContact, to: '/old/contact' }
     ]
   }
 ])
@@ -43,8 +49,8 @@ const mainSections = computed(() => [
 
 <template>
   <RefonteLegalPage
-    title="Plan du site"
-    lead="Vue d'ensemble de l'architecture et des pages accessibles sur le portfolio."
+    :title="ui.sitemap.title"
+    :lead="ui.sitemap.lead"
   >
     <section v-for="group in mainSections" :key="group.title">
       <h2>{{ group.title }}</h2>
@@ -56,7 +62,7 @@ const mainSections = computed(() => [
     </section>
 
     <section>
-      <h2>Contact</h2>
+      <h2>{{ ui.sitemap.contact }}</h2>
       <p>
         <a :href="`mailto:${meta.email}`">{{ meta.email }}</a>
         · {{ meta.phone }}

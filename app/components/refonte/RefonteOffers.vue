@@ -2,10 +2,11 @@
 import { RF_A11Y_CHANGE_EVENT, rfMotionReduced } from '@/composables/refonte/useRefonteA11y'
 import { useRefonteScroll } from '@/composables/refonte/useRefonteScroll'
 import { useRefonteTransition } from '@/composables/refonte/useRefonteTransition'
-import { MISSION_OFFER, PAGE_UNIQUE } from '@/data/refonte-offers'
+import { getOfferCatalog } from '@/i18n/offer-catalog'
 
 const { bindScrollScrub, ready, refresh } = useRefonteScroll()
 const { navigateTo } = useRefonteTransition()
+const { ui, locale } = useUi()
 
 const sectionRef = ref<HTMLElement | null>(null)
 
@@ -16,44 +17,40 @@ async function goPrestations(event?: MouseEvent) {
 
 let scrubCleanups: Array<() => void> = []
 
-const cards = [
-  {
-    num: MISSION_OFFER.num,
-    name: MISSION_OFFER.name,
-    kind: 'mission' as const,
-    tagline: MISSION_OFFER.tagline,
-    lead: '',
-    copy: MISSION_OFFER.copy,
-    skillsTitle: MISSION_OFFER.skillsTitle,
-    skills: [...MISSION_OFFER.includes],
-    stack: [...MISSION_OFFER.stack],
-    note: 'TJM',
-    prices: [
-      { value: MISSION_OFFER.tjm, unit: MISSION_OFFER.unit, label: '' }
-    ],
-    duration: MISSION_OFFER.duration,
-    billing: MISSION_OFFER.billing,
-    fit: MISSION_OFFER.fit,
-    panes: [] as typeof PAGE_UNIQUE.panes[number][]
-  },
-  {
-    num: PAGE_UNIQUE.num,
-    name: PAGE_UNIQUE.name,
-    kind: 'page' as const,
-    tagline: PAGE_UNIQUE.tagline,
-    lead: PAGE_UNIQUE.lead,
-    copy: null,
-    skillsTitle: '',
-    skills: [] as string[],
-    stack: [] as string[],
-    note: 'Tarif',
-    prices: [] as Array<{ value: string, unit: string, label: string }>,
-    duration: '',
-    billing: '',
-    fit: '',
-    panes: [...PAGE_UNIQUE.panes]
-  }
-]
+const cards = computed(() => {
+  const catalog = getOfferCatalog(locale.value)
+  return [
+    {
+      num: catalog.mission.num,
+      name: catalog.mission.name,
+      kind: 'mission' as const,
+      tagline: catalog.mission.tagline,
+      copy: catalog.mission.copy,
+      skillsTitle: catalog.mission.skillsTitle,
+      skills: catalog.mission.includes,
+      stack: catalog.mission.stack,
+      duration: catalog.mission.duration,
+      billing: catalog.mission.billing,
+      fit: catalog.mission.fit,
+      panes: [] as typeof catalog.page.panes
+    },
+    {
+      num: catalog.page.num,
+      name: catalog.page.name,
+      kind: 'page' as const,
+      tagline: catalog.page.tagline,
+      lead: catalog.page.lead,
+      copy: null,
+      skillsTitle: '',
+      skills: [] as readonly string[],
+      stack: [] as readonly string[],
+      duration: '',
+      billing: '',
+      fit: '',
+      panes: catalog.page.panes
+    }
+  ]
+})
 
 function bindScrub() {
   scrubCleanups.forEach((fn) => fn())
@@ -123,7 +120,7 @@ onMounted(() => {
 
 const pagePaneId = ref('landing')
 
-const pageCard = computed(() => cards.find((card) => card.kind === 'page'))
+const pageCard = computed(() => cards.value.find((card) => card.kind === 'page'))
 const activePagePane = computed(
   () => pageCard.value?.panes.find((pane) => pane.id === pagePaneId.value) ?? pageCard.value?.panes[0]
 )
@@ -159,10 +156,10 @@ function onPagePaneKeydown(event: KeyboardEvent, index: number) {
   >
     <div class="refonte-container">
       <header class="rf-offers__head">
-        <p class="refonte-label" v-reveal>Prestations</p>
+        <p class="refonte-label" v-reveal>{{ ui.offers.label }}</p>
         <h2 class="refonte-display rf-offers__title" v-reveal="{ delay: 60 }">
-          Mission
-          <span class="refonte-serif rf-offers__title-accent">front-end</span>
+          {{ ui.offers.title }}
+          <span class="refonte-serif rf-offers__title-accent">{{ ui.offers.titleAccent }}</span>
         </h2>
       </header>
 
@@ -222,7 +219,7 @@ function onPagePaneKeydown(event: KeyboardEvent, index: number) {
             <div
               class="rf-offers__switch"
               role="tablist"
-              aria-label="Type de page unique"
+              :aria-label="ui.offers.pageType"
             >
               <button
                 v-for="(pane, paneIndex) in card.panes"
@@ -277,7 +274,7 @@ function onPagePaneKeydown(event: KeyboardEvent, index: number) {
           class="refonte-btn rf-offers__more"
           @click="goPrestations"
         >
-          Voir plus
+          {{ ui.offers.more }}
         </a>
       </div>
     </div>

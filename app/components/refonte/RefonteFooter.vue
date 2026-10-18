@@ -3,11 +3,19 @@ import { PUBLIC_CONTACT_EMAIL } from '@/constants/contact'
 import { LEGAL_PAGES } from '@/constants/legal'
 import { useRefonteTransition } from '@/composables/refonte/useRefonteTransition'
 
-const { meta, sections } = useContent()
+const { meta, sections } = useLocalizedContent()
+const { ui } = useUi()
 const { navigateTo } = useRefonteTransition()
 const route = useRoute()
 const year = new Date().getFullYear()
 const footerRef = ref<HTMLElement | null>(null)
+
+const legalPages = computed(() => [
+  { to: '/mentions-legales', label: ui.value.legalNav.mentions },
+  { to: '/cgu', label: ui.value.legalNav.cgu },
+  { to: '/confidentialite', label: ui.value.legalNav.privacy },
+  { to: '/plan-du-site', label: ui.value.legalNav.sitemap }
+])
 
 const isLegalPage = computed(() => LEGAL_PAGES.some((page) => route.path === page.to))
 
@@ -26,9 +34,9 @@ async function goContact(event: MouseEvent) {
     data-rf-chapter="Contact"
   >
     <div v-if="!isLegalPage" class="refonte-container refonte-footer__climax">
-      <p class="rf-movement__num" v-reveal>Finale</p>
+      <p class="rf-movement__num" v-reveal>{{ ui.footer.finale }}</p>
       <h2 class="refonte-display refonte-footer__hero" v-reveal="{ delay: 60 }">
-        Travaillons<br>ensemble sur votre <span class="refonte-footer__hero-accent">prochain projet</span>
+        {{ ui.footer.line1 }}<br>{{ ui.footer.line2 }} <span class="refonte-footer__hero-accent">{{ ui.footer.accent }}</span>
       </h2>
       <p class="refonte-footer__pitch" v-reveal="{ delay: 120 }">
         {{ sections.a_propos.availability }}
@@ -36,23 +44,23 @@ async function goContact(event: MouseEvent) {
 
       <div class="refonte-footer__cta" v-reveal="{ delay: 170 }">
         <a :href="`mailto:${PUBLIC_CONTACT_EMAIL}`" class="refonte-btn refonte-footer__email">
-          M'écrire
+          {{ ui.footer.write }}
         </a>
         <a href="/contact" class="refonte-footer__form-link" @click="goContact">
-          ou via le formulaire →
+          {{ ui.footer.form }}
         </a>
       </div>
     </div>
 
     <div class="refonte-container refonte-footer__meta" :class="{ 'refonte-footer__meta--solo': isLegalPage }">
       <div v-reveal="{ index: 0, total: 3, reverse: true, stagger: 80 }">
-        <p class="refonte-label">Portfolio</p>
+        <p class="refonte-label">{{ ui.footer.portfolio }}</p>
         <p class="refonte-footer__name">{{ meta.name }}</p>
         <p class="refonte-footer__role">{{ meta.role }} · {{ meta.location }}</p>
       </div>
 
       <div v-reveal="{ index: 1, total: 3, reverse: true, stagger: 80 }">
-        <p class="refonte-label">Réseaux</p>
+        <p class="refonte-label">{{ ui.footer.networks }}</p>
         <ul class="refonte-footer__links">
           <li v-if="meta.links.linkedin">
             <a :href="meta.links.linkedin" target="_blank" rel="noopener">LinkedIn</a>
@@ -60,12 +68,12 @@ async function goContact(event: MouseEvent) {
           <li v-if="meta.links.github">
             <a :href="meta.links.github" target="_blank" rel="noopener">GitHub</a>
           </li>
-          <li><NuxtLink to="/old">Version classique</NuxtLink></li>
+          <li><NuxtLink to="/old">{{ ui.footer.classic }}</NuxtLink></li>
         </ul>
       </div>
 
       <div v-reveal="{ index: 2, total: 3, reverse: true, stagger: 80 }">
-        <p class="refonte-label">Stack</p>
+        <p class="refonte-label">{{ ui.footer.stack }}</p>
         <ul class="refonte-footer__tags">
           <li v-for="item in sections.a_propos.highlights.slice(0, 4)" :key="item">{{ item }}</li>
         </ul>
@@ -74,9 +82,9 @@ async function goContact(event: MouseEvent) {
 
     <div class="refonte-container refonte-footer__bottom">
       <p>© {{ year }} {{ meta.name }}</p>
-      <nav class="refonte-footer__legal" aria-label="Informations légales">
+      <nav class="refonte-footer__legal" :aria-label="ui.footer.legalNav">
         <RefonteLink
-          v-for="page in LEGAL_PAGES"
+          v-for="page in legalPages"
           :key="page.to"
           :to="page.to"
           class="refonte-footer__legal-link"

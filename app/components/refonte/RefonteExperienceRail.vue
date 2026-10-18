@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { RF_A11Y_CHANGE_EVENT, restoreRfScrollSnap, rfMotionReduced } from '@/composables/refonte/useRefonteA11y'
 import { useRefonteExperienceScroll } from '@/composables/refonte/useRefonteExperienceScroll'
+import { fill } from '@/i18n/ui'
 
-const { sections } = useContent()
+const { sections } = useLocalizedContent()
+const { ui } = useUi()
 
 const scrollerRef = ref<HTMLElement | null>(null)
 const trackRef = ref<HTMLElement | null>(null)
@@ -74,11 +76,11 @@ const detailStep = computed(() => {
 })
 
 const detailActLabel = computed(() => {
-  if (!isDesktop.value) return 'Détails'
-  if (detailStep.value >= 3) return '03 — Stack'
-  if (detailStep.value >= 2) return '02 — Missions'
-  if (detailStep.value >= 1) return '01 — Contexte'
-  return '00 — Intro'
+  if (!isDesktop.value) return ui.value.experience.details
+  if (detailStep.value >= 3) return ui.value.experience.actStack
+  if (detailStep.value >= 2) return ui.value.experience.actMissions
+  if (detailStep.value >= 1) return ui.value.experience.actContext
+  return ui.value.experience.actIntro
 })
 
 const visibleMissions = computed(() => {
@@ -173,27 +175,27 @@ watch(isDesktop, () => {
           :aria-valuenow="progressPercent"
           aria-valuemin="0"
           aria-valuemax="100"
-          :aria-label="`Progression du parcours ${progressPercent}%`"
+          :aria-label="fill(ui.experience.progress, { n: progressPercent })"
         >
           <div class="refonte-xp__progress-fill" :style="{ width: `${progressPercent}%` }" />
         </div>
 
         <div class="refonte-container refonte-xp__head">
           <div class="refonte-xp__head-copy">
-            <p class="rf-movement__num">05 — Expériences</p>
-            <h2 class="refonte-display refonte-xp__title">Expériences</h2>
+            <p class="rf-movement__num">{{ ui.experience.kicker }}</p>
+            <h2 class="refonte-display refonte-xp__title">{{ ui.experience.title }}</h2>
             <p class="refonte-xp__lead">
               <template v-if="isDesktop && reduceMotion">
-                Cliquez une carte pour explorer la mission.
+                {{ ui.experience.click }}
               </template>
               <template v-else-if="isDesktop && !isComplete">
-                Scrollez — les détails de chaque mission se dévoilent au fil du scroll.
+                {{ ui.experience.scroll }}
               </template>
               <template v-else-if="isDesktop">
-                Parcours complet — continuez vers le bas.
+                {{ ui.experience.done }}
               </template>
               <template v-else>
-                Sélectionnez une entreprise pour explorer la mission.
+                {{ ui.experience.pick }}
               </template>
             </p>
           </div>
@@ -213,7 +215,7 @@ watch(isDesktop, () => {
                 class="refonte-xp__mission"
               >
                 <aside class="refonte-xp__mission-lead">
-                  <p class="refonte-xp__mission-kicker">Mission</p>
+                  <p class="refonte-xp__mission-kicker">{{ ui.experience.mission }}</p>
                   <p class="refonte-xp__mission-index refonte-serif">{{ pad(activeIndex) }}</p>
                   <h3 class="refonte-xp__mission-role">{{ activeExperience.role }}</h3>
                   <p class="refonte-xp__mission-company">
@@ -241,7 +243,7 @@ watch(isDesktop, () => {
                   >
                     <p class="refonte-xp__beat-num">01</p>
                     <div class="refonte-xp__beat-content">
-                      <h4 class="refonte-xp__beat-title">Contexte</h4>
+                      <h4 class="refonte-xp__beat-title">{{ ui.experience.context }}</h4>
                       <p class="refonte-xp__beat-text">{{ activeExperience.summary }}</p>
                     </div>
                   </section>
@@ -253,7 +255,7 @@ watch(isDesktop, () => {
                   >
                     <p class="refonte-xp__beat-num">02</p>
                     <div class="refonte-xp__beat-content">
-                      <h4 class="refonte-xp__beat-title">Missions</h4>
+                      <h4 class="refonte-xp__beat-title">{{ ui.experience.missions }}</h4>
                       <ol class="refonte-xp__beat-list">
                         <li
                           v-for="(mission, mi) in visibleMissions"
@@ -274,7 +276,7 @@ watch(isDesktop, () => {
                   >
                     <p class="refonte-xp__beat-num">03</p>
                     <div class="refonte-xp__beat-content">
-                      <h4 class="refonte-xp__beat-title">Stack</h4>
+                      <h4 class="refonte-xp__beat-title">{{ ui.experience.stack }}</h4>
                       <div class="refonte-xp__beat-stack">
                         <span
                           v-for="(tech, ti) in visibleStack"
@@ -341,7 +343,7 @@ watch(isDesktop, () => {
             ref="tabListRef"
             class="refonte-xp__tabs"
             role="tablist"
-            aria-label="Missions"
+            :aria-label="ui.experience.missions"
           >
             <button
               v-for="(xp, index) in experiences"
@@ -372,7 +374,7 @@ watch(isDesktop, () => {
                 <section class="refonte-xp__beat">
                   <p class="refonte-xp__beat-num">01</p>
                   <div class="refonte-xp__beat-content">
-                    <h4 class="refonte-xp__beat-title">Contexte</h4>
+                    <h4 class="refonte-xp__beat-title">{{ ui.experience.context }}</h4>
                     <p class="refonte-xp__beat-text">{{ activeExperience.summary }}</p>
                   </div>
                 </section>
@@ -380,7 +382,7 @@ watch(isDesktop, () => {
                 <section class="refonte-xp__beat">
                   <p class="refonte-xp__beat-num">02</p>
                   <div class="refonte-xp__beat-content">
-                    <h4 class="refonte-xp__beat-title">Missions</h4>
+                    <h4 class="refonte-xp__beat-title">{{ ui.experience.missions }}</h4>
                     <ol class="refonte-xp__beat-list">
                       <li v-for="(mission, mi) in activeExperience.missions" :key="mission">
                         <span class="refonte-xp__beat-list-idx">{{ String(mi + 1).padStart(2, '0') }}</span>
@@ -393,7 +395,7 @@ watch(isDesktop, () => {
                 <section class="refonte-xp__beat">
                   <p class="refonte-xp__beat-num">03</p>
                   <div class="refonte-xp__beat-content">
-                    <h4 class="refonte-xp__beat-title">Stack</h4>
+                    <h4 class="refonte-xp__beat-title">{{ ui.experience.stack }}</h4>
                     <div class="refonte-xp__beat-stack">
                       <span v-for="tech in activeExperience.stack" :key="tech">{{ tech }}</span>
                     </div>

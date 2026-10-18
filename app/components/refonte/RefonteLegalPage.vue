@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { LEGAL_LAST_UPDATED } from '@/constants/legal'
+import { fill } from '@/i18n/ui'
+
+const { ui } = useUi()
 
 defineProps<{
   title: string
@@ -11,11 +13,11 @@ defineProps<{
   <article class="rf-legal" data-scroll-section>
     <div class="refonte-container rf-legal__inner">
       <header class="rf-legal__head">
-        <RefonteLink to="/" class="rf-legal__back">← Retour à l'accueil</RefonteLink>
-        <p class="refonte-label">Informations légales</p>
+        <RefonteLink to="/" class="rf-legal__back">{{ ui.legalChrome.back }}</RefonteLink>
+        <p class="refonte-label">{{ ui.legalChrome.kicker }}</p>
         <h1 class="refonte-display rf-legal__title">{{ title }}</h1>
         <p v-if="lead" class="rf-legal__lead">{{ lead }}</p>
-        <p class="rf-legal__updated">Dernière mise à jour : {{ LEGAL_LAST_UPDATED }}</p>
+        <p class="rf-legal__updated">{{ fill(ui.legalChrome.updated, { date: ui.legalChrome.date }) }}</p>
       </header>
 
       <div class="rf-legal__content">

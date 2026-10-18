@@ -4,7 +4,8 @@ import { sortProjectsByYear } from '~/utils/sort-projects'
 definePageMeta({ layout: 'refonte' })
 
 const route = useRoute()
-const { meta, sections } = useContent()
+const { meta, sections } = useLocalizedContent()
+const { ui } = useUi()
 
 const sortedProjects = computed(() => sortProjectsByYear(sections.value.projets))
 
@@ -18,12 +19,12 @@ const index = computed(() =>
 
 watchEffect(() => {
   if (sections.value.projets.length && !project.value) {
-    throw createError({ statusCode: 404, statusMessage: 'Projet introuvable' })
+    throw createError({ statusCode: 404, statusMessage: ui.value.case.missing })
   }
 })
 
 useHead({
-  title: computed(() => `${project.value?.title ?? 'Projet'} — ${meta.value.name}`)
+  title: computed(() => `${project.value?.title ?? ui.value.case.fallback} — ${meta.value.name}`)
 })
 
 function pad(n: number) {
@@ -36,7 +37,7 @@ function pad(n: number) {
     <span class="rf-case__ghost" aria-hidden="true">{{ pad(index) }}</span>
 
     <div class="refonte-container rf-case__inner">
-      <RefonteLink to="/projets" class="rf-case__back" v-reveal>← Retour aux projets</RefonteLink>
+      <RefonteLink to="/projets" class="rf-case__back" v-reveal>{{ ui.case.back }}</RefonteLink>
 
       <header class="rf-case__head">
         <p class="refonte-label" v-reveal="{ delay: 40 }">{{ project.year }} · {{ project.org }}</p>
@@ -46,20 +47,20 @@ function pad(n: number) {
 
       <div class="rf-case__meta">
         <div v-reveal="{ index: 0, total: 3, stagger: 80 }">
-          <span class="refonte-label">Stack</span>
+          <span class="refonte-label">{{ ui.case.stack }}</span>
           <ul>
             <li v-for="tech in project.stack" :key="tech">{{ tech }}</li>
           </ul>
         </div>
         <div v-if="project.tags?.length" v-reveal="{ index: 1, total: 3, stagger: 80 }">
-          <span class="refonte-label">Tags</span>
+          <span class="refonte-label">{{ ui.case.tags }}</span>
           <ul>
             <li v-for="tag in project.tags" :key="tag">{{ tag }}</li>
           </ul>
         </div>
         <div class="rf-case__links" v-reveal="{ index: 2, total: 3, stagger: 80 }">
-          <a v-if="project.link" :href="project.link" target="_blank" rel="noopener">Voir en ligne →</a>
-          <a v-if="project.github" :href="project.github" target="_blank" rel="noopener">GitHub →</a>
+          <a v-if="project.link" :href="project.link" target="_blank" rel="noopener">{{ ui.case.live }}</a>
+          <a v-if="project.github" :href="project.github" target="_blank" rel="noopener">{{ ui.case.github }}</a>
         </div>
       </div>
     </div>

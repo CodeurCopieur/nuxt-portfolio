@@ -10,4 +10,12 @@
 
 <script setup>
 import { SpeedInsights } from '@vercel/speed-insights/vue'
+
+const { locale } = useLocale()
+
+useHead({
+  htmlAttrs: {
+    lang: locale
+  }
+})
 </script>

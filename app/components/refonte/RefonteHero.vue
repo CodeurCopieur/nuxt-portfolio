@@ -1,5 +1,8 @@
 <script setup lang="ts">
-const { meta, sections } = useContent()
+import { fill } from '@/i18n/ui'
+
+const { meta, sections } = useLocalizedContent()
+const { ui } = useUi()
 </script>
 
 <template>
@@ -10,16 +13,16 @@ const { meta, sections } = useContent()
       <span class="refonte-label">{{ meta.role }}</span>
       <span class="rf-hero__status">
         <span class="rf-hero__status-dot" />
-        Disponible en freelance
+        {{ ui.hero.available }}
       </span>
     </div>
 
     <div class="refonte-container rf-hero__body">
       <h1 class="rf-hero__title">
-        <span class="rf-hero__mask"><span class="rf-hero__line" style="--i: 0">Je conçois des</span></span>
-        <span class="rf-hero__mask"><span class="rf-hero__line" style="--i: 1">interfaces</span></span>
+        <span class="rf-hero__mask"><span class="rf-hero__line" style="--i: 0">{{ ui.hero.line1 }}</span></span>
+        <span class="rf-hero__mask"><span class="rf-hero__line" style="--i: 1">{{ ui.hero.line2 }}</span></span>
         <span class="rf-hero__mask">
-          <span class="rf-hero__line rf-hero__line--serif refonte-serif" style="--i: 2">qui tiennent la charge</span>
+          <span class="rf-hero__line rf-hero__line--serif refonte-serif" style="--i: 2">{{ ui.hero.line3 }}</span>
         </span>
       </h1>
 
@@ -31,12 +34,12 @@ const { meta, sections } = useContent()
     <div class="refonte-container rf-hero__foot">
       <a href="#rf-intro" class="rf-hero__scroll-cue">
         <span class="rf-hero__scroll-arrow" aria-hidden="true">↓</span>
-        <span>Scroll pour explorer</span>
+        <span>{{ ui.hero.scroll }}</span>
       </a>
 
       <ul class="rf-hero__stats">
-        <li>{{ meta.years_experience }}+ ans</li>
-        <li>{{ sections.projets.length }} projets</li>
+        <li>{{ fill(ui.hero.years, { n: meta.years_experience }) }}</li>
+        <li>{{ fill(ui.hero.projects, { n: sections.projets.length }) }}</li>
         <li>{{ meta.location }}</li>
       </ul>
     </div>

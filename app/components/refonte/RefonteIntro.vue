@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { useRefonteScroll } from '@/composables/refonte/useRefonteScroll'
+import { fill } from '@/i18n/ui'
 
-const { meta, sections } = useContent()
+const { meta, sections } = useLocalizedContent()
+const { ui, locale } = useUi()
 const { bindScrollScrub } = useRefonteScroll()
 
 const statementRef = ref<HTMLElement | null>(null)
@@ -27,21 +29,25 @@ function withA(name: string) {
 
 const statement = computed(() => {
   const list = companies.value
-  if (list.length === 0) {
-    return `${meta.value.years_experience} ans à concevoir des interfaces qui tiennent la charge, sans jamais sacrifier le détail.`
-  }
-  if (list.length === 1) {
-    return `${list[0]} — ${meta.value.years_experience} ans à concevoir des interfaces qui tiennent la charge, sans jamais sacrifier le détail.`
-  }
+  const tail = fill(ui.value.intro.tail, { years: meta.value.years_experience })
+  if (list.length === 0) return tail
+  if (list.length === 1) return `${list[0]} — ${tail}`
 
   const first = list[0]!
   const last = list[list.length - 1]!
   const middle = list.slice(1, -1)
-  const path = middle.length
-    ? `${withDe(first).replace(/^d/, 'D')} ${withA(last)}, en passant par ${middle.join(', ')}`
-    : `${withDe(first).replace(/^d/, 'D')} ${withA(last)}`
 
-  return `${path} — ${meta.value.years_experience} ans à concevoir des interfaces qui tiennent la charge, sans jamais sacrifier le détail.`
+  if (locale.value === 'fr') {
+    const path = middle.length
+      ? `${withDe(first).replace(/^d/, 'D')} ${withA(last)}, en passant par ${middle.join(', ')}`
+      : `${withDe(first).replace(/^d/, 'D')} ${withA(last)}`
+    return `${path} — ${tail}`
+  }
+
+  const path = middle.length
+    ? fill(ui.value.intro.fromToVia, { first, last, middle: middle.join(', ') })
+    : fill(ui.value.intro.fromTo, { first, last })
+  return `${path} — ${tail}`
 })
 
 const words = computed(() => statement.value.split(' '))
@@ -69,7 +75,7 @@ onMounted(() => {
     <div class="refonte-container rf-intro__grid">
       <div class="rf-intro__side">
         <span class="rf-intro__ghost" aria-hidden="true">02</span>
-        <p class="refonte-label" v-reveal>Manifeste</p>
+        <p class="refonte-label" v-reveal>{{ ui.intro.label }}</p>
       </div>
 
       <div class="rf-intro__main">

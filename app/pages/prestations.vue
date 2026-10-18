@@ -1,19 +1,20 @@
 <script setup lang="ts">
 import { useRefonteTransition } from '@/composables/refonte/useRefonteTransition'
-import { MISSION_OFFER, PAGE_UNIQUE, SITE_MULTIPAGE } from '@/data/refonte-offers'
+import { getOfferCatalog, type OfferPane } from '@/i18n/offer-catalog'
 
 definePageMeta({ layout: 'refonte' })
 
-const { meta, sections } = useContent()
+const { meta, sections } = useLocalizedContent()
+const { ui, locale } = useUi()
 const { navigateTo } = useRefonteTransition()
 
+const pageTitle = computed(() => `${ui.value.pricing.pageTitle} — ${meta.value?.name ?? 'Portfolio'}`)
+
 useSeoMeta({
-  title: computed(() => `Prestations — ${meta.value?.name ?? 'Portfolio'}`),
-  description:
-    'Offres web sur devis et missions front Vue/Nuxt au TJM 500 €.',
-  ogTitle: computed(() => `Prestations — ${meta.value?.name ?? 'Portfolio'}`),
-  ogDescription:
-    'Landing, multipage, sur-mesure sur devis. Missions front Vue/Nuxt au TJM 500 €.',
+  title: pageTitle,
+  description: computed(() => ui.value.pricing.description),
+  ogTitle: pageTitle,
+  ogDescription: computed(() => ui.value.pricing.ogDescription),
   twitterCard: 'summary_large_image'
 })
 
@@ -49,20 +50,7 @@ type Category = {
   offers: Offer[]
 }
 
-function offerFromPane(
-  pane: {
-    id: string
-    name: string
-    tagline: string
-    duration: string
-    copy: Offer['copy']
-    skillsTitle: string
-    includes: readonly string[]
-    stack: readonly string[]
-    fit: string
-  },
-  featured: boolean
-): Offer {
+function offerFromPane(pane: OfferPane, featured: boolean): Offer {
   return {
     id: pane.id,
     name: pane.name,
@@ -77,99 +65,95 @@ function offerFromPane(
   }
 }
 
-const categories: Category[] = [
-  {
-    id: 'mission',
-    tab: 'Mission',
-    num: MISSION_OFFER.num,
-    kind: 'mission',
-    lead: MISSION_OFFER.tagline,
-    offers: [
-      {
-        id: 'mission',
-        name: MISSION_OFFER.name,
-        tagline: MISSION_OFFER.tagline,
-        showTjm: true,
-        tjmFront: MISSION_OFFER.tjm,
-        priceNote: 'TJM',
-        unit: MISSION_OFFER.unit,
-        duration: MISSION_OFFER.duration,
-        featured: true,
-        copy: MISSION_OFFER.copy,
-        skillsTitle: MISSION_OFFER.skillsTitle,
-        billing: MISSION_OFFER.billing,
-        includes: MISSION_OFFER.includes,
-        stack: MISSION_OFFER.stack,
-        fit: MISSION_OFFER.fit
-      }
-    ]
-  },
-  {
-    id: 'onepage',
-    tab: 'Page unique',
-    num: PAGE_UNIQUE.num,
-    kind: 'devis',
-    lead: PAGE_UNIQUE.lead,
-    offers: PAGE_UNIQUE.panes.map((pane, index) => offerFromPane(pane, index === 1))
-  },
-  {
-    id: 'multipage',
-    tab: 'Site multipage',
-    num: SITE_MULTIPAGE.num,
-    kind: 'devis',
-    lead: SITE_MULTIPAGE.lead,
-    offers: SITE_MULTIPAGE.panes.map((pane, index) => offerFromPane(pane, index === 1))
-  },
-  {
-    id: 'custom',
-    tab: 'Sur-mesure',
-    num: '04',
-    kind: 'devis',
-    lead: 'Motion, parcours riches, CMS ou contraintes fortes — chiffrage après brief.',
-    offers: [
-      {
-        id: 'complexe',
-        name: 'Projet complexe',
-        tagline: 'Motion, parcours, exigences fortes.',
-        duration: '6 semaines et +',
-        featured: false,
-        includes: [
-          'Storytelling au scroll (GSAP / scrub)',
-          'Parcours multi-étapes ou app front',
-          'Intégration CMS / Twig / Drupal si besoin',
-          'Perf, a11y et SEO exigeants',
-          'Design system léger & composants réutilisables',
-          'TMA / itérations post-livraison',
-          'Cadence Agile, points réguliers'
-        ],
-        stack: ['GSAP', 'Nuxt 4', 'Drupal / Twig', 'A11y'],
-        fit: 'Agences, produits, refontes premium.'
-      }
-    ]
-  }
-]
+const catalog = computed(() => getOfferCatalog(locale.value))
 
-type CategoryId = (typeof categories)[number]['id']
+const categories = computed<Category[]>(() => {
+  const current = catalog.value
+  return [
+    {
+      id: 'mission',
+      tab: current.mission.name,
+      num: current.mission.num,
+      kind: 'mission',
+      lead: current.mission.tagline,
+      offers: [
+        {
+          id: 'mission',
+          name: current.mission.name,
+          tagline: current.mission.tagline,
+          showTjm: true,
+          tjmFront: current.mission.tjm,
+          priceNote: ui.value.offers.tjmNote,
+          unit: current.mission.unit,
+          duration: current.mission.duration,
+          featured: true,
+          copy: current.mission.copy,
+          skillsTitle: current.mission.skillsTitle,
+          billing: current.mission.billing,
+          includes: current.mission.includes,
+          stack: current.mission.stack,
+          fit: current.mission.fit
+        }
+      ]
+    },
+    {
+      id: 'onepage',
+      tab: current.page.name,
+      num: current.page.num,
+      kind: 'devis',
+      lead: current.page.lead,
+      offers: current.page.panes.map((pane, index) => offerFromPane(pane, index === 1))
+    },
+    {
+      id: 'multipage',
+      tab: current.site.name,
+      num: current.site.num,
+      kind: 'devis',
+      lead: current.site.lead,
+      offers: current.site.panes.map((pane, index) => offerFromPane(pane, index === 1))
+    },
+    {
+      id: 'custom',
+      tab: current.custom.tab,
+      num: current.custom.num,
+      kind: 'devis',
+      lead: current.custom.lead,
+      offers: [
+        {
+          id: 'complexe',
+          name: current.custom.name,
+          tagline: current.custom.tagline,
+          duration: current.custom.duration,
+          featured: false,
+          includes: current.custom.includes,
+          stack: current.custom.stack,
+          fit: current.custom.fit
+        }
+      ]
+    }
+  ]
+})
+
+type CategoryId = Category['id']
 
 const activeId = ref<CategoryId>('mission')
 const activeCategory = computed(
-  () => categories.find((category) => category.id === activeId.value) ?? categories[0]
+  () => categories.value.find((category) => category.id === activeId.value) ?? categories.value[0]!
 )
 const accordionMode = ref(true)
 const termsMode = computed(() => activeCategory.value.kind)
 const activeTerms = computed(() =>
-  termsMode.value === 'mission' ? termsMission : termsDevis
+  termsMode.value === 'mission' ? catalog.value.termsMission : catalog.value.termsDevis
 )
 
-const switchSets = {
-  onepage: PAGE_UNIQUE,
-  multipage: SITE_MULTIPAGE
-} as const
-
-const switchSet = computed(() => switchSets[activeId.value as keyof typeof switchSets] ?? null)
-const switchPaneId = ref(PAGE_UNIQUE.panes[0].id)
+const switchSet = computed(() => {
+  if (activeId.value === 'onepage') return catalog.value.page
+  if (activeId.value === 'multipage') return catalog.value.site
+  return null
+})
+const switchPaneId = ref('landing')
 const switchLabel = computed(() =>
-  activeId.value === 'multipage' ? 'Type de site multipage' : 'Type de page unique'
+  activeId.value === 'multipage' ? ui.value.pricing.siteType : ui.value.pricing.pageType
 )
 
 const visibleOffers = computed(() => {
@@ -197,48 +181,14 @@ function onSwitchPaneKeydown(event: KeyboardEvent, index: number) {
   document.getElementById(`rf-pricing-switch-tab-${panes[next].id}`)?.focus()
 }
 
-const termsMission = [
-  {
-    title: 'Cadre',
-    text: 'Mission au TJM : 500 € HT / jour. Facturation au réel.'
-  },
-  {
-    title: 'Accord',
-    text: 'Un échange (brief + disponibilités) fixe le démarrage. Pas d’acompte forfaitaire : engagement au temps.'
-  },
-  {
-    title: 'Démarrage',
-    text: 'La mission démarre à la date convenue, après confirmation écrite (mail ou contrat de mission).'
-  },
-  {
-    title: 'Facturation',
-    text: 'Facturation en fin de chaque mois, au réel des jours effectués.'
-  }
-]
-
-const termsDevis = [
-  {
-    title: 'Brief',
-    text: 'Objectifs, contenus, délais et contraintes. Le devis découle de ce périmètre.'
-  },
-  {
-    title: 'Devis visé',
-    text: 'Acceptation par signature ou « bon pour accord ». Ce visa formalise la commande.'
-  },
-  {
-    title: 'Acompte',
-    text: 'Acompte de 40 % HT à la commande, déduit de la facture finale. Ce n’est pas des arrhes.'
-  },
-  {
-    title: 'Démarrage & solde',
-    text: 'Travaux après devis visé + acompte. Solde (60 %) à la livraison des livrables.'
-  }
-]
-
 const openOfferId = ref<string | null>(defaultOpenOfferId())
 
 watch(activeId, (id) => {
-  const set = switchSets[id as keyof typeof switchSets]
+  const set = id === 'onepage'
+    ? catalog.value.page
+    : id === 'multipage'
+      ? catalog.value.site
+      : null
   if (set) switchPaneId.value = set.panes[0].id
   openOfferId.value = defaultOpenOfferId()
 })
@@ -273,7 +223,7 @@ function selectCategory(id: CategoryId) {
 }
 
 function onTabKeydown(event: KeyboardEvent, index: number) {
-  const last = categories.length - 1
+  const last = categories.value.length - 1
   let next = index
 
   if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
@@ -289,9 +239,9 @@ function onTabKeydown(event: KeyboardEvent, index: number) {
   }
 
   event.preventDefault()
-  selectCategory(categories[next].id)
+  selectCategory(categories.value[next]!.id)
   nextTick(() => {
-    document.getElementById(`rf-pricing-tab-${categories[next].id}`)?.focus()
+    document.getElementById(`rf-pricing-tab-${categories.value[next]!.id}`)?.focus()
   })
 }
 
@@ -326,13 +276,13 @@ onMounted(() => {
     </div>
     <div class="rf-pricing" data-scroll-section data-rf-chapter="Prestations">
     <header class="refonte-container rf-pricing__hero">
-      <p class="refonte-label" v-reveal>03 — Prestations</p>
+      <p class="refonte-label" v-reveal>{{ ui.pricing.kicker }}</p>
       <h1 class="refonte-display rf-pricing__title" v-reveal="{ delay: 50 }">
-        Offres
-        <span class="refonte-serif rf-pricing__title-accent">& missions</span>
+        {{ ui.pricing.title }}
+        <span class="refonte-serif rf-pricing__title-accent">{{ ui.pricing.titleAccent }}</span>
       </h1>
       <p class="rf-pricing__lead" v-reveal="{ delay: 100 }">
-        Forfaits chiffrés après brief, ou mission au TJM 500 € / jour.
+        {{ ui.pricing.lead }}
       </p>
       <p class="rf-pricing__availability" v-reveal="{ delay: 140 }">
         {{ sections.a_propos.availability }}
@@ -343,14 +293,14 @@ onMounted(() => {
         v-reveal="{ delay: 180 }"
         @click="scrollToConditions"
       >
-        <span>Voir les conditions</span>
+        <span>{{ ui.pricing.jump }}</span>
         <span class="rf-pricing__jump-arrow" aria-hidden="true" />
       </a>
     </header>
 
     <div class="refonte-container rf-pricing__offers" v-reveal="{ delay: 160 }">
       <div class="rf-pricing__tabs-track">
-        <div class="rf-pricing__tabs" role="tablist" aria-label="Familles d’offres">
+        <div class="rf-pricing__tabs" role="tablist" :aria-label="ui.pricing.families">
           <button
             v-for="(category, index) in categories"
             :id="`rf-pricing-tab-${category.id}`"
@@ -457,9 +407,9 @@ onMounted(() => {
                 <p class="rf-pricing__card-duration">{{ offer.duration }}</p>
               </template>
               <template v-else>
-                <span class="rf-pricing__card-price-note">Tarif</span>
+                <span class="rf-pricing__card-price-note">{{ ui.pricing.rate }}</span>
                 <p class="rf-pricing__card-price-value rf-pricing__card-price-value--soft">
-                  <span>Sur devis</span>
+                  <span>{{ ui.pricing.onQuote }}</span>
                 </p>
                 <p class="rf-pricing__card-duration">{{ offer.duration }}</p>
               </template>
@@ -491,7 +441,7 @@ onMounted(() => {
               class="refonte-btn refonte-btn--ghost rf-pricing__cta"
               @click="goContact"
             >
-              {{ offer.showTjm ? 'Mission' : 'Devis' }}
+              {{ offer.showTjm ? ui.pricing.ctaMission : ui.pricing.ctaQuote }}
             </a>
             </div>
           </article>
@@ -504,19 +454,19 @@ onMounted(() => {
       class="refonte-container rf-pricing__note"
       v-reveal
     >
-      <p class="refonte-label">Conditions</p>
+      <p class="refonte-label">{{ ui.pricing.conditions }}</p>
       <h2 class="refonte-display rf-pricing__note-title">
-        Comment ça démarre
+        {{ ui.pricing.how }}
       </h2>
       <p class="rf-pricing__note-intro">
-        Les règles suivent le cadre de l’onglet choisi : mission au TJM, ou devis pour les autres offres.
+        {{ ui.pricing.intro }}
       </p>
 
       <div
         v-if="activeCategory.kind === 'devis'"
         class="rf-pricing__terms-switch"
         role="tablist"
-        aria-label="Type de conditions"
+        :aria-label="ui.pricing.termsType"
       >
         <button
           type="button"
@@ -527,7 +477,7 @@ onMounted(() => {
           :disabled="termsMode !== 'mission'"
           :class="{ 'is-active': termsMode === 'mission' }"
         >
-          Mission
+          {{ ui.pricing.mission }}
         </button>
         <button
           type="button"
@@ -538,7 +488,7 @@ onMounted(() => {
           :disabled="termsMode !== 'devis'"
           :class="{ 'is-active': termsMode === 'devis' }"
         >
-          Devis
+          {{ ui.pricing.quote }}
         </button>
       </div>
 
@@ -549,15 +499,14 @@ onMounted(() => {
         </li>
       </ol>
       <p class="rf-pricing__terms-aside">
-        Facturation en HT (TVA selon régime). En cas d’annulation après démarrage, le travail
-        déjà réalisé reste dû.
+        {{ ui.pricing.aside }}
       </p>
       <a
         href="/contact"
         class="refonte-btn rf-pricing__note-cta"
         @click="goContact"
       >
-        Contact
+        {{ ui.pricing.contact }}
       </a>
     </section>
     </div>

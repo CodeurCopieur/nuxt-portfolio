@@ -9,32 +9,9 @@ import {
 import { RF_A11Y_CHANGE_EVENT, restoreRfScrollSnap, rfMotionReduced } from '@/composables/refonte/useRefonteA11y'
 import { useRefonteScroll } from '@/composables/refonte/useRefonteScroll'
 
-const { sections } = useContent()
+const { sections } = useLocalizedContent()
+const { ui } = useUi()
 const { scroll, ready, refresh } = useRefonteScroll()
-
-const CATEGORY_LABELS: Record<string, string> = {
-  langages: 'Langages',
-  frameworks: 'Frameworks',
-  outils_dev: 'Outils',
-  ui_animations: 'UI & motion',
-  design: 'Design',
-  environnements: 'Environnements',
-  methodes: 'Méthodes',
-  ia_cursor: 'IA',
-  accessibilite: 'Accessibilité'
-}
-
-const RADAR_LABELS: Record<string, string> = {
-  langages: 'Langages',
-  frameworks: 'Frameworks',
-  outils_dev: 'Outils',
-  ui_animations: 'UI & motion',
-  design: 'Design',
-  environnements: 'Environnements',
-  methodes: 'Méthodes',
-  ia_cursor: 'IA & Cursor',
-  accessibilite: 'Accessibilité'
-}
 
 const scrollerRef = ref<HTMLElement | null>(null)
 const smooth = ref(0)
@@ -101,7 +78,12 @@ function checkScrollIdle() {
 }
 
 function labelFor(key: string) {
-  return CATEGORY_LABELS[key] ?? key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+  return ui.value.expertise.categories[key] ?? key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+}
+
+function radarLabelFor(key: string) {
+  const label = labelFor(key)
+  return key === 'ia_cursor' ? `${label} & Cursor` : label
 }
 
 const categories = computed(() => {
@@ -113,7 +95,7 @@ const categories = computed(() => {
     .map((key) => ({
       key,
       label: labelFor(key),
-      radarLabel: RADAR_LABELS[key] ?? labelFor(key),
+      radarLabel: radarLabelFor(key),
       skills: sections.value.competences[key] ?? [],
       avg: categoryAvg(key, sections.value.competences[key] ?? []),
       letter: categoryLetter(key, sections.value.competences[key] ?? [])
@@ -159,9 +141,9 @@ function selectStaticCategory(index: number) {
 const totalSkills = computed(() => categories.value.reduce((n, c) => n + c.skills.length, 0))
 
 const statTargets = computed(() => [
-  { target: sections.value.experiences.length, label: 'Missions', pad: 2 },
-  { target: totalSkills.value, label: 'Technologies', pad: 2 },
-  { target: categories.value.length, label: 'Domaines', pad: 2 }
+  { target: sections.value.experiences.length, label: ui.value.expertise.missions, pad: 2 },
+  { target: totalSkills.value, label: ui.value.expertise.technologies, pad: 2 },
+  { target: categories.value.length, label: ui.value.expertise.domains, pad: 2 }
 ])
 
 function span(p: number, start: number, end: number) {
@@ -333,10 +315,10 @@ function isAxisActive(index: number) {
 }
 
 const actLabel = computed(() => {
-  if (p.value < 0.24) return '01 — Chiffres'
-  if (p.value < DETAIL_START) return '02 — Radar'
-  if (isChoreographyComplete.value) return 'Fin — Parcours complet'
-  return activeCategory.value ? `03 — ${activeCategory.value.label}` : '03 — Détail'
+  if (p.value < 0.24) return ui.value.expertise.actNumbers
+  if (p.value < DETAIL_START) return ui.value.expertise.actRadar
+  if (isChoreographyComplete.value) return ui.value.expertise.actDone
+  return activeCategory.value ? `03 — ${activeCategory.value.label}` : ui.value.expertise.actDetail
 })
 
 function pad(n: number) {
@@ -571,10 +553,10 @@ onUnmounted(() => {
         <div class="refonte-container rf-expertise__frame">
           <header class="rf-expertise__head">
             <div>
-              <p class="refonte-label">04 — Savoir-faire</p>
-              <h2 class="refonte-display rf-expertise__title">Compétences</h2>
+              <p class="refonte-label">{{ ui.expertise.kicker }}</p>
+              <h2 class="refonte-display rf-expertise__title">{{ ui.expertise.title }}</h2>
               <p v-if="isDesktop && reduceMotion" class="rf-expertise__hint">
-                Cliquez une note du radar (A, B, C…) pour afficher le détail de la compétence.
+                {{ ui.expertise.hint }}
               </p>
             </div>
             <p class="rf-expertise__act" aria-hidden="true">{{ actLabel }}</p>

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'refonte' })
 
-const { meta } = useContent()
+const { meta } = useLocalizedContent()
+const { ui } = useUi()
 
 useHead({
-  title: computed(() => `Contact — ${meta.value?.name ?? 'Portfolio'}`)
+  title: computed(() => `${ui.value.contact.pageTitle} — ${meta.value?.name ?? 'Portfolio'}`)
 })
 </script>
 

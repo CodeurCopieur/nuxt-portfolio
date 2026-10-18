@@ -1,141 +1,117 @@
 <script setup lang="ts">
-import { formatLegalAddress, LEGAL_ENTITY, LEGAL_THIRD_PARTIES } from '@/constants/legal'
+import { LEGAL_ENTITY, LEGAL_THIRD_PARTIES } from '@/constants/legal'
+import { fill } from '@/i18n/ui'
 
 definePageMeta({ layout: 'refonte' })
 
-const { meta } = useContent()
+const { meta } = useLocalizedContent()
+const { ui } = useUi()
 const siteUrl = computed(() => useRequestURL().origin)
+const copy = computed(() => ui.value.privacy)
+const address = computed(() => {
+  const { line1, postalCode, city } = LEGAL_ENTITY.address
+  return `${line1}, ${postalCode} ${city}, ${ui.value.entity.country}`
+})
 
 useHead({
-  title: computed(() => `Politique de confidentialité — ${meta.value?.name ?? 'Portfolio'}`)
+  title: computed(() => `${copy.value.pageTitle} — ${meta.value?.name ?? 'Portfolio'}`)
 })
 </script>
 
 <template>
   <RefonteLegalPage
-    title="Politique de confidentialité"
-    lead="Comment vos données sont collectées, utilisées et protégées sur ce site."
+    :title="copy.title"
+    :lead="copy.lead"
   >
     <section>
-      <h2>Responsable du traitement</h2>
+      <h2>{{ copy.controllerTitle }}</h2>
       <p>
-        {{ LEGAL_ENTITY.businessName }} — {{ LEGAL_ENTITY.legalForm }}<br>
-        {{ formatLegalAddress() }}<br>
-        Contact :
+        {{ LEGAL_ENTITY.businessName }} — {{ ui.entity.legalForm }}<br>
+        {{ address }}<br>
+        {{ copy.contact }}
         <a :href="`mailto:${LEGAL_ENTITY.email}`">{{ LEGAL_ENTITY.email }}</a>
         · {{ LEGAL_ENTITY.phone }}
       </p>
     </section>
 
     <section>
-      <h2>Données collectées</h2>
-      <p>Les données personnelles susceptibles d'être traitées sur {{ siteUrl }} sont les suivantes :</p>
+      <h2>{{ copy.collectedTitle }}</h2>
+      <p>{{ fill(copy.collectedIntro, { url: siteUrl }) }}</p>
       <ul>
-        <li>
-          <strong>Formulaire de contact</strong> : nom, adresse e-mail et contenu du message que vous
-          choisissez de transmettre.
-        </li>
-        <li>
-          <strong>Données techniques</strong> : logs de connexion, adresse IP, type de navigateur,
-          pages consultées et horodatages, collectés automatiquement par l'hébergeur et les outils de
-          mesure d'audience.
-        </li>
-        <li>
-          <strong>Cookies et traceurs</strong> : cookies techniques nécessaires au fonctionnement du site
-          et traceurs de mesure d'audience et de performance (Vercel Web Analytics et Speed Insights),
-          sans cookies publicitaires.
-        </li>
+        <li><strong>{{ copy.formItem }}</strong></li>
+        <li><strong>{{ copy.techItem }}</strong></li>
+        <li><strong>{{ copy.cookieItem }}</strong></li>
       </ul>
     </section>
 
     <section>
-      <h2>Finalités du traitement</h2>
+      <h2>{{ copy.purposesTitle }}</h2>
       <ul>
-        <li>Répondre aux demandes envoyées via le formulaire de contact.</li>
-        <li>Assurer la sécurité, la maintenance et le bon fonctionnement du site.</li>
-        <li>Mesurer l'audience (pages vues) et les performances, afin d'améliorer l'expérience.</li>
-        <li>Respecter les obligations légales applicables.</li>
+        <li>{{ copy.purpose1 }}</li>
+        <li>{{ copy.purpose2 }}</li>
+        <li>{{ copy.purpose3 }}</li>
+        <li>{{ copy.purpose4 }}</li>
       </ul>
     </section>
 
     <section>
-      <h2>Base légale</h2>
+      <h2>{{ copy.basisTitle }}</h2>
       <ul>
-        <li>Intérêt légitime pour la sécurité du site et l'amélioration de l'expérience.</li>
-        <li>Exécution de mesures précontractuelles à votre demande (prise de contact).</li>
-        <li>Consentement lorsque requis pour certains traceurs non essentiels.</li>
+        <li>{{ copy.basis1 }}</li>
+        <li>{{ copy.basis2 }}</li>
+        <li>{{ copy.basis3 }}</li>
       </ul>
     </section>
 
     <section>
-      <h2>Destinataires et sous-traitants</h2>
-      <p>Vos données peuvent être transmises aux prestataires suivants, dans la limite de leurs missions :</p>
+      <h2>{{ copy.recipientsTitle }}</h2>
+      <p>{{ copy.recipientsIntro }}</p>
       <ul>
         <li>
-          <strong>Vercel Inc.</strong> — hébergement du site, mesure d'audience (Web Analytics)
-          et mesure de performance (Speed Insights)
-          (<a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">politique de confidentialité</a>).
+          <strong>{{ copy.vercel }}</strong>
+          (<a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">{{ copy.vercelPolicy }}</a>).
         </li>
         <li>
-          <strong>{{ LEGAL_THIRD_PARTIES.emailjs.name }}</strong> — transmission des messages du formulaire
-          de contact
-          (<a :href="LEGAL_THIRD_PARTIES.emailjs.website" target="_blank" rel="noopener">site web</a>).
+          <strong>{{ fill(copy.emailjs, { name: LEGAL_THIRD_PARTIES.emailjs.name }) }}</strong>
+          (<a :href="LEGAL_THIRD_PARTIES.emailjs.website" target="_blank" rel="noopener">{{ copy.emailjsSite }}</a>).
         </li>
       </ul>
-      <p>Aucune donnée n'est vendue à des tiers.</p>
+      <p>{{ copy.noSale }}</p>
     </section>
 
     <section>
-      <h2>Durée de conservation</h2>
+      <h2>{{ copy.retentionTitle }}</h2>
       <ul>
-        <li>Messages de contact : jusqu'à 3 ans à compter du dernier échange.</li>
-        <li>Données techniques et logs : durée limitée conformément aux obligations de l'hébergeur.</li>
-        <li>
-          Données de mesure d'audience : 30 jours pour Vercel Web Analytics (plan Hobby) ;
-          durées propres à Vercel Speed Insights pour les métriques de performance.
-        </li>
+        <li>{{ copy.retention1 }}</li>
+        <li>{{ copy.retention2 }}</li>
+        <li>{{ copy.retention3 }}</li>
       </ul>
     </section>
 
     <section>
-      <h2>Vos droits</h2>
+      <h2>{{ copy.rightsTitle }}</h2>
+      <p>{{ copy.rights }}</p>
       <p>
-        Conformément au Règlement général sur la protection des données (RGPD) et à la loi Informatique
-        et Libertés, vous disposez des droits suivants : accès, rectification, effacement, limitation,
-        opposition et portabilité de vos données lorsque applicable.
-      </p>
-      <p>
-        Pour exercer vos droits, contactez :
+        {{ copy.rightsContact }}
         <a :href="`mailto:${LEGAL_ENTITY.email}`">{{ LEGAL_ENTITY.email }}</a>.
-        Vous pouvez également introduire une réclamation auprès de la CNIL
+        {{ copy.cnil }}
         (<a href="https://www.cnil.fr" target="_blank" rel="noopener">www.cnil.fr</a>).
       </p>
     </section>
 
     <section>
-      <h2>Cookies</h2>
-      <p>
-        Le site peut déposer des cookies strictement nécessaires à son fonctionnement. Vercel Web Analytics
-        ne repose pas sur des cookies : il mesure les pages vues de façon anonymisée. Speed Insights
-        mesure les performances. Vous pouvez configurer votre navigateur pour bloquer les scripts
-        d'analyse ; cela n'empêche pas la navigation.
-      </p>
+      <h2>{{ copy.cookiesTitle }}</h2>
+      <p>{{ copy.cookies }}</p>
     </section>
 
     <section>
-      <h2>Sécurité</h2>
-      <p>
-        {{ LEGAL_ENTITY.businessName }} met en œuvre des mesures techniques et organisationnelles
-        appropriées pour protéger vos données contre l'accès non autorisé, la perte ou la divulgation.
-      </p>
+      <h2>{{ copy.securityTitle }}</h2>
+      <p>{{ fill(copy.security, { name: LEGAL_ENTITY.businessName }) }}</p>
     </section>
 
     <section>
-      <h2>Modifications</h2>
-      <p>
-        La présente politique peut être mise à jour pour refléter l'évolution du site ou de la
-        réglementation. La date de dernière mise à jour figure en haut de cette page.
-      </p>
+      <h2>{{ copy.changesTitle }}</h2>
+      <p>{{ copy.changes }}</p>
     </section>
   </RefonteLegalPage>
 </template>

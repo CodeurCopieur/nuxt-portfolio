@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { PortfolioProject } from '~/types/portfolio'
 import { sortProjectsByYear } from '~/utils/sort-projects'
+import { fill } from '@/i18n/ui'
 
-const { sections } = useContent()
+const { sections } = useLocalizedContent()
+const { ui, locale } = useUi()
 
 const activeTech = ref<string | null>(null)
 
@@ -16,7 +18,7 @@ const techFilters = computed(() => {
   for (const project of allProjects.value) {
     project.stack.forEach((item) => set.add(item))
   }
-  return [...set].sort((a, b) => a.localeCompare(b, 'fr'))
+  return [...set].sort((a, b) => a.localeCompare(b, locale.value))
 })
 
 function projectMatchesTech(project: PortfolioProject, tech: string) {
@@ -44,23 +46,23 @@ function selectTech(tech: string | null) {
 <template>
   <div class="rf-projects">
     <div class="refonte-container rf-projects__head">
-      <p class="refonte-label" v-reveal>Archives</p>
-      <h1 class="refonte-display rf-projects__title" v-reveal="{ delay: 60 }">Tous les projets</h1>
+      <p class="refonte-label" v-reveal>{{ ui.archive.label }}</p>
+      <h1 class="refonte-display rf-projects__title" v-reveal="{ delay: 60 }">{{ ui.archive.title }}</h1>
       <p class="rf-projects__lead" v-reveal="{ delay: 120 }">
-        {{ allProjects.length }} réalisations — filtrez par technologie pour cibler une stack.
+        {{ fill(ui.archive.lead, { n: allProjects.length }) }}
       </p>
     </div>
 
     <div class="refonte-container rf-projects__filters">
       <div class="rf-projects__filters-track">
-        <div class="rf-projects__tabs" role="group" aria-label="Filtrer par technologie">
+        <div class="rf-projects__tabs" role="group" :aria-label="ui.archive.filter">
           <button
             type="button"
             class="rf-projects__tab"
             :class="{ 'is-active': !activeTech }"
             @click="selectTech(null)"
           >
-            Tous
+            {{ ui.archive.all }}
           </button>
           <button
             v-for="tech in techFilters"
@@ -76,7 +78,7 @@ function selectTech(tech: string | null) {
         </div>
       </div>
       <p class="rf-projects__count" aria-live="polite">
-        {{ filteredProjects.length }} projet{{ filteredProjects.length > 1 ? 's' : '' }}
+        {{ fill(filteredProjects.length > 1 ? ui.archive.countMany : ui.archive.countOne, { n: filteredProjects.length }) }}
       </p>
     </div>
 

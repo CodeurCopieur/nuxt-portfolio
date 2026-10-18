@@ -1,13 +1,16 @@
 <script setup lang="ts">
+import { fill } from '@/i18n/ui'
+
 definePageMeta({ layout: 'refonte' })
 
-const { meta } = useContent()
+const { meta } = useLocalizedContent()
+const { ui } = useUi()
 
-const pageTitle = computed(() => `${meta.value.name} — Développeur front-end`)
+const pageTitle = computed(() => fill(ui.value.seo.homeTitle, { name: meta.value.name }))
 const pageDescription = computed(() => {
   const tagline = meta.value?.tagline?.trim()
-  if (tagline) return `${tagline} Portfolio front-end Nuxt & Vue — interfaces performantes et accessibles.`
-  return 'Widdy Louis — développeur front-end freelance. Interfaces web performantes, accessibles et animées.'
+  if (tagline) return fill(ui.value.seo.homeWithTagline, { tagline })
+  return ui.value.seo.homeFallback
 })
 
 useSeoMeta({
@@ -24,7 +27,7 @@ useSeoMeta({
 useSchemaOrg([
   definePerson({
     name: () => meta.value.name || 'Widdy Louis',
-    jobTitle: () => meta.value.role || 'Développeur Front-End',
+    jobTitle: () => meta.value.role || ui.value.seo.roleFallback,
     url: 'https://www.linkedin.com/in/widdy-louis/',
     sameAs: [
       'https://www.linkedin.com/in/widdy-louis/',

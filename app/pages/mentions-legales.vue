@@ -1,75 +1,84 @@
 <script setup lang="ts">
 import {
-  formatLegalAddress,
   LEGAL_ENTITY,
   LEGAL_HOSTING,
   LEGAL_THIRD_PARTIES
 } from '@/constants/legal'
+import { fill } from '@/i18n/ui'
 
 definePageMeta({ layout: 'refonte' })
 
-const { meta } = useContent()
+const { meta } = useLocalizedContent()
+const { ui } = useUi()
 const siteUrl = computed(() => useRequestURL().origin)
+const copy = computed(() => ui.value.mentions)
+const address = computed(() => {
+  const { line1, postalCode, city } = LEGAL_ENTITY.address
+  return `${line1}, ${postalCode} ${city}, ${ui.value.entity.country}`
+})
+const hostingAddress = computed(() =>
+  LEGAL_HOSTING.address.replace('États-Unis', ui.value.entity.hostingCountry)
+)
 
 useHead({
-  title: computed(() => `Mentions légales — ${meta.value?.name ?? 'Portfolio'}`)
+  title: computed(() => `${copy.value.pageTitle} — ${meta.value?.name ?? 'Portfolio'}`)
 })
 </script>
 
 <template>
   <RefonteLegalPage
-    title="Mentions légales"
-    lead="Informations légales relatives à l'édition et à l'hébergement du site portfolio."
+    :title="copy.title"
+    :lead="copy.lead"
   >
     <section>
-      <h2>Éditeur du site</h2>
+      <h2>{{ copy.publisher }}</h2>
       <dl>
         <div>
-          <dt>Raison sociale</dt>
+          <dt>{{ copy.businessName }}</dt>
           <dd>{{ LEGAL_ENTITY.businessName }}</dd>
         </div>
         <div>
-          <dt>Nom commercial</dt>
+          <dt>{{ copy.tradeName }}</dt>
           <dd>{{ LEGAL_ENTITY.tradeName }}</dd>
         </div>
         <div>
-          <dt>Forme juridique</dt>
-          <dd>{{ LEGAL_ENTITY.legalForm }}</dd>
+          <dt>{{ copy.legalForm }}</dt>
+          <dd>{{ ui.entity.legalForm }}</dd>
         </div>
         <div>
-          <dt>SIREN</dt>
+          <dt>{{ copy.siren }}</dt>
           <dd>{{ LEGAL_ENTITY.siren }}</dd>
         </div>
         <div>
-          <dt>SIRET (siège)</dt>
+          <dt>{{ copy.siret }}</dt>
           <dd>{{ LEGAL_ENTITY.siret }}</dd>
         </div>
         <div>
-          <dt>Numéro de TVA intracommunautaire</dt>
+          <dt>{{ copy.vat }}</dt>
           <dd>{{ LEGAL_ENTITY.vatNumber }}</dd>
         </div>
         <div>
-          <dt>Immatriculation</dt>
-          <dd>{{ LEGAL_ENTITY.rneStatus }} · {{ LEGAL_ENTITY.rcsStatus }}</dd>
+          <dt>{{ copy.registration }}</dt>
+          <dd>{{ ui.entity.rne }} · {{ ui.entity.rcs }}</dd>
         </div>
         <div>
-          <dt>Activité</dt>
-          <dd>{{ LEGAL_ENTITY.activity }} (code NAF {{ LEGAL_ENTITY.nafCode }})</dd>
+          <dt>{{ copy.activity }}</dt>
+          <dd>{{ ui.entity.activity }} ({{ fill(copy.naf, { code: LEGAL_ENTITY.nafCode }) }})</dd>
         </div>
         <div>
-          <dt>Adresse du siège</dt>
-          <dd>{{ formatLegalAddress() }}</dd>
+          <dt>{{ copy.address }}</dt>
+          <dd>{{ address }}</dd>
         </div>
         <div>
-          <dt>Domiciliation</dt>
+          <dt>{{ copy.domiciliation }}</dt>
           <dd>{{ LEGAL_ENTITY.domiciliation }}</dd>
         </div>
         <div>
-          <dt>Date de création</dt>
-          <dd>{{ LEGAL_ENTITY.creationDate }}</dd>
+          <dt>{{ copy.created }}</dt>
+          <dd>{{ ui.entity.created }}</dd>
         </div>
         <div>
-          <dt>Contact</dt>
+          <dt>{{ copy.contact }}</dt>
           <dd>
             <a :href="`mailto:${LEGAL_ENTITY.email}`">{{ LEGAL_ENTITY.email }}</a>
             · {{ LEGAL_ENTITY.phone }}
@@ -79,66 +88,50 @@ useHead({
     </section>
 
     <section>
-      <h2>Directeur de la publication</h2>
-      <p>{{ LEGAL_ENTITY.director }}, en qualité de chef d'entreprise.</p>
+      <h2>{{ copy.directorTitle }}</h2>
+      <p>{{ fill(copy.director, { name: LEGAL_ENTITY.director }) }}</p>
     </section>
 
     <section>
-      <h2>Hébergement</h2>
+      <h2>{{ copy.hostingTitle }}</h2>
       <p>
-        Le site est hébergé par {{ LEGAL_HOSTING.name }}, {{ LEGAL_HOSTING.address }}.
-        Site web :
+        {{ fill(copy.hosting, { name: LEGAL_HOSTING.name, address: hostingAddress }) }}
+        {{ copy.website }}
         <a :href="LEGAL_HOSTING.website" target="_blank" rel="noopener">{{ LEGAL_HOSTING.website }}</a>.
       </p>
     </section>
 
     <section>
-      <h2>Propriété intellectuelle</h2>
-      <p>
-        L'ensemble des éléments composant le site {{ siteUrl }} (textes, visuels, code source,
-        identité graphique, animations) est la propriété exclusive de {{ LEGAL_ENTITY.businessName }},
-        sauf mention contraire. Toute reproduction, représentation ou exploitation, totale ou
-        partielle, sans autorisation écrite préalable est interdite.
-      </p>
+      <h2>{{ copy.ipTitle }}</h2>
+      <p>{{ fill(copy.ip, { url: siteUrl, name: LEGAL_ENTITY.businessName }) }}</p>
     </section>
 
     <section>
-      <h2>Services tiers</h2>
+      <h2>{{ copy.thirdTitle }}</h2>
       <ul>
-        <li>
-          {{ LEGAL_THIRD_PARTIES.emailjs.name }} — {{ LEGAL_THIRD_PARTIES.emailjs.purpose }}.
-        </li>
-        <li>
-          {{ LEGAL_THIRD_PARTIES.vercelAnalytics.name }} — {{ LEGAL_THIRD_PARTIES.vercelAnalytics.purpose }}.
-        </li>
-        <li>
-          {{ LEGAL_THIRD_PARTIES.vercelWebAnalytics.name }} — {{ LEGAL_THIRD_PARTIES.vercelWebAnalytics.purpose }}.
-        </li>
+        <li>{{ LEGAL_THIRD_PARTIES.emailjs.name }} — {{ ui.entity.emailjs }}.</li>
+        <li>{{ LEGAL_THIRD_PARTIES.vercelAnalytics.name }} — {{ ui.entity.speed }}.</li>
+        <li>{{ LEGAL_THIRD_PARTIES.vercelWebAnalytics.name }} — {{ ui.entity.analytics }}.</li>
       </ul>
     </section>
 
     <section>
-      <h2>Données personnelles</h2>
+      <h2>{{ copy.dataTitle }}</h2>
       <p>
-        Pour en savoir plus sur la collecte et le traitement de vos données, consultez la
-        <RefonteLink to="/confidentialite">politique de confidentialité</RefonteLink>.
+        {{ copy.data }}
+        <RefonteLink to="/confidentialite">{{ copy.privacyLink }}</RefonteLink>.
       </p>
     </section>
 
     <section>
-      <h2>Limitation de responsabilité</h2>
-      <p>
-        {{ LEGAL_ENTITY.businessName }} s'efforce d'assurer l'exactitude des informations diffusées
-        sur ce site. Toutefois, elle ne saurait être tenue responsable des erreurs, omissions ou
-        indisponibilités temporaires du service, ni des dommages résultant de l'utilisation du site
-        ou de sites tiers accessibles via des liens hypertextes.
-      </p>
+      <h2>{{ copy.liabilityTitle }}</h2>
+      <p>{{ fill(copy.liability, { name: LEGAL_ENTITY.businessName }) }}</p>
     </section>
 
     <section>
-      <h2>Source des informations d'entreprise</h2>
+      <h2>{{ copy.sourceTitle }}</h2>
       <p>
-        Informations légales issues du registre des entreprises, consultables sur
+        {{ copy.source }}
         <a :href="LEGAL_ENTITY.pappersUrl" target="_blank" rel="noopener">Pappers</a>.
       </p>
     </section>

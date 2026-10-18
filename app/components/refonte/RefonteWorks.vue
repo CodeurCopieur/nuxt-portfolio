@@ -3,8 +3,10 @@ import { RF_A11Y_CHANGE_EVENT, restoreRfScrollSnap, rfMotionReduced } from '@/co
 import { useRefonteScroll } from '@/composables/refonte/useRefonteScroll'
 import { useRefonteTransition } from '@/composables/refonte/useRefonteTransition'
 import type { PortfolioProject } from '~/types/portfolio'
+import { fill } from '@/i18n/ui'
 
-const { featuredWorks } = useContent()
+const { featuredWorks } = useLocalizedContent()
+const { ui } = useUi()
 const { scroll, ready, refresh } = useRefonteScroll()
 const { navigateTo } = useRefonteTransition()
 
@@ -143,11 +145,14 @@ const listOpacity = computed(() => {
 const listVisible = computed(() => listOpacity.value > 0.02 || !isDesktop.value)
 
 const actLabel = computed(() => {
-  if (p.value < FOCUS_START) return '01 — Projets'
+  if (p.value < FOCUS_START) return ui.value.works.actProjects
   if (p.value < LIST_START) {
-    return `02 — Focus ${pad(focusIndex.value)}/${pad(Math.max(total.value - 1, 0))}`
+    return fill(ui.value.works.actFocus, {
+      current: pad(focusIndex.value),
+      total: pad(Math.max(total.value - 1, 0))
+    })
   }
-  return '03 — Liste'
+  return ui.value.works.actList
 })
 
 function rowStyle(index: number) {
@@ -284,16 +289,16 @@ onUnmounted(() => {
         <div class="refonte-container rf-works__frame">
           <header class="rf-works__head">
             <div class="rf-works__head-main">
-              <p class="refonte-label">03 — Réalisations</p>
+              <p class="refonte-label">{{ ui.works.kicker }}</p>
               <h2 class="refonte-display rf-works__title">
-                Travaux
-                <span class="refonte-serif rf-works__title-serif">sélectionnés</span>
+                {{ ui.works.title }}
+                <span class="refonte-serif rf-works__title-serif">{{ ui.works.titleAccent }}</span>
               </h2>
             </div>
             <div class="rf-works__head-side">
               <p class="rf-works__act" aria-hidden="true">{{ actLabel }}</p>
               <RefonteLink to="/projets" class="refonte-link rf-works__all">
-                Archives →
+                {{ ui.works.archives }}
               </RefonteLink>
             </div>
           </header>
@@ -309,11 +314,11 @@ onUnmounted(() => {
                 visibility: manifestoOpacity < 0.02 ? 'hidden' : 'visible'
               }"
             >
-              <p class="rf-works__manifesto-kicker">Sélection</p>
+              <p class="rf-works__manifesto-kicker">{{ ui.works.selection }}</p>
               <p class="rf-works__manifesto-count refonte-serif">{{ liveCount }}</p>
-              <p class="rf-works__manifesto-label">projets mis en avant</p>
+              <p class="rf-works__manifesto-label">{{ ui.works.featured }}</p>
               <p class="rf-works__manifesto-lead">
-                Des interfaces pensées pour tenir la charge — du brief à la prod.
+                {{ ui.works.lead }}
               </p>
             </div>
 
@@ -351,7 +356,7 @@ onUnmounted(() => {
                     :rel="isLiveWork(activeProject) ? 'noopener noreferrer' : undefined"
                     @click="onWorkClick(activeProject, $event)"
                   >
-                    Voir le projet →
+                    {{ ui.works.view }}
                   </a>
                 </div>
               </Transition>

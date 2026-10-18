@@ -7,15 +7,17 @@ const route = useRoute()
 const { navigateTo } = useRefonteTransition()
 const { scrollProgress, activeChapter, refresh, scroll } = useRefonteScroll()
 const { mode: themeMode, toggle: toggleTheme } = useThemeMode()
+const { ui, locale } = useUi()
+const { setLocale, locales } = useLocale()
 const menuOpen = ref(false)
 const contactEmail = PUBLIC_CONTACT_EMAIL
 
-const links = [
-  { to: '/', label: 'Accueil', num: '01' },
-  { to: '/projets', label: 'Projets', num: '02' },
-  { to: '/prestations', label: 'Prestations', num: '03' },
-  { to: '/contact', label: 'Contact', num: '04' }
-]
+const links = computed(() => [
+  { to: '/', label: ui.value.nav.home, num: '01' },
+  { to: '/projets', label: ui.value.nav.projects, num: '02' },
+  { to: '/prestations', label: ui.value.nav.services, num: '03' },
+  { to: '/contact', label: ui.value.nav.contact, num: '04' }
+])
 
 const scrollPct = computed(() => String(Math.round(scrollProgress.value * 100)).padStart(2, '0'))
 
@@ -26,12 +28,13 @@ const chapterLabel = computed(() => {
     '/plan-du-site': 'Plan du site'
   }
 
-  if (route.path.startsWith('/projets')) return 'Projets'
+  let key = byRoute[route.path]
+  if (route.path.startsWith('/projets')) key = 'Projets'
   if (route.path.startsWith('/mentions') || route.path.startsWith('/cgu') || route.path.startsWith('/confidentialite')) {
-    return 'Légal'
+    key = 'Légal'
   }
-
-  return byRoute[route.path] ?? activeChapter.value
+  if (!key) key = activeChapter.value
+  return ui.value.chapters[key] ?? key
 })
 
 function isActive(path: string) {
@@ -92,12 +95,26 @@ onUnmounted(() => {
 
       <div class="refonte-nav__actions">
         <p class="refonte-nav__chapter" aria-live="polite">{{ chapterLabel }}</p>
+        <div class="refonte-nav__langs" role="group" :aria-label="ui.langGroup">
+          <button
+            v-for="item in locales"
+            :key="item.id"
+            type="button"
+            class="refonte-nav__lang"
+            :class="{ 'is-active': locale === item.id }"
+            :aria-pressed="locale === item.id"
+            :aria-label="item.name"
+            @click="setLocale(item.id)"
+          >
+            {{ item.label }}
+          </button>
+        </div>
         <button
           type="button"
           class="refonte-nav__theme"
-          :aria-label="themeMode === 'light' ? 'Passer en thème sombre bleu roi' : 'Passer en thème clair'"
+          :aria-label="themeMode === 'light' ? ui.nav.themeToDark : ui.nav.themeToLight"
           :aria-pressed="themeMode === 'light'"
-          :title="themeMode === 'light' ? 'Thème sombre bleu roi' : 'Thème clair'"
+          :title="themeMode === 'light' ? ui.nav.themeDarkTitle : ui.nav.themeLightTitle"
           @click="toggleTheme"
         >
           <svg
@@ -135,7 +152,7 @@ onUnmounted(() => {
           @click="toggleMenu"
         >
           <span class="refonte-nav__trigger-pct">{{ scrollPct }}%</span>
-          <span class="refonte-nav__trigger-label">{{ menuOpen ? 'Fermer' : 'Menu' }}</span>
+          <span class="refonte-nav__trigger-label">{{ menuOpen ? ui.nav.close : ui.nav.menu }}</span>
           <span class="refonte-nav__trigger-icon" aria-hidden="true">
             <i /><i /><i />
           </span>
@@ -145,7 +162,7 @@ onUnmounted(() => {
 
     <Transition name="rf-overlay">
       <div v-if="menuOpen" id="refonte-nav-overlay" class="refonte-nav__overlay">
-        <nav class="refonte-nav__overlay-links" aria-label="Navigation principale">
+        <nav class="refonte-nav__overlay-links" :aria-label="ui.nav.primary">
           <a
             v-for="(link, i) in [...links].reverse()"
             :key="link.to"
@@ -164,7 +181,7 @@ onUnmounted(() => {
           <a :href="`mailto:${contactEmail}`" class="refonte-nav__overlay-mail">
             {{ contactEmail }}
           </a>
-          <p class="refonte-nav__overlay-note">Front-end · Motion · Paris / Remote</p>
+          <p class="refonte-nav__overlay-note">{{ ui.nav.note }}</p>
         </div>
       </div>
     </Transition>
@@ -245,6 +262,38 @@ onUnmounted(() => {
     font-size: 0.62rem;
     letter-spacing: 0.04em;
   }
+}
+
+.refonte-nav__langs {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--rf-line);
+  border-radius: 999px;
+  padding: 0.12rem;
+  flex-shrink: 0;
+}
+
+.refonte-nav__lang {
+  border: 0;
+  background: transparent;
+  color: var(--rf-text-muted);
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  padding: 0.42rem 0.42rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.refonte-nav__lang.is-active {
+  color: var(--rf-text);
+  background: rgba(var(--rf-accent-rgb), 0.16);
+}
+
+.refonte-nav__lang:hover {
+  color: var(--rf-accent);
 }
 
 .refonte-nav__theme {

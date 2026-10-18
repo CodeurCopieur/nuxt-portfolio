@@ -2,24 +2,25 @@
 import { useRefonteA11y, type RfCvdMode } from '@/composables/refonte/useRefonteA11y'
 
 const { prefs, setFlag, setCvd, reset } = useRefonteA11y()
+const { ui } = useUi()
 
 const open = ref(false)
 const panelRef = ref<HTMLElement | null>(null)
 const triggerRef = ref<HTMLButtonElement | null>(null)
 
-const displayToggles = [
-  { key: 'contrast' as const, label: 'Contraste élevé' },
-  { key: 'bigText' as const, label: 'Texte plus grand' },
-  { key: 'underline' as const, label: 'Souligner les liens' },
-  { key: 'motion' as const, label: 'Réduire les animations' }
-]
+const displayToggles = computed(() => [
+  { key: 'contrast' as const, label: ui.value.a11y.contrast },
+  { key: 'bigText' as const, label: ui.value.a11y.bigText },
+  { key: 'underline' as const, label: ui.value.a11y.underline },
+  { key: 'motion' as const, label: ui.value.a11y.motion }
+])
 
-const cvdModes: Array<{ id: RfCvdMode, label: string }> = [
-  { id: 'standard', label: 'Standard' },
-  { id: 'deuteranopia', label: 'Deutéranopie' },
-  { id: 'protanopia', label: 'Protanopie' },
-  { id: 'tritanopia', label: 'Tritanopie' }
-]
+const cvdModes = computed<Array<{ id: RfCvdMode, label: string }>>(() => [
+  { id: 'standard', label: ui.value.a11y.standard },
+  { id: 'deuteranopia', label: ui.value.a11y.deuteranopia },
+  { id: 'protanopia', label: ui.value.a11y.protanopia },
+  { id: 'tritanopia', label: ui.value.a11y.tritanopia }
+])
 
 function openPanel() {
   open.value = true
@@ -83,17 +84,17 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
     >
       <header class="rf-a11y__head">
         <div>
-          <h2 id="rf-a11y-title" class="rf-a11y__title">Accessibilité</h2>
+          <h2 id="rf-a11y-title" class="rf-a11y__title">{{ ui.a11y.title }}</h2>
           <p class="rf-a11y__lead">
-            Ajustez l’affichage pour mieux lire et distinguer les couleurs.
+            {{ ui.a11y.lead }}
           </p>
         </div>
         <button type="button" class="rf-a11y__close" @click="closePanel">
-          Fermer
+          {{ ui.a11y.close }}
         </button>
       </header>
 
-      <p class="rf-a11y__section">Affichage</p>
+      <p class="rf-a11y__section">{{ ui.a11y.display }}</p>
       <ul class="rf-a11y__toggles">
         <li v-for="item in displayToggles" :key="item.key">
           <button
@@ -109,11 +110,11 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
         </li>
       </ul>
 
-      <p class="rf-a11y__section">Vision des couleurs</p>
+      <p class="rf-a11y__section">{{ ui.a11y.color }}</p>
       <p class="rf-a11y__hint">
-        Palette adaptée au daltonisme (couleurs plus distinctes).
+        {{ ui.a11y.colorHint }}
       </p>
-      <div class="rf-a11y__cvd" role="radiogroup" aria-label="Vision des couleurs">
+      <div class="rf-a11y__cvd" role="radiogroup" :aria-label="ui.a11y.colorGroup">
         <button
           v-for="mode in cvdModes"
           :key="mode.id"
@@ -132,11 +133,11 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
         <span class="rf-a11y__dot rf-a11y__dot--1" />
         <span class="rf-a11y__dot rf-a11y__dot--2" />
         <span class="rf-a11y__dot rf-a11y__dot--3" />
-        Aperçu des couleurs
+        {{ ui.a11y.preview }}
       </p>
 
       <button type="button" class="rf-a11y__reset" @click="reset">
-        Réinitialiser
+        {{ ui.a11y.reset }}
       </button>
     </div>
 
@@ -149,7 +150,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
       @click="togglePanel"
     >
       <span class="rf-a11y__fab-icon" aria-hidden="true">i</span>
-      Accessibilité
+      {{ ui.a11y.open }}
     </button>
   </div>
 </template>

@@ -2,6 +2,7 @@
 import { useRefonteScroll } from '@/composables/refonte/useRefonteScroll'
 
 const { cursor } = useRefonteScroll()
+const { locale } = useLocale()
 
 const clock = ref('--:--')
 let clockTimer: ReturnType<typeof setInterval> | null = null
@@ -31,7 +32,7 @@ const cursorLabel = computed(() => `${pad(cursor.value.x)} X ${pad(cursor.value.
   <aside class="refonte-hud" aria-hidden="true">
     <div class="refonte-hud__row refonte-hud__row--meta">
       <span>{{ clock }}</span>
-      <span>GMT+1 FR</span>
+      <span>GMT+1 {{ locale.toUpperCase() }}</span>
     </div>
 
     <div class="refonte-hud__row">

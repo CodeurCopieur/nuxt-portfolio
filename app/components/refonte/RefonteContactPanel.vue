@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { PUBLIC_CONTACT_EMAIL } from '@/constants/contact'
 
-const { meta, sections } = useContent()
+const { meta, sections } = useLocalizedContent()
+const { ui } = useUi()
 
 const form = reactive({ name: '', email: '', message: '' })
 const loading = ref(false)
@@ -19,7 +20,7 @@ async function submit() {
 
   try {
     if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
-      errorMessage.value = 'Veuillez remplir tous les champs obligatoires.'
+      errorMessage.value = ui.value.contact.required
       return
     }
 
@@ -43,7 +44,7 @@ async function submit() {
     form.message = ''
   } catch {
     success.value = false
-    errorMessage.value = 'Une erreur est survenue lors de l\'envoi. Veuillez réessayer.'
+    errorMessage.value = ui.value.contact.sendError
   } finally {
     loading.value = false
   }
@@ -54,64 +55,64 @@ async function submit() {
   <div class="rf-contact">
 
     <section class="refonte-container rf-contact__head refonte-section" data-scroll-section>
-      <p class="refonte-label" v-reveal>Contact</p>
+      <p class="refonte-label" v-reveal>{{ ui.contact.label }}</p>
       <h1 class="refonte-display rf-contact__title" v-reveal="{ delay: 60 }">
-        Parlons de <span class="refonte-serif rf-contact__title-serif">votre projet</span>
+        {{ ui.contact.title }} <span class="refonte-serif rf-contact__title-serif">{{ ui.contact.titleAccent }}</span>
       </h1>
       <p class="rf-contact__lead" v-reveal="{ delay: 120 }">
-        Prêt à collaborer ? Décrivez vos idées et voyons comment je peux vous aider à les concrétiser.
+        {{ ui.contact.lead }}
       </p>
     </section>
 
     <section class="refonte-container rf-contact__grid refonte-section" data-scroll-section>
       <aside class="rf-contact__info">
         <div class="rf-contact__info-item" v-reveal="{ index: 0, total: 3, stagger: 90 }">
-          <span class="refonte-label">Email</span>
+          <span class="refonte-label">{{ ui.contact.email }}</span>
           <a :href="`mailto:${PUBLIC_CONTACT_EMAIL}`">{{ PUBLIC_CONTACT_EMAIL }}</a>
         </div>
         <div class="rf-contact__info-item" v-reveal="{ index: 1, total: 3, stagger: 90 }">
-          <span class="refonte-label">Localisation</span>
+          <span class="refonte-label">{{ ui.contact.location }}</span>
           <p>{{ meta.location }}</p>
         </div>
         <div class="rf-contact__info-item" v-reveal="{ index: 2, total: 3, stagger: 90 }">
-          <span class="refonte-label">Disponibilité</span>
-          <p>Réponse sous 24h · {{ sections.a_propos.availability }}</p>
+          <span class="refonte-label">{{ ui.contact.availability }}</span>
+          <p>{{ ui.contact.reply }} · {{ sections.a_propos.availability }}</p>
         </div>
       </aside>
 
       <form class="rf-contact__form" novalidate @submit.prevent="submit">
         <div class="rf-contact__field" v-reveal="{ index: 0, total: 4, stagger: 70 }">
-          <label for="refonte-contact-name">Nom complet *</label>
+          <label for="refonte-contact-name">{{ ui.contact.name }}</label>
           <input
             id="refonte-contact-name"
             v-model="form.name"
             type="text"
             required
             autocomplete="name"
-            placeholder="Votre nom complet"
+            :placeholder="ui.contact.namePlaceholder"
           >
         </div>
 
         <div class="rf-contact__field" v-reveal="{ index: 1, total: 4, stagger: 70 }">
-          <label for="refonte-contact-email">Email *</label>
+          <label for="refonte-contact-email">{{ ui.contact.emailLabel }}</label>
           <input
             id="refonte-contact-email"
             v-model="form.email"
             type="email"
             required
             autocomplete="email"
-            placeholder="votre@email.com"
+            :placeholder="ui.contact.emailPlaceholder"
           >
         </div>
 
         <div class="rf-contact__field" v-reveal="{ index: 2, total: 4, stagger: 70 }">
-          <label for="refonte-contact-message">Message *</label>
+          <label for="refonte-contact-message">{{ ui.contact.message }}</label>
           <textarea
             id="refonte-contact-message"
             v-model="form.message"
             rows="5"
             required
-            placeholder="Décrivez votre projet, vos besoins ou posez-moi vos questions..."
+            :placeholder="ui.contact.messagePlaceholder"
           />
         </div>
 
@@ -121,23 +122,23 @@ async function submit() {
           :disabled="loading"
           v-reveal="{ index: 3, total: 4, stagger: 70 }"
         >
-          <span v-if="!loading">Envoyer le message</span>
+          <span v-if="!loading">{{ ui.contact.send }}</span>
           <span v-else class="rf-contact__submit-loading">
-            <LoadingPulse label="Envoi…" />
-            Envoi en cours…
+            <LoadingPulse :label="ui.contact.sendingLabel" />
+            {{ ui.contact.sending }}
           </span>
         </button>
 
         <div v-if="success === true" class="rf-contact__alert rf-contact__alert--ok" role="status">
           <span class="rf-contact__alert-mark" aria-hidden="true">✓</span>
           <div class="rf-contact__alert-body">
-            <p class="rf-contact__alert-title">Message envoyé avec succès</p>
-            <p class="rf-contact__alert-desc">Je vous répondrai dans les plus brefs délais.</p>
+            <p class="rf-contact__alert-title">{{ ui.contact.successTitle }}</p>
+            <p class="rf-contact__alert-desc">{{ ui.contact.successDesc }}</p>
           </div>
         </div>
 
         <div v-else-if="success === false" class="rf-contact__alert rf-contact__alert--err">
-          <p>{{ errorMessage || 'Une erreur est survenue. Veuillez réessayer ou me contacter directement par email.' }}</p>
+          <p>{{ errorMessage || ui.contact.fallbackError }}</p>
         </div>
 
         <div v-if="errorMessage && success === null" class="rf-contact__alert rf-contact__alert--warn">
