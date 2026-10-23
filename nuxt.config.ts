@@ -62,10 +62,11 @@ export default defineNuxtConfig({
     }
   },
   robots: {
-    disallow: ['/admin', '/api/admin', '/old']
+    disallow: ['/admin', '/api/admin', '/old', '/game']
   },
   sitemap: {
-    exclude: ['/admin/**', '/api/**', '/old', '/old/**']
+    exclude: ['/admin/**', '/api/**', '/old', '/old/**', '/game', '/game/**'],
+    sources: ['/api/__sitemap__/urls']
   },
   ogImage: {
     enabled: false
@@ -177,6 +178,14 @@ export default defineNuxtConfig({
       headers: { 'X-Robots-Tag': 'noindex, follow' }
     },
     '/old/**': {
+      robots: false,
+      headers: { 'X-Robots-Tag': 'noindex, follow' }
+    },
+    '/game': {
+      robots: false,
+      headers: { 'X-Robots-Tag': 'noindex, follow' }
+    },
+    '/game/**': {
       robots: false,
       headers: { 'X-Robots-Tag': 'noindex, follow' }
     },

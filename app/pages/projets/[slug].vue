@@ -23,8 +23,14 @@ watchEffect(() => {
   }
 })
 
-useHead({
-  title: computed(() => `${project.value?.title ?? ui.value.case.fallback} — ${meta.value.name}`)
+const pageTitle = computed(() => `${project.value?.title ?? ui.value.case.fallback} — ${meta.value.name}`)
+const pageDescription = computed(() => project.value?.summary?.trim() || ui.value.seo.homeFallback)
+
+useSeoMeta({
+  title: pageTitle,
+  description: pageDescription,
+  ogTitle: pageTitle,
+  ogDescription: pageDescription
 })
 
 function pad(n: number) {

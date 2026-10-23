@@ -1,0 +1,8 @@
+# L’adresse historique du profil GitHub pointe encore ici.
+# Le site servi est https://louiswiddy.vercel.app — une redirection
+# permanente évite d’indexer une copie en erreur.
+[[redirects]]
+  from = "/*"
+  to = "https://louiswiddy.vercel.app/:splat"
+  status = 301
+  force = true

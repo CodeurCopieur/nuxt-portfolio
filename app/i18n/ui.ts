@@ -204,6 +204,8 @@ export type UiCopy = {
     homeFallback: string
     homeWithTagline: string
     roleFallback: string
+    projectsDescription: string
+    contactDescription: string
   }
   sitemap: {
     title: string
@@ -560,7 +562,9 @@ const fr: UiCopy = {
     homeTitle: '{name} — Développeur front-end',
     homeFallback: 'Widdy Louis — développeur front-end freelance. Interfaces web performantes, accessibles et animées.',
     homeWithTagline: '{tagline} Portfolio front-end Nuxt & Vue — interfaces performantes et accessibles.',
-    roleFallback: 'Développeur Front-End'
+    roleFallback: 'Développeur Front-End',
+    projectsDescription: 'Réalisations front-end : interfaces Nuxt, Vue et intégrations pour la presse, le luxe et la banque.',
+    contactDescription: 'Écrire à Widdy Louis pour une mission front-end freelance, une landing ou un site sur devis.'
   },
   sitemap: {
     title: 'Plan du site',
@@ -917,7 +921,9 @@ const en: UiCopy = {
     homeTitle: '{name} — Front-end developer',
     homeFallback: 'Widdy Louis — freelance front-end developer. Fast, accessible, carefully animated web interfaces.',
     homeWithTagline: '{tagline} Nuxt & Vue front-end portfolio — fast, accessible interfaces.',
-    roleFallback: 'Front-end developer'
+    roleFallback: 'Front-end developer',
+    projectsDescription: 'Front-end work: Nuxt and Vue interfaces, and integrations for press, luxury and banking.',
+    contactDescription: 'Write to Widdy Louis about a freelance front-end engagement, a landing page or a quoted site.'
   },
   sitemap: {
     title: 'Sitemap',
@@ -1274,7 +1280,9 @@ const es: UiCopy = {
     homeTitle: '{name} — Desarrollador front-end',
     homeFallback: 'Widdy Louis — desarrollador front-end freelance. Interfaces web rápidas, accesibles y animadas.',
     homeWithTagline: '{tagline} Portfolio front-end Nuxt y Vue — interfaces rápidas y accesibles.',
-    roleFallback: 'Desarrollador front-end'
+    roleFallback: 'Desarrollador front-end',
+    projectsDescription: 'Trabajos front-end: interfaces Nuxt y Vue, e integraciones para prensa, lujo y banca.',
+    contactDescription: 'Escribir a Widdy Louis para una misión front-end freelance, una landing o un sitio bajo presupuesto.'
   },
   sitemap: {
     title: 'Mapa del sitio',

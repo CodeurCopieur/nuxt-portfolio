@@ -4,8 +4,13 @@ definePageMeta({ layout: 'refonte' })
 const { meta } = useLocalizedContent()
 const { ui } = useUi()
 
-useHead({
-  title: computed(() => `${ui.value.contact.pageTitle} — ${meta.value?.name ?? 'Portfolio'}`)
+const pageTitle = computed(() => `${ui.value.contact.pageTitle} — ${meta.value?.name ?? 'Portfolio'}`)
+
+useSeoMeta({
+  title: pageTitle,
+  description: computed(() => ui.value.seo.contactDescription),
+  ogTitle: pageTitle,
+  ogDescription: computed(() => ui.value.seo.contactDescription)
 })
 </script>
 
