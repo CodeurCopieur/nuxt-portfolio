@@ -8,6 +8,30 @@ import {
 import { sortExperiencesChronologically } from '../../app/utils/experience-map'
 import fallbackData from '../../app/data/content.json'
 
+const OLD_BIO_STARTS = [
+  'Passionné par la création d’interfaces performantes et accessibles, j’ai évolué dans des environnements exigeants (banque, luxe, presse) où j’ai contribué à des projets innovants.',
+  "Passionné par la création d'interfaces performantes et accessibles, j'ai évolué dans des environnements exigeants (banque, luxe, presse) où j'ai contribué à des projets innovants."
+]
+
+const NEW_BIO_START = 'Développeur front-end freelance à Paris. Interfaces Nuxt et Vue pour la banque, le luxe et la presse : rapides, accessibles et animées juste ce qu’il faut.'
+
+/** Le texte indexé par Google reprend le début de la bio. On remplace l’ancienne amorce si elle est encore en base. */
+function asSkillList(value: unknown) {
+  const skills = Array.isArray(value) ? value : []
+  return skills.map((skill) => (
+    typeof skill === 'string' && /^typescript\s*\(débutant\)$/i.test(skill.trim())
+      ? 'TypeScript'
+      : skill
+  ))
+}
+
+function withSearchBio(bio: string) {
+  const match = OLD_BIO_STARTS.find((start) => bio.startsWith(start))
+  if (!match) return bio
+  const rest = bio.slice(match.length).trim().replace(/^je /, 'Je ')
+  return rest ? `${NEW_BIO_START} ${rest}` : NEW_BIO_START
+}
+
 function mapExperiences(
   rows: Array<Record<string, unknown>>
 ): PortfolioContent['sections']['experiences'] {
@@ -92,13 +116,13 @@ export async function fetchPortfolioContent(): Promise<PortfolioContent | null> 
       },
       sections: {
         a_propos: {
-          bio: about?.bio ?? '',
+          bio: withSearchBio(about?.bio ?? ''),
           highlights: (about?.highlights as string[]) ?? [],
           availability: about?.availability ?? ''
         },
         experiences: mapExperiences(experiencesRes.data ?? []),
         competences: {
-          langages: (competences?.langages as string[]) ?? [],
+          langages: asSkillList(competences?.langages),
           frameworks: (competences?.frameworks as string[]) ?? [],
           outils_dev: (competences?.outils_dev as string[]) ?? [],
           ui_animations: (competences?.ui_animations as string[]) ?? [],
@@ -148,6 +172,10 @@ export function getFallbackContent(): PortfolioContent {
     ...content,
     sections: {
       ...content.sections,
+      a_propos: {
+        ...content.sections.a_propos,
+        bio: withSearchBio(content.sections.a_propos.bio)
+      },
       experiences: sortExperiencesChronologically(content.sections.experiences),
       competences_categories: mergeCompetenceCategories(order)
     }

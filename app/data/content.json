@@ -14,7 +14,7 @@
   },
   "sections": {
     "a_propos": {
-      "bio": "Passionné par la création d’interfaces performantes et accessibles, j’ai évolué dans des environnements exigeants (banque, luxe, presse) où j’ai contribué à des projets innovants. Fort de mes différentes expériences, j’apporte un soin particulier à la performance des sites, au graphisme, la prise en compte des contraintes d'accessibilité et du responsive design. je me forme en permanence pour parfaire mon travail.",
+      "bio": "Développeur front-end freelance à Paris. Interfaces Nuxt et Vue pour la banque, le luxe et la presse : rapides, accessibles et animées juste ce qu’il faut. Fort de mes différentes expériences, j’apporte un soin particulier à la performance des sites, au graphisme, à l’accessibilité et au responsive. Je me forme en permanence pour affiner le travail.",
       "highlights": [
         "TypeScript, Nuxt 3 / Vue 3, TailwindCSS, GSAP",
         "Accessibilité, SEO, mobile-first",
@@ -199,7 +199,7 @@
         "HTML5",
         "CSS3/SCSS",
         "JavaScript",
-        "TypeScript (débutant)"
+        "TypeScript"
       ],
       "frameworks": [
         "Nuxt 4",

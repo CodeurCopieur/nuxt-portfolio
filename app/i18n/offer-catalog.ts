@@ -84,7 +84,7 @@ const french: OfferCatalog = {
       'TMA / itérations post-livraison',
       'Cadence Agile, points réguliers'
     ],
-    stack: ['GSAP', 'Nuxt 4', 'Drupal / Twig', 'A11y'],
+    stack: ['GSAP', 'Nuxt 4', 'TypeScript', 'Drupal / Twig', 'A11y'],
     fit: 'Agences, produits, refontes premium.'
   },
   termsMission: [
@@ -157,7 +157,7 @@ const english: OfferCatalog = {
           'Contact form (EmailJS / mailto)',
           'Launch (Vercel or equivalent)'
         ],
-        stack: ['Vue 3', 'Nuxt 4', 'Tailwind / SCSS', 'GSAP', 'SEO'],
+        stack: ['Vue 3', 'Nuxt 4', 'TypeScript', 'Tailwind / SCSS', 'GSAP', 'SEO'],
         price: 'On quote',
         duration: '3 – 7 days',
         fit: 'An offer launch, an event, a campaign, a waiting page.'
@@ -183,7 +183,7 @@ const english: OfferCatalog = {
           'Advanced forms, anti-spam, email notifications',
           'A Nuxt structure ready to become multi-page'
         ],
-        stack: ['Nuxt 4', 'Vue 3', 'Pinia', 'Supabase', 'Firebase'],
+        stack: ['Nuxt 4', 'Vue 3', 'TypeScript', 'Pinia', 'Supabase', 'Firebase'],
         price: 'On quote',
         duration: '1 – 2 weeks',
         fit: 'Lead generation, a waitlist, a launch with content that changes.'
@@ -218,7 +218,7 @@ const english: OfferCatalog = {
           'Contact form (EmailJS / mailto)',
           'Launch and a short handover'
         ],
-        stack: ['Vue 3', 'Nuxt 4', 'Tailwind / SCSS', 'GSAP', 'SEO'],
+        stack: ['Vue 3', 'Nuxt 4', 'TypeScript', 'Tailwind / SCSS', 'GSAP', 'SEO'],
         price: 'On quote',
         duration: '1 – 2 weeks',
         fit: 'Independents, studios, brand launches.'
@@ -244,7 +244,7 @@ const english: OfferCatalog = {
           'Advanced forms, anti-spam, email notifications',
           'A Nuxt structure ready to grow'
         ],
-        stack: ['Nuxt 4', 'Vue 3', 'Pinia', 'Supabase', 'Firebase'],
+        stack: ['Nuxt 4', 'Vue 3', 'TypeScript', 'Pinia', 'Supabase', 'Firebase'],
         price: 'On quote',
         duration: '2 – 4 weeks',
         fit: 'Offers that change, a catalog, a client portfolio.'
@@ -267,7 +267,7 @@ const english: OfferCatalog = {
       'Maintenance / iterations after delivery',
       'An agile cadence, regular check-ins'
     ],
-    stack: ['GSAP', 'Nuxt 4', 'Drupal / Twig', 'A11y'],
+    stack: ['GSAP', 'Nuxt 4', 'TypeScript', 'Drupal / Twig', 'A11y'],
     fit: 'Agencies, products, premium rebuilds.'
   },
   termsMission: [
@@ -340,7 +340,7 @@ const spanish: OfferCatalog = {
           'Formulario de contacto (EmailJS / mailto)',
           'Puesta en línea (Vercel o equivalente)'
         ],
-        stack: ['Vue 3', 'Nuxt 4', 'Tailwind / SCSS', 'GSAP', 'SEO'],
+        stack: ['Vue 3', 'Nuxt 4', 'TypeScript', 'Tailwind / SCSS', 'GSAP', 'SEO'],
         price: 'Bajo presupuesto',
         duration: '3 – 7 días',
         fit: 'Lanzamiento de oferta, evento, campaña, página de espera.'
@@ -366,7 +366,7 @@ const spanish: OfferCatalog = {
           'Formularios avanzados, antispam, notificaciones por email',
           'Estructura Nuxt lista para evolucionar a multipágina'
         ],
-        stack: ['Nuxt 4', 'Vue 3', 'Pinia', 'Supabase', 'Firebase'],
+        stack: ['Nuxt 4', 'Vue 3', 'TypeScript', 'Pinia', 'Supabase', 'Firebase'],
         price: 'Bajo presupuesto',
         duration: '1 – 2 semanas',
         fit: 'Generación de leads, lista de espera, lanzamiento con contenido que se mueve.'
@@ -401,7 +401,7 @@ const spanish: OfferCatalog = {
           'Formulario de contacto (EmailJS / mailto)',
           'Puesta en línea y formación corta'
         ],
-        stack: ['Vue 3', 'Nuxt 4', 'Tailwind / SCSS', 'GSAP', 'SEO'],
+        stack: ['Vue 3', 'Nuxt 4', 'TypeScript', 'Tailwind / SCSS', 'GSAP', 'SEO'],
         price: 'Bajo presupuesto',
         duration: '1 – 2 semanas',
         fit: 'Autónomos, estudios, lanzamientos de marca.'
@@ -427,7 +427,7 @@ const spanish: OfferCatalog = {
           'Formularios avanzados, antispam, notificaciones por email',
           'Estructura Nuxt lista para evolucionar'
         ],
-        stack: ['Nuxt 4', 'Vue 3', 'Pinia', 'Supabase', 'Firebase'],
+        stack: ['Nuxt 4', 'Vue 3', 'TypeScript', 'Pinia', 'Supabase', 'Firebase'],
         price: 'Bajo presupuesto',
         duration: '2 – 4 semanas',
         fit: 'Ofertas que cambian, catálogo, portfolio de cliente.'
@@ -450,7 +450,7 @@ const spanish: OfferCatalog = {
       'Mantenimiento / iteraciones tras la entrega',
       'Cadencia ágil, puntos regulares'
     ],
-    stack: ['GSAP', 'Nuxt 4', 'Drupal / Twig', 'A11y'],
+    stack: ['GSAP', 'Nuxt 4', 'TypeScript', 'Drupal / Twig', 'A11y'],
     fit: 'Agencias, productos, reconstrucciones premium.'
   },
   termsMission: [

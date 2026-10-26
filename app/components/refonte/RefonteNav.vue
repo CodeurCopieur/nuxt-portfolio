@@ -256,11 +256,9 @@ onUnmounted(() => {
   text-align: right;
 }
 
-@media (max-width: 479px) {
+@media (max-width: 767px) {
   .refonte-nav__chapter {
-    max-width: 6.5rem;
-    font-size: 0.62rem;
-    letter-spacing: 0.04em;
+    display: none;
   }
 }
 

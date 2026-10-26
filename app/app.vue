@@ -14,6 +14,7 @@ import { SpeedInsights } from '@vercel/speed-insights/vue'
 const { locale } = useLocale()
 
 useHead({
+  titleTemplate: '%s',
   htmlAttrs: {
     lang: locale
   }

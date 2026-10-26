@@ -28,7 +28,7 @@ const en: ContentCopy = {
     location: 'Paris / Remote'
   },
   about: {
-    bio: 'I care about building interfaces that are fast and accessible. I have worked in demanding environments — banking, luxury, press — and contributed to ambitious products. Across those experiences I pay close attention to performance, visual craft, accessibility constraints and responsive design. I keep learning so the work stays sharp.',
+    bio: 'Freelance front-end developer in Paris. Fast, accessible Nuxt and Vue interfaces for banking, luxury and press. Across those experiences I pay close attention to performance, visual craft, accessibility and responsive design. I keep learning so the work stays sharp.',
     highlights: [
       'TypeScript, Nuxt 3 / Vue 3, TailwindCSS, GSAP',
       'Accessibility, SEO, mobile-first',
@@ -252,7 +252,7 @@ const es: ContentCopy = {
     location: 'París / Remoto'
   },
   about: {
-    bio: 'Me interesa crear interfaces rápidas y accesibles. He trabajado en entornos exigentes (banca, lujo, prensa) y he contribuido a proyectos ambiciosos. Con esa experiencia cuido el rendimiento, el grafismo, las exigencias de accesibilidad y el diseño responsive. Sigo formándome para afinar el trabajo.',
+    bio: 'Desarrollador front-end freelance en París. Interfaces Nuxt y Vue, rápidas y accesibles, para banca, lujo y prensa. Con esa experiencia cuido el rendimiento, el grafismo, la accesibilidad y el diseño responsive. Sigo formándome para afinar el trabajo.',
     highlights: [
       'TypeScript, Nuxt 3 / Vue 3, TailwindCSS, GSAP',
       'Accesibilidad, SEO, mobile-first',

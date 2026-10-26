@@ -54,7 +54,7 @@ export const PAGE_UNIQUE = {
         'Formulaire de contact (EmailJS / mailto)',
         'Mise en ligne (Vercel ou équivalent)'
       ],
-      stack: ['Vue 3', 'Nuxt 4', 'Tailwind / SCSS', 'GSAP', 'SEO'],
+      stack: ['Vue 3', 'Nuxt 4', 'TypeScript', 'Tailwind / SCSS', 'GSAP', 'SEO'],
       price: 'Sur devis',
       duration: '3 – 7 jours',
       fit: 'Lancement d’offre, event, campagne, page d’attente.'
@@ -80,7 +80,7 @@ export const PAGE_UNIQUE = {
         'Formulaires avancés, anti-spam, notifications mail',
         'Structure Nuxt prête à évoluer vers un multipage'
       ],
-      stack: ['Nuxt 4', 'Vue 3', 'Pinia', 'Supabase', 'Firebase'],
+      stack: ['Nuxt 4', 'Vue 3', 'TypeScript', 'Pinia', 'Supabase', 'Firebase'],
       price: 'Sur devis',
       duration: '1 – 2 semaines',
       fit: 'Lead gen, waitlist, lancement avec contenu qui bouge.'
@@ -116,7 +116,7 @@ export const SITE_MULTIPAGE = {
         'Formulaire de contact (EmailJS / mailto)',
         'Mise en ligne et formation courte'
       ],
-      stack: ['Vue 3', 'Nuxt 4', 'Tailwind / SCSS', 'GSAP', 'SEO'],
+      stack: ['Vue 3', 'Nuxt 4', 'TypeScript', 'Tailwind / SCSS', 'GSAP', 'SEO'],
       price: 'Sur devis',
       duration: '1 – 2 semaines',
       fit: 'Indépendants, studios, lancements de marque.'
@@ -142,7 +142,7 @@ export const SITE_MULTIPAGE = {
         'Formulaires avancés, anti-spam, notifications mail',
         'Structure Nuxt prête à évoluer'
       ],
-      stack: ['Nuxt 4', 'Vue 3', 'Pinia', 'Supabase', 'Firebase'],
+      stack: ['Nuxt 4', 'Vue 3', 'TypeScript', 'Pinia', 'Supabase', 'Firebase'],
       price: 'Sur devis',
       duration: '2 – 4 semaines',
       fit: 'Offres qui changent, catalogue, portfolio client.'

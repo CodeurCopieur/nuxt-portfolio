@@ -28,16 +28,17 @@ export default defineNuxtConfig({
     url: siteUrl,
     name: 'Widdy Louis',
     description:
-      'Widdy Louis — développeur front-end freelance. Interfaces web performantes, accessibles et animées (Nuxt, Vue).',
+      'Développeur front-end freelance à Paris. Interfaces Nuxt et Vue pour la banque, le luxe et la presse : rapides, accessibles et animées. 7 ans d’expérience.',
     defaultLocale: 'fr'
   },
   app: {
     head: {
+      titleTemplate: '%s',
       meta: [
         {
           name: 'description',
           content:
-            'Widdy Louis — développeur front-end freelance. Interfaces web performantes, accessibles et animées (Nuxt, Vue).'
+            'Développeur front-end freelance à Paris. Interfaces Nuxt et Vue pour la banque, le luxe et la presse : rapides, accessibles et animées. 7 ans d’expérience.'
         },
         { name: 'theme-color', content: '#0b1a3a' },
         { name: 'mobile-web-app-capable', content: 'yes' },

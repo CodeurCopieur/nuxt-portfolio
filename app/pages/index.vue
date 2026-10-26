@@ -7,11 +7,7 @@ const { meta } = useLocalizedContent()
 const { ui } = useUi()
 
 const pageTitle = computed(() => fill(ui.value.seo.homeTitle, { name: meta.value.name }))
-const pageDescription = computed(() => {
-  const tagline = meta.value?.tagline?.trim()
-  if (tagline) return fill(ui.value.seo.homeWithTagline, { tagline })
-  return ui.value.seo.homeFallback
-})
+const pageDescription = computed(() => ui.value.seo.homeFallback)
 
 useSeoMeta({
   title: pageTitle,

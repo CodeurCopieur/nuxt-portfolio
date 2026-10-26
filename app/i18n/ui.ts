@@ -202,7 +202,6 @@ export type UiCopy = {
   seo: {
     homeTitle: string
     homeFallback: string
-    homeWithTagline: string
     roleFallback: string
     projectsDescription: string
     contactDescription: string
@@ -559,9 +558,8 @@ const fr: UiCopy = {
     ogDescription: 'Landing, multipage, sur-mesure sur devis. Missions front Vue/Nuxt au TJM 500 €.'
   },
   seo: {
-    homeTitle: '{name} — Développeur front-end',
-    homeFallback: 'Widdy Louis — développeur front-end freelance. Interfaces web performantes, accessibles et animées.',
-    homeWithTagline: '{tagline} Portfolio front-end Nuxt & Vue — interfaces performantes et accessibles.',
+    homeTitle: '{name} — Développeur front-end freelance à Paris',
+    homeFallback: 'Développeur front-end freelance à Paris. Interfaces Nuxt et Vue pour la banque, le luxe et la presse : rapides, accessibles et animées. 7 ans d’expérience.',
     roleFallback: 'Développeur Front-End',
     projectsDescription: 'Réalisations front-end : interfaces Nuxt, Vue et intégrations pour la presse, le luxe et la banque.',
     contactDescription: 'Écrire à Widdy Louis pour une mission front-end freelance, une landing ou un site sur devis.'
@@ -918,9 +916,8 @@ const en: UiCopy = {
     ogDescription: 'Landing pages, multi-page sites and custom work on quote. Vue/Nuxt front-end engagements at €500 / day.'
   },
   seo: {
-    homeTitle: '{name} — Front-end developer',
-    homeFallback: 'Widdy Louis — freelance front-end developer. Fast, accessible, carefully animated web interfaces.',
-    homeWithTagline: '{tagline} Nuxt & Vue front-end portfolio — fast, accessible interfaces.',
+    homeTitle: '{name} — Freelance front-end developer in Paris',
+    homeFallback: 'Freelance front-end developer in Paris. Fast, accessible Nuxt and Vue interfaces for banking, luxury and press. 7 years of experience.',
     roleFallback: 'Front-end developer',
     projectsDescription: 'Front-end work: Nuxt and Vue interfaces, and integrations for press, luxury and banking.',
     contactDescription: 'Write to Widdy Louis about a freelance front-end engagement, a landing page or a quoted site.'
@@ -1277,9 +1274,8 @@ const es: UiCopy = {
     ogDescription: 'Landing, multipágina y a medida bajo presupuesto. Misiones front Vue/Nuxt a 500 € / día.'
   },
   seo: {
-    homeTitle: '{name} — Desarrollador front-end',
-    homeFallback: 'Widdy Louis — desarrollador front-end freelance. Interfaces web rápidas, accesibles y animadas.',
-    homeWithTagline: '{tagline} Portfolio front-end Nuxt y Vue — interfaces rápidas y accesibles.',
+    homeTitle: '{name} — Desarrollador front-end freelance en París',
+    homeFallback: 'Desarrollador front-end freelance en París. Interfaces Nuxt y Vue, rápidas y accesibles, para banca, lujo y prensa. 7 años de experiencia.',
     roleFallback: 'Desarrollador front-end',
     projectsDescription: 'Trabajos front-end: interfaces Nuxt y Vue, e integraciones para prensa, lujo y banca.',
     contactDescription: 'Escribir a Widdy Louis para una misión front-end freelance, una landing o un sitio bajo presupuesto.'
