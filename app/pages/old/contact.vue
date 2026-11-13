@@ -1,6 +1,8 @@
 <!-- pages/contact.vue -->
 <script setup lang="ts">
 import { PUBLIC_CONTACT_EMAIL } from '@/constants/contact'
+import { contactMailParams, isEmailAddress } from '@/utils/email'
+import { containsSqlPayload } from '@/utils/form-input'
 
 const { meta } = useContent()
 
@@ -27,8 +29,17 @@ async function submit() {
   
   try {
     // Validation des champs
-    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
+    const email = form.email.trim()
+    if (!form.name.trim() || !email || !form.message.trim()) {
       errorMessage.value = 'Veuillez remplir tous les champs obligatoires.'
+      return
+    }
+    if (!isEmailAddress(email)) {
+      errorMessage.value = 'Cette adresse e-mail n’est pas valide. Exemple : nom@domaine.fr'
+      return
+    }
+    if ([form.name, email, form.message].some((value) => containsSqlPayload(value))) {
+      errorMessage.value = 'Un champ contient une saisie non autorisée.'
       return
     }
 
@@ -39,13 +50,7 @@ async function submit() {
     const result = await emailjs.send(
       EMAILJS_SERVICE_ID,
       EMAILJS_TEMPLATE_ID,
-      {
-        from_name: form.name,
-        from_email: form.email,
-        message: form.message,
-        to_name: 'Boss', // Votre nom
-        reply_to: form.email
-      },
+      contactMailParams(form.name, email, form.message, 'Widdy Louis'),
       EMAILJS_PUBLIC_KEY
     )
     

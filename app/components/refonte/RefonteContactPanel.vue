@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { PUBLIC_CONTACT_EMAIL } from '@/constants/contact'
+import { contactMailParams, isEmailAddress } from '@/utils/email'
+import { containsSqlPayload } from '@/utils/form-input'
 
 const { meta, sections } = useLocalizedContent()
 const { ui } = useUi()
@@ -8,6 +10,7 @@ const form = reactive({ name: '', email: '', message: '' })
 const loading = ref(false)
 const success = ref<boolean | null>(null)
 const errorMessage = ref('')
+const emailInvalid = ref(false)
 
 const EMAILJS_SERVICE_ID = 'service_dinz4nd'
 const EMAILJS_TEMPLATE_ID = 'template_z6ywdca'
@@ -19,8 +22,20 @@ async function submit() {
   errorMessage.value = ''
 
   try {
-    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
+    emailInvalid.value = false
+    const email = form.email.trim()
+    if (!form.name.trim() || !email || !form.message.trim()) {
       errorMessage.value = ui.value.contact.required
+      emailInvalid.value = !email
+      return
+    }
+    if (!isEmailAddress(email)) {
+      errorMessage.value = ui.value.contact.invalidEmail
+      emailInvalid.value = true
+      return
+    }
+    if ([form.name, email, form.message].some((value) => containsSqlPayload(value))) {
+      errorMessage.value = ui.value.contact.unsafeInput
       return
     }
 
@@ -28,13 +43,7 @@ async function submit() {
     await emailjs.send(
       EMAILJS_SERVICE_ID,
       EMAILJS_TEMPLATE_ID,
-      {
-        from_name: form.name,
-        from_email: form.email,
-        message: form.message,
-        to_name: meta.value.name,
-        reply_to: form.email
-      },
+      contactMailParams(form.name, email, form.message, meta.value.name),
       EMAILJS_PUBLIC_KEY
     )
 
@@ -101,6 +110,7 @@ async function submit() {
             type="email"
             required
             autocomplete="email"
+            :aria-invalid="emailInvalid"
             :placeholder="ui.contact.emailPlaceholder"
           >
         </div>

@@ -119,6 +119,8 @@ export type UiCopy = {
     successTitle: string
     successDesc: string
     required: string
+    invalidEmail: string
+    unsafeInput: string
     sendError: string
     fallbackError: string
     pageTitle: string
@@ -477,6 +479,8 @@ const fr: UiCopy = {
     successTitle: 'Message envoyé avec succès',
     successDesc: 'Je vous répondrai dans les plus brefs délais.',
     required: 'Veuillez remplir tous les champs obligatoires.',
+    invalidEmail: 'Cette adresse e-mail n’est pas valide. Exemple : nom@domaine.fr',
+    unsafeInput: 'Un champ contient une saisie non autorisée.',
     sendError: "Une erreur est survenue lors de l'envoi. Veuillez réessayer.",
     fallbackError: 'Une erreur est survenue. Veuillez réessayer ou me contacter directement par email.',
     pageTitle: 'Contact'
@@ -835,6 +839,8 @@ const en: UiCopy = {
     successTitle: 'Message sent',
     successDesc: 'I will get back to you as soon as I can.',
     required: 'Please fill in every required field.',
+    invalidEmail: 'This email address is not valid. Example: name@domain.com',
+    unsafeInput: 'One field contains text that is not allowed.',
     sendError: 'Something went wrong while sending. Please try again.',
     fallbackError: 'Something went wrong. Please try again or email me directly.',
     pageTitle: 'Contact'
@@ -1193,6 +1199,8 @@ const es: UiCopy = {
     successTitle: 'Mensaje enviado',
     successDesc: 'Te responderé lo antes posible.',
     required: 'Completa todos los campos obligatorios.',
+    invalidEmail: 'Esta dirección de correo no es válida. Ejemplo: nombre@dominio.es',
+    unsafeInput: 'Un campo contiene un texto no permitido.',
     sendError: 'Ha ocurrido un error al enviar. Inténtalo de nuevo.',
     fallbackError: 'Ha ocurrido un error. Inténtalo de nuevo o escríbeme directamente por email.',
     pageTitle: 'Contacto'
